@@ -1,0 +1,16 @@
+{
+  "name": "ad-cliplayer",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:bun": "bun run index.js",
+    "dev": "node index.js",
+    "setup": "./setup.sh",
+    "up": "./setup.sh"
+  },
+  "dependencies": {
+    "@opentui/core": "^0.5.7"
+  }
+}
