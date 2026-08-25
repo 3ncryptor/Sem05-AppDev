@@ -41,7 +41,9 @@ lerna-debug.log*
 .env.production.local
 .env*.local
 
-# Build output
+# Build output & Binaries
 dist/
 build/
 out/
+audio_player
+

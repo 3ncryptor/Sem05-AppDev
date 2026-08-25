@@ -3,45 +3,101 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Define ES Module equivalents of __filename and __dirname
+// -----------------------------------------------------------------------------
+// 1. SETUP & FILE PATHS
+// -----------------------------------------------------------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Simple Player State variables
-let currentProcess = null;
-let isPlaying = false;
-let isPaused = false;
-let elapsedSeconds = 0;
-let totalDuration = 0;
-let intervalId = null;
+// Path to our compiled native audio player binary
+const playerBinaryPath = path.join(__dirname, '..', 'audio_player');
 
-// Mixer settings
-let volume = 0.8; // 0.0 to 1.5
-let rate = 1.0;   // 0.5 to 2.0
+// -----------------------------------------------------------------------------
+// 2. PLAYER STATE VARIABLES
+// -----------------------------------------------------------------------------
+let workerProcess = null;      // The background native audio process
+let isPlaying = false;          // True when a song is actively playing
+let isPaused = false;           // True when playback is paused
+let elapsedSeconds = 0;         // How many seconds of the song have played
+let totalDuration = 0;          // Total duration of current song in seconds
+let intervalId = null;          // 1-second interval timer ID
+let currentSong = "";           // File name of current song (e.g. "song.mp3")
+let volume = 0.8;               // Volume level from 0.0 to 1.0 (80% default)
+let rate = 1.0;                 // Playback speed from 0.5x to 2.0x (1.0x default)
+let onSongEndCallback = null;   // Function to call when a song finishes
 
-// Song and queue lists
-let queue = [];
-let audioFiles = [];
-let currentSong = "";
+let queue = [];                 // List of upcoming song filenames
+let audioFiles = [];            // List of all loaded audio files
 
-// Function to scan files in a folder
-function loadSongs(dirName) {
-    try {
-        const files = fs.readdirSync(dirName);
-        audioFiles = files.filter(file => {
-            const ext = path.extname(file).toLowerCase();
-            return ['.mp3', '.wav', '.m4a', '.aiff', '.mp4'].includes(ext);
+// -----------------------------------------------------------------------------
+// 3. BACKGROUND AUDIO WORKER MANAGEMENT
+// -----------------------------------------------------------------------------
+
+// Starts or reuses the background native audio player process
+function getWorker() {
+    if (workerProcess && !workerProcess.killed) {
+        return workerProcess;
+    }
+
+    if (fs.existsSync(playerBinaryPath)) {
+        workerProcess = spawn(playerBinaryPath, [], { stdio: ['pipe', 'pipe', 'ignore'] });
+
+        workerProcess.stdout.on('data', (data) => {
+            const lines = data.toString().split('\n');
+            for (const line of lines) {
+                const message = line.trim();
+
+                // Native player sends: "DURATION <seconds>"
+                if (message.startsWith('DURATION')) {
+                    const seconds = parseInt(message.split(' ')[1], 10);
+                    if (!isNaN(seconds)) {
+                        totalDuration = seconds;
+                    }
+                }
+                // Native player sends: "ENDED" when track finishes playing
+                else if (message === 'ENDED') {
+                    isPlaying = false;
+                    isPaused = false;
+                    clearInterval(intervalId);
+
+                    if (typeof onSongEndCallback === 'function') {
+                        onSongEndCallback();
+                    }
+                }
+            }
         });
-    } catch (err) {
+
+        workerProcess.on('exit', () => {
+            workerProcess = null;
+        });
+    }
+
+    return workerProcess;
+}
+
+// -----------------------------------------------------------------------------
+// 4. SONG LOADING & DURATION HELPERS
+// -----------------------------------------------------------------------------
+
+function loadSongs(folderPath) {
+    try {
+        const files = fs.readdirSync(folderPath);
+        const supportedExtensions = ['.mp3', '.wav', '.m4a', '.aiff', '.mp4'];
+
+        audioFiles = files.filter((file) => {
+            const ext = path.extname(file).toLowerCase();
+            return supportedExtensions.includes(ext);
+        });
+    } catch (error) {
         audioFiles = [];
     }
     return audioFiles;
 }
 
-// Function to get song duration via afinfo command
 function getDuration(songPath, callback) {
     exec(`afinfo "${songPath}"`, (err, stdout) => {
         if (err) return callback(0);
+
         const match = stdout.match(/estimated duration:\s*([\d.]+)\s*sec/);
         if (match) {
             callback(Math.round(parseFloat(match[1])));
@@ -51,71 +107,126 @@ function getDuration(songPath, callback) {
     });
 }
 
-// Play song function
+// -----------------------------------------------------------------------------
+// 5. PLAYBACK CONTROL FUNCTIONS
+// -----------------------------------------------------------------------------
+
 function playSong(songPath, onEndCallback) {
-    stopSong(); // Stop if already playing
+    stopSong();
 
     currentSong = path.basename(songPath);
     isPlaying = true;
     isPaused = false;
     elapsedSeconds = 0;
+    totalDuration = 0;
+    onSongEndCallback = onEndCallback;
 
     getDuration(songPath, (duration) => {
-        totalDuration = duration;
+        if (duration > 0) {
+            totalDuration = duration;
+        }
+    });
 
-        // Spawn macOS afplay command
+    const worker = getWorker();
+
+    if (worker && worker.stdin) {
+        worker.stdin.write(`PLAY ${songPath}\n`);
+        worker.stdin.write(`RATE ${rate.toFixed(2)}\n`);
+        worker.stdin.write(`VOLUME ${volume.toFixed(2)}\n`);
+    } else {
         const args = ['-v', volume.toString(), '-r', rate.toString(), songPath];
-        currentProcess = spawn('afplay', args);
+        workerProcess = spawn('afplay', args, { stdio: 'ignore' });
 
-        // Update timer every second
-        intervalId = setInterval(() => {
-            if (!isPaused && isPlaying) {
-                elapsedSeconds += rate;
-                if (elapsedSeconds >= totalDuration) {
-                    elapsedSeconds = totalDuration;
-                }
-            }
-        }, 1000);
-
-        currentProcess.on('close', () => {
+        workerProcess.on('close', (code, signal) => {
             clearInterval(intervalId);
-            currentProcess = null;
-
-            // Song ended naturally, call next song handler
-            if (isPlaying && !isPaused) {
+            if (isPlaying && !isPaused && signal !== 'SIGKILL') {
                 isPlaying = false;
-                onEndCallback();
+                if (typeof onEndCallback === 'function') onEndCallback();
             }
         });
-    });
+    }
+
+    intervalId = setInterval(() => {
+        if (isPlaying && !isPaused) {
+            elapsedSeconds += rate;
+            if (totalDuration > 0 && elapsedSeconds >= totalDuration) {
+                elapsedSeconds = totalDuration;
+            }
+        }
+    }, 1000);
 }
 
-// Toggle Pause and Resume using macOS signals
 function pauseSong() {
-    if (currentProcess && isPlaying && !isPaused) {
-        currentProcess.kill('SIGSTOP');
+    if (isPlaying && !isPaused) {
         isPaused = true;
+        const worker = getWorker();
+        if (worker && worker.stdin) {
+            worker.stdin.write("PAUSE\n");
+        } else if (workerProcess) {
+            try { workerProcess.kill('SIGSTOP'); } catch (e) {}
+        }
     }
 }
 
 function resumeSong() {
-    if (currentProcess && isPlaying && isPaused) {
-        currentProcess.kill('SIGCONT');
+    if (isPlaying && isPaused) {
         isPaused = false;
+        const worker = getWorker();
+        if (worker && worker.stdin) {
+            worker.stdin.write("RESUME\n");
+        } else if (workerProcess) {
+            try { workerProcess.kill('SIGCONT'); } catch (e) {}
+        }
     }
 }
 
-// Stop playback and reset timers
 function stopSong() {
     isPlaying = false;
     isPaused = false;
     elapsedSeconds = 0;
-    clearInterval(intervalId);
 
-    if (currentProcess) {
-        currentProcess.kill('SIGKILL');
-        currentProcess = null;
+    if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
     }
+
+    const worker = getWorker();
+    if (worker && worker.stdin) {
+        worker.stdin.write("STOP\n");
+    } else if (workerProcess) {
+        try { workerProcess.kill('SIGKILL'); } catch (e) {}
+        workerProcess = null;
+    }
+}
+
+// -----------------------------------------------------------------------------
+// 6. VOLUME, SPEED & QUEUE CONTROLS
+// -----------------------------------------------------------------------------
+
+function setVolume(newVolume) {
+    volume = Math.max(0.0, Math.min(1.0, newVolume));
+    const worker = getWorker();
+    if (worker && worker.stdin) {
+        worker.stdin.write(`VOLUME ${volume.toFixed(2)}\n`);
+    }
+}
+
+function setRate(newRate) {
+    rate = Math.max(0.5, Math.min(2.0, newRate));
+    const worker = getWorker();
+    if (worker && worker.stdin) {
+        worker.stdin.write(`RATE ${rate.toFixed(2)}\n`);
+    }
+}
+
+function addToQueue(songFileName) {
+    if (!queue.includes(songFileName)) {
+        queue.push(songFileName);
+    }
+}
+
+function shiftQueue() {
+    return queue.shift();
 }
 
 function getState() {
@@ -132,30 +243,44 @@ function getState() {
     };
 }
 
-function setVolume(vol) {
-    volume = Math.max(0, Math.min(1.5, vol));
-}
+// -----------------------------------------------------------------------------
+// 7. CLEANUP ON PROCESS EXIT
+// -----------------------------------------------------------------------------
+function cleanupAllAudio() {
+    stopSong();
 
-function setRate(speed) {
-    rate = Math.max(0.5, Math.min(2.0, speed));
-}
-
-function addToQueue(song) {
-    if (!queue.includes(song)) {
-        queue.push(song);
+    if (workerProcess) {
+        try {
+            if (workerProcess.stdin) workerProcess.stdin.write("QUIT\n");
+            workerProcess.kill('SIGKILL');
+        } catch (e) {}
+        workerProcess = null;
     }
+
+    try {
+        exec('killall afplay >/dev/null 2>&1');
+    } catch (e) {}
 }
 
-function shiftQueue() {
-    return queue.shift();
-}
+process.on('exit', cleanupAllAudio);
+process.on('SIGINT', () => { cleanupAllAudio(); process.exit(0); });
+process.on('SIGTERM', () => { cleanupAllAudio(); process.exit(0); });
+process.on('uncaughtException', (err) => {
+    cleanupAllAudio();
+    console.error(err);
+    process.exit(1);
+});
 
+// -----------------------------------------------------------------------------
+// 8. EXPORTS
+// -----------------------------------------------------------------------------
 export {
     loadSongs,
     playSong,
     pauseSong,
     resumeSong,
     stopSong,
+    cleanupAllAudio,
     getState,
     setVolume,
     setRate,

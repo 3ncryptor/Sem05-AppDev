@@ -15,9 +15,10 @@ echo "    CLI Music Player Setup & Launcher     "
 echo "=========================================="
 echo ""
 
-# 1. Host Subsystem Check
-if ! command -v afplay >/dev/null 2>&1; then
-    echo "Warning: macOS 'afplay' utility not detected. Audio playback requires Darwin subsystems." >&2
+# 1. Native Audio Engine Build
+if [ ! -f "audio_player" ] && command -v clang >/dev/null 2>&1 && [ -f "audio_player.m" ]; then
+    echo "Compiling native audio engine..."
+    clang -O2 -fobjc-arc -framework Foundation -framework AVFoundation audio_player.m -o audio_player
 fi
 
 # 2. Interactive Runtime Selection
