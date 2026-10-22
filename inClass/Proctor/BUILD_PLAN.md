@@ -1095,3 +1095,46 @@ relaunch: main reads session.bin (safeStorage) and queue.json; evidence worker r
 C1 shows "exam in progress" (exams.list) → Resume → attempts.get (server finalizes it if overdue) → Welcome-back card
 → exam:enter → queue flushes → heartbeat → C7 at the same question with the server's deadline
 ```
+
+## 23. Contract changes from Loop 1 (these override earlier sections)
+
+Recorded after the backend and frontend specialists finished Loop 1 (2026-10-23). Where these differ from §8, §17, §18 or §21, these win.
+
+**Ids.** Every id has a two-letter prefix so it matches the §18 path check: `us_` users, `ex_` exams, `qn_` questions, `at_` attempts, `fl_` flags. Option/item ids inside questions: `op_`, `it_`, `lt_`, `rt_`.
+
+**Envelope.** Every IPC invoke returns `{ ok, data, error }`; the "Returns" column in §17.2 describes `data`. HTTP errors may carry extras: `NOT_PUBLISHABLE` has `error.problems[]` and `error.warnings[]`; `SERVER_ERROR` has `error.requestId`. New code `ATTEMPT_HELD` (409) when releasing a held result.
+
+**New and changed endpoints.**
+- `GET /api/health`, no auth. `server:ping` uses it; any HTTP answer counts as reachable.
+- CSV export and evidence download send raw bytes, not the JSON envelope.
+- `exams.get` also returns `code`, `termsVersion`, `proctoringSummary { lines[], text }`, `canStart` and `cannotStartReason`.
+- `attempts.start` / `attempts.get` return `{ attempt, exam, questions, answers, proctoring, flags, resumed }`. Status is 201 for a new attempt and 200 for a resume. `attempt.maxFlags` already includes `flagAllowance`, and is `null` when auto-end is off.
+- Heartbeat also returns `submitReason`. Warnings also carry `at` and `questionId`.
+
+**Values.**
+- Results visibility: `after_submit` | `after_publish`.
+- Proctoring presets: `standard` | `lenient` | `monitor` | `off` | `custom`, plus a `blockMultipleDisplays` field. `updateProctoring` accepts `{ proctoring: { preset } }` alone or a partial config.
+- `short_text` student config includes `caseSensitive` (for the C7a hint).
+- Ordering items and the matching right column are always shuffled for students, whatever `shuffleOptions` says.
+- Extra client event types accepted: `camera_restored`, `display_removed`, `network_online`, `system_resume`.
+
+**Admin response shapes.**
+- `admin.exams.get` → `{ exam }`, where `exam` also has `displayStatus`, `locked`, `problems` and `counts`.
+- Settings body is `{ settings }`; partial updates are fine.
+- `admin.results.list` → `{ exam, pipeline, rows }`.
+- Publish dry run → `{ willPublish, held, outcomes }`.
+- Users: list → `{ users }`, create → `{ user, password }`, import → `{ rows, counts, created }`. Import is `dryRun: true` unless `false` is sent.
+- Risk reasons are `{ code, label, points }`.
+
+**Main process (frontend).**
+- New modules `settings.js`, `session.js`, `log.js`, `selftest.js`.
+- `app:info` also returns `theme`; `evidence:summary` also returns `folder`.
+- Saving a different server URL signs the user out.
+- `--selftest` and `--spike` flags, plus a `#/selftest` route, exist for packaging checks.
+
+**Behaviour.**
+- Event times use the client's `clientTs`, clamped between the attempt start and now, so the 2 s merge still works for events sent late from the offline queue.
+- Evidence uploads are still accepted after submit, so the upload worker can finish its queue.
+- Extend isn't capped at the window close.
+- Dismissing a flag never reopens an ended attempt.
+- A heartbeat gap is a silence of more than 30 s, recorded at the next heartbeat. Each gap adds 5 risk points.
