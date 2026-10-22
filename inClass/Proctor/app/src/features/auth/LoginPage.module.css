@@ -1,0 +1,69 @@
+.card {
+  display: grid;
+  gap: var(--space-5);
+  width: 380px;
+  padding: var(--space-8);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  animation: enter var(--duration-slow) var(--ease-out);
+}
+
+.heading {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.subtitle {
+  color: var(--ink-soft);
+}
+
+.fields {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.reveal {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-soft);
+}
+
+.reveal:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--critical-tint);
+  color: var(--critical);
+}
+
+.error svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.server {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}

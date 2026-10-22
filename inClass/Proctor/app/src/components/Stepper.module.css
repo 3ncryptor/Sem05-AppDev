@@ -1,0 +1,53 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+.step + .step::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  margin-right: var(--space-2);
+  background: var(--line-strong);
+}
+
+.marker {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  font-size: var(--text-xs);
+}
+
+.current {
+  color: var(--ink);
+}
+
+.current .marker {
+  border-color: var(--focus);
+  background: var(--focus);
+  color: var(--on-focus);
+}
+
+.done {
+  color: var(--ink-soft);
+}
+
+.done .marker {
+  border-color: var(--ok);
+  color: var(--ok);
+}

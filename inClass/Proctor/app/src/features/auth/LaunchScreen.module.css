@@ -1,0 +1,8 @@
+.screen {
+  height: 100%;
+  background: var(--canvas);
+}
+
+.titlebar {
+  height: var(--titlebar-height);
+}

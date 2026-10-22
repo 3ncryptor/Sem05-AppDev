@@ -1,0 +1,29 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--canvas);
+}
+
+.titlebar {
+  flex: none;
+  height: var(--titlebar-height);
+}
+
+.center {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  overflow: auto;
+}
+
+.footer {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 var(--space-6) var(--space-4);
+  color: var(--ink-faint);
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+}

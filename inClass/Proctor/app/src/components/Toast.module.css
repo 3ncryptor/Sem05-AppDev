@@ -1,0 +1,44 @@
+.region {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-6);
+  z-index: 100;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 480px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--canvas);
+  box-shadow: var(--shadow-overlay);
+  font-weight: 500;
+  animation: in var(--duration-slow) var(--ease-out);
+}
+
+.ok svg {
+  color: var(--ok-tint);
+}
+
+.attention svg {
+  color: var(--attention-tint);
+}
+
+.critical svg {
+  color: var(--critical-tint);
+}
+
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}

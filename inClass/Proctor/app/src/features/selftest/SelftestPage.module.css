@@ -1,0 +1,47 @@
+.page {
+  height: 100%;
+  overflow: auto;
+}
+
+.titlebar {
+  height: var(--titlebar-height);
+}
+
+.card {
+  display: grid;
+  gap: var(--space-3);
+  width: min(560px, calc(100% - 48px));
+  margin: 0 auto var(--space-8);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: 650;
+}
+
+.soft {
+  color: var(--ink-soft);
+}
+
+.result {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunk);
+  font-size: var(--text-sm);
+}
+
+.video {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-control);
+  background: var(--surface-sunk);
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+.count {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  min-height: 22px;
+}

@@ -1,0 +1,63 @@
+.shell {
+  display: flex;
+  height: 100%;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas);
+}
+
+.titlebar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: var(--titlebar-height);
+  padding: 0 var(--space-8);
+}
+
+.content {
+  flex: 1;
+  overflow: auto;
+  padding: 0 var(--space-8) var(--space-10);
+}
+
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.crumbs li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.crumbs li + li::before {
+  content: '/';
+  color: var(--ink-faint);
+}
+
+.crumbs a {
+  color: var(--ink-soft);
+}
+
+.crumbs [aria-current='page'] {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* The traffic lights stay put when the admin sidebar collapses to its 56 px rail, so the title bar
+   content moves right to clear them. */
+.shell:has([data-collapsed='true']) .titlebar {
+  padding-left: 40px;
+}

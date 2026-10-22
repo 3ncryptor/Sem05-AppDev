@@ -1,0 +1,58 @@
+.banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line);
+  background: var(--surface-sunk);
+}
+
+.icon {
+  flex: none;
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+}
+
+.action {
+  flex: none;
+}
+
+.focus {
+  background: var(--focus-tint);
+  border-color: transparent;
+}
+
+.focus .icon {
+  color: var(--focus);
+}
+
+.ok {
+  background: var(--ok-tint);
+  border-color: transparent;
+}
+
+.ok .icon {
+  color: var(--ok);
+}
+
+.attention {
+  background: var(--attention-tint);
+  border-color: transparent;
+}
+
+.attention .icon {
+  color: var(--attention);
+}
+
+.critical {
+  background: var(--critical-tint);
+  border-color: transparent;
+}
+
+.critical .icon {
+  color: var(--critical);
+}

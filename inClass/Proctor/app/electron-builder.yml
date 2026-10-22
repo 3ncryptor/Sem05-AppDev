@@ -1,0 +1,41 @@
+# electron-builder config: arm64 DMG only, unsigned for distribution (ad-hoc signature), no notarization.
+appId: edu.athena.app
+productName: Athena
+copyright: Copyright © 2026 Aryan Vibhuti
+
+directories:
+  output: release
+  buildResources: build
+
+# Only the built UI and the main process ship. Every npm package is a devDependency on purpose:
+# Vite bundles the renderer's libraries into dist/, and main uses only Electron and Node built-ins,
+# so the app needs no node_modules at runtime.
+files:
+  - dist/**/*
+  - electron/**/*
+  - package.json
+asar: true
+npmRebuild: false
+
+# Turn off Electron features an exam app never needs, so the shipped binary can't be repurposed as a Node runtime.
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  onlyLoadAppFromAsar: true
+
+mac:
+  target:
+    - target: dmg
+      arch: [arm64]
+  category: public.app-category.education
+  # "-" = ad-hoc signature. Apple Silicon refuses to run unsigned arm64 code, and we have no Developer ID.
+  identity: "-"
+  # Hardened runtime would need camera entitlements plus a real signature; it buys nothing without notarization.
+  hardenedRuntime: false
+  notarize: false
+  extendInfo:
+    NSCameraUsageDescription: Athena uses your camera during a proctored exam to take an identity photo and occasional photos that your examiner reviews.
+
+dmg:
+  artifactName: Athena-${version}-arm64.dmg

@@ -1,0 +1,115 @@
+/* Design tokens (BUILD_PLAN §5.2, SCREENS §0). Light first; warm charcoal dark under data-theme="dark".
+   data-theme is set from main's nativeTheme (theme:changed), so the Settings override and macOS both work. */
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --canvas: #fbf8f2;
+  --surface: #ffffff;
+  --surface-sunk: #f3efe7;
+  --surface-raised: #ffffff;
+  --sidebar: #f5f1e9;
+  --ink: #1e2529;
+  --ink-soft: #5a646b;
+  --ink-faint: #8b9298;
+  --line: #e7e1d7;
+  --line-strong: #d6cfc2;
+
+  --focus: #3b4cca;
+  --focus-hover: #3242b5;
+  --focus-tint: #eceefb;
+  --on-focus: #ffffff;
+
+  --ok: #1f7a4d;
+  --ok-tint: #e6f2ea;
+  --attention: #b4690e;
+  --attention-tint: #fbf0e0;
+  --critical: #b3122f;
+  --critical-hover: #9c0f29;
+  --critical-tint: #fae8ea;
+
+  --hover: rgb(30 37 41 / 0.05);
+  --pressed: rgb(30 37 41 / 0.09);
+  --scrim: rgb(23 24 26 / 0.32);
+  --shadow-overlay: 0 1px 2px rgb(30 37 41 / 0.06), 0 12px 32px rgb(30 37 41 / 0.14);
+  --shadow-card: 0 1px 2px rgb(30 37 41 / 0.04);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --canvas: #17181a;
+  --surface: #1f2023;
+  --surface-sunk: #141517;
+  --surface-raised: #26272b;
+  --sidebar: #1b1c1f;
+  --ink: #ece9e3;
+  --ink-soft: #a9a59e;
+  --ink-faint: #7b7872;
+  --line: #2c2d31;
+  --line-strong: #3a3b40;
+
+  --focus: #8c98ff;
+  --focus-hover: #a1abff;
+  --focus-tint: #272b4a;
+  --on-focus: #12131a;
+
+  /* §5.2 gives one value for these; they are too dark on charcoal, so dark mode lifts them. */
+  --ok: #5bbf8a;
+  --ok-tint: #1c2c24;
+  --attention: #e3a04a;
+  --attention-tint: #2f2518;
+  --critical: #f06a7e;
+  --critical-hover: #f5899a;
+  --critical-tint: #33191e;
+
+  --hover: rgb(236 233 227 / 0.06);
+  --pressed: rgb(236 233 227 / 0.1);
+  --scrim: rgb(0 0 0 / 0.5);
+  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px rgb(0 0 0 / 0.45);
+  --shadow-card: none;
+}
+
+:root {
+  /* Type: the system font, so nothing ships. SF Mono for timers and codes. */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 15px;
+  --text-xl: 20px;
+  --text-2xl: 26px;
+
+  /* 4 px grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --radius-sm: 6px;
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --radius-pill: 999px;
+
+  --control-height: 32px;
+  --control-height-lg: 40px;
+  --titlebar-height: 44px;
+  --sidebar-width: 220px;
+  --sidebar-rail: 56px;
+  --sheet-width: 440px;
+  --stage-width: 760px;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration: 160ms;
+  --duration-slow: 180ms;
+}

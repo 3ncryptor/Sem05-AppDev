@@ -1,0 +1,52 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.symbol {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.neutral {
+  background: var(--surface-sunk);
+  color: var(--ink-soft);
+}
+
+.focus {
+  background: var(--focus-tint);
+  color: var(--focus);
+}
+
+.ok {
+  background: var(--ok-tint);
+  color: var(--ok);
+}
+
+.attention {
+  background: var(--attention-tint);
+  color: var(--attention);
+}
+
+.critical {
+  background: var(--critical-tint);
+  color: var(--critical);
+}
+
+/* "Live now" pulses gently (SCREENS A0). Reduced motion stops it via base.css. */
+.pulse {
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}

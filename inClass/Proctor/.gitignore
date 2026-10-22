@@ -14,3 +14,6 @@ backend/data/evidence/
 backend/data/sessions.json
 backend/data/attempts.json
 backend/data/logs/
+
+# Copied from node_modules at build time (scripts/copy-mediapipe.js)
+app/public/mediapipe/
