@@ -1,0 +1,16 @@
+node_modules/
+dist/
+release/
+out/
+.DS_Store
+*.log
+
+# Local evidence and screenshots (never commit images of anyone's screen or face)
+frontend/app/user-camera-snap/
+frontend/app/user-screen-snapshot/
+app/electron/user-camera-snap/
+app/electron/user-screen-snapshot/
+backend/data/evidence/
+backend/data/sessions.json
+backend/data/attempts.json
+backend/data/logs/
