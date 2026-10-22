@@ -1,0 +1,47 @@
+'use strict';
+// Seed exam: Electron Apps (30 min, results when the admin publishes, Standard proctoring).
+
+const b = require('./build');
+
+module.exports = () => ({
+  code: 'ELE-01',
+  title: 'Electron Apps',
+  description: 'Process model, preload and contextBridge, IPC, windows, dialogs and packaging.',
+  durationMinutes: 30,
+  visibility: 'after_publish',
+  preset: 'standard',
+  questions: [
+    b.single('dialog', 2, 'Which process is allowed to call `dialog.showOpenDialog`?',
+      ['The renderer process', 'The main process', "The preload script, through Node's `require`", 'Any process with `nodeIntegration` on'], 1,
+      '`dialog` is a main-process module. The renderer asks main to open it over IPC, and main sends the chosen path back.'),
+    b.single('Preload and contextBridge', 2, "What does this line in a preload script do?\n\n```js\ncontextBridge.exposeInMainWorld('athena', api);\n```",
+      ['Makes `api` available as `window.athena` in the page, without exposing Node', 'Gives the page direct access to `ipcRenderer`', 'Runs `api` inside the main process', 'Creates a new BrowserWindow called athena'], 0,
+      'With context isolation on, the page and the preload live in separate JavaScript worlds. `exposeInMainWorld` copies a safe API across, so the page sees `window.athena` and nothing else.'),
+    b.single('BrowserWindow', 2, 'Which `BrowserWindow` option hides the macOS title bar but keeps the traffic-light buttons, inset into the content?',
+      ["`titleBarStyle: 'hiddenInset'`", '`frame: true`', '`transparent: true`', '`fullscreen: false`'], 0,
+      "`titleBarStyle: 'hiddenInset'` removes the title bar and moves the traffic lights slightly inward. The page then marks a drag region with CSS."),
+    b.multi('Process model', 3, 'Which of these run in the main process?',
+      ['`app` lifecycle events such as `ready`', '`ipcMain.handle` handlers', 'Creating a `BrowserWindow`', 'React components rendering the DOM', '`document.querySelector`'], [0, 1, 2],
+      'Main owns the app lifecycle, windows and IPC handlers. The DOM, and anything that touches it, lives in a renderer.'),
+    b.multi('Preload and contextBridge', 3, 'Which `webPreferences` settings make a renderer safer?',
+      ['`contextIsolation: true`', '`sandbox: true`', '`nodeIntegration: false`', '`webSecurity: false`'], [0, 1, 2],
+      'Context isolation, the sandbox and no Node integration all reduce what a compromised page can do. `webSecurity: false` turns off the same-origin policy, which makes it less safe.'),
+    b.trueFalse('Preload and contextBridge', 1, '`contextIsolation` is on by default in current versions of Electron.', true,
+      'It has been on by default since Electron 12. Athena still writes it out explicitly so the security settings are visible in the code.'),
+    b.trueFalse('IPC', 1, '`ipcRenderer.send` returns a Promise that resolves with the main process\'s reply.', false,
+      '`send` is one-way and returns nothing. For request and reply, use `ipcRenderer.invoke` in the renderer with `ipcMain.handle` in main.'),
+    b.shortText('IPC', 2, 'Which `ipcMain` method registers a handler that answers `ipcRenderer.invoke`? Type the method name.', ['handle', 'ipcMain.handle'], true,
+      "`ipcMain.handle('channel', fn)` registers the handler; whatever `fn` returns (or resolves to) becomes the result of `invoke` in the renderer."),
+    b.shortText('Packaging', 2, 'Which npm package does this course use to build a macOS DMG from an Electron app?', ['electron-builder'], false,
+      '`electron-builder` reads `electron-builder.yml` and produces the DMG. Electron Forge is another option, but not the one used here.'),
+    b.numeric('Process model', 2, 'How many main processes does a running Electron app have?', 1, 0, null,
+      'There is exactly one main process. It can create many windows, and each one gets its own renderer.'),
+    b.ordering('IPC', 4, 'Put the steps of an `invoke` round trip in order.',
+      ['React calls `window.athena.save(data)`', "The preload calls `ipcRenderer.invoke('save', data)`", "The `ipcMain.handle('save')` handler runs in main", 'The handler\'s return value resolves the promise in React'],
+      'The page only sees the preload API. The preload forwards the call over IPC, main handles it, and the reply travels back as the resolved promise.'),
+    b.matching('dialog', 4, 'Match each Electron module to what it does.',
+      [['`dialog`', 'Native open, save and message boxes'], ['`desktopCapturer`', 'Lists screens and windows to capture'], ['`powerMonitor`', 'Reports sleep, lock and resume'], ['`safeStorage`', 'Encrypts strings with the OS keychain']],
+      ['Bundles the app into a DMG'],
+      'These are all main-process modules. Building a DMG is the job of electron-builder, not a runtime module.'),
+  ],
+});

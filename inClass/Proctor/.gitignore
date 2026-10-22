@@ -17,3 +17,9 @@ backend/data/logs/
 
 # Copied from node_modules at build time (scripts/copy-mediapipe.js)
 app/public/mediapipe/
+
+# Athena backend: generated accounts and credentials (random per seed; never commit)
+backend/data/users.json
+backend/data/seed-credentials.txt
+backend/data/*.tmp
+backend/data/exams.json

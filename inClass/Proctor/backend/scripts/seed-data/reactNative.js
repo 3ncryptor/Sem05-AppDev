@@ -1,0 +1,47 @@
+'use strict';
+// Seed exam: React Native (25 min, results when the admin publishes, Standard proctoring).
+
+const b = require('./build');
+
+module.exports = () => ({
+  code: 'RN-01',
+  title: 'React Native',
+  description: 'Components and JSX, state and props, FlatList, navigation and native modules.',
+  durationMinutes: 25,
+  visibility: 'after_publish',
+  preset: 'standard',
+  questions: [
+    b.single('Components and JSX', 2, 'Which component must wrap a string of text in React Native?',
+      ['`<Text>`', '`<p>`', '`<span>`', '`<View>`'], 0,
+      'There is no DOM in React Native. Raw strings must sit inside `<Text>`; putting one directly in a `<View>` is an error.'),
+    b.single('FlatList', 2, 'Which `FlatList` prop tells it how to get a unique key for each item?',
+      ['`keyExtractor`', '`renderItem`', '`data`', '`extraData`'], 0,
+      '`keyExtractor={(item) => item.id}` gives each row a stable key so the list can update rows efficiently.'),
+    b.single('Navigation', 2, "With React Navigation, how do you go to a screen named 'Details'?",
+      ["`navigation.navigate('Details')`", "`window.location = '/Details'`", "`Linking.openURL('Details')`", "`document.open('Details')`"], 0,
+      'Screens get a `navigation` object (or use `useNavigation()`); `navigate` pushes the named screen. There is no `window.location` in a native app.'),
+    b.multi('Components and JSX', 3, 'Which of these are React Native core components?',
+      ['`View`', '`Text`', '`Image`', '`FlatList`', '`div`', '`RecyclerView`'], [0, 1, 2, 3],
+      '`View`, `Text`, `Image` and `FlatList` ship with React Native. `div` is HTML, and `RecyclerView` is an Android class, not a React Native component.'),
+    b.multi('State and props', 3, 'Which statements about props are true?',
+      ['They are passed from a parent component to a child', 'A component should treat its own props as read-only', 'Only the component itself can set its props', 'When a parent re-renders with new props, the child re-renders'], [0, 1, 3],
+      'Props flow down from the parent and are read-only inside the child. State is what a component owns and sets itself.'),
+    b.trueFalse('State and props', 1, 'After `setCount(count + 1)`, the variable `count` already holds the new value on the next line of the same function.', false,
+      'A state setter schedules a re-render. `count` in the current function still holds the old value; the new value appears in the next render.'),
+    b.trueFalse('FlatList', 1, '`FlatList` renders rows lazily as they scroll into view, so it suits long lists better than `.map()` inside a `ScrollView`.', true,
+      '`ScrollView` renders every child at once. `FlatList` virtualises the list and only renders rows near the screen.'),
+    b.shortText('State and props', 2, 'Complete the hook call:\n\n```jsx\nconst [count, setCount] = ____(0);\n```', ['useState', 'React.useState'], true,
+      '`useState(initial)` returns the current value and a setter. Hook names are case-sensitive.'),
+    b.shortText('Native modules', 2, 'Which React Native module lets you branch on the platform, as in `____.OS === \'ios\'`?', ['Platform'], true,
+      "`Platform.OS` is `'ios'` or `'android'`, and `Platform.select({ ios, android })` picks a value per platform."),
+    b.numeric('State and props', 2, 'The button is pressed once, starting from `n = 0`. What is `n` after the next render?\n\n```jsx\nconst [n, setN] = useState(0);\nconst press = () => {\n  setN(n + 1);\n  setN(n + 1);\n  setN(n + 1);\n};\n```', 1, 0, null,
+      'All three calls read the same `n` (0) from this render, so each one sets 1. To add 3, use the updater form `setN((v) => v + 1)`.'),
+    b.ordering('State and props', 4, 'Put these in order for a tap on a button that updates state.',
+      ['The `onPress` handler runs', 'The state setter schedules an update', 'React re-renders the component with the new state', 'The native views on screen update'],
+      'Events run handlers, handlers set state, React re-renders, and React Native applies the differences to the native views.'),
+    b.matching('Components and JSX', 4, 'Match each core component to its job.',
+      [['`TextInput`', 'Lets the user type text'], ['`Image`', 'Shows a picture'], ['`ActivityIndicator`', 'Shows a loading spinner'], ['`Pressable`', 'Detects taps and presses']],
+      ['Plays background audio'],
+      'All four are core components. Audio playback needs a library such as expo-av; it is not a core component.'),
+  ],
+});

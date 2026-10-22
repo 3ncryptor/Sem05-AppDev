@@ -1,0 +1,389 @@
+# Athena API: one request per route (BUILD_PLAN §18). For the VS Code "REST Client" extension.
+# 1. cd backend && npm run seed && npm start
+# 2. Put the passwords from data/seed-credentials.txt below.
+# 3. Run the requests top to bottom; later ones reuse ids from earlier responses.
+# Every JSON response is { ok, data, error }. The full story with checks is `npm run smoke`.
+
+@base = http://127.0.0.1:3000/api
+@adminPassword = PASTE-FROM-seed-credentials.txt
+@studentRollNo = 23CS042
+@studentPassword = PASTE-FROM-seed-credentials.txt
+
+@admin = {{adminLogin.response.body.data.token}}
+@student = {{studentLogin.response.body.data.token}}
+@examId = {{createExam.response.body.data.exam.id}}
+@questionId = {{createQuestion.response.body.data.question.id}}
+@seedExamId = {{studentExams.response.body.data.exams[0].id}}
+@attemptId = {{startAttempt.response.body.data.attempt.id}}
+@firstQuestionId = {{startAttempt.response.body.data.questions[0].id}}
+@userId = {{createStudent.response.body.data.user.id}}
+
+### Health (server:ping)
+GET {{base}}/health
+
+### ───────── auth ─────────
+
+### auth.login (admin)
+# @name adminLogin
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{ "rollNo": "admin", "password": "{{adminPassword}}" }
+
+### auth.login (student)
+# @name studentLogin
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{ "rollNo": "{{studentRollNo}}", "password": "{{studentPassword}}" }
+
+### auth.login wrong password → 401 INVALID_CREDENTIALS (5 in 15 min → 429 RATE_LIMITED)
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{ "rollNo": "admin", "password": "wrong" }
+
+### auth.me
+GET {{base}}/auth/me
+Authorization: Bearer {{student}}
+
+### ───────── admin: exams and questions ─────────
+
+### admin.exams.list
+GET {{base}}/admin/exams
+Authorization: Bearer {{admin}}
+
+### admin.exams.create (add "copyFromId" to duplicate)
+# @name createExam
+POST {{base}}/admin/exams
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "title": "Swift Apps v2", "code": "SWF-02", "description": "Practice round" }
+
+### admin.exams.get (includes keys, problems, counts, locks)
+GET {{base}}/admin/exams/{{examId}}
+Authorization: Bearer {{admin}}
+
+### admin.exams.update (title, code, description)
+PATCH {{base}}/admin/exams/{{examId}}
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "description": "Optionals, closures and SwiftUI state." }
+
+### admin.questions.create (single, no key yet: the checklist will flag it)
+# @name createQuestion
+POST {{base}}/admin/exams/{{examId}}/questions
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "type": "single", "text": "Which wrapper gives a view local state?", "marks": 2, "topic": "SwiftUI",
+  "explanation": "@State is owned by the view.",
+  "config": { "options": [ { "id": "op_state", "text": "@State" }, { "id": "op_bind", "text": "@Binding" } ] } }
+
+### admin.questions.create (true_false)
+POST {{base}}/admin/exams/{{examId}}/questions
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "type": "true_false", "text": "A struct is a reference type.", "marks": 1, "topic": "Structs", "explanation": "Value type.", "key": { "value": false } }
+
+### admin.questions.create (short_text)
+POST {{base}}/admin/exams/{{examId}}/questions
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "type": "short_text", "text": "Which keyword exits early when an optional is nil?\n\n```swift\n____ let user = user else { return }\n```",
+  "marks": 2, "topic": "Optionals", "explanation": "guard let", "key": { "accepted": ["guard"], "caseSensitive": true } }
+
+### admin.questions.create (numeric)
+POST {{base}}/admin/exams/{{examId}}/questions
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "type": "numeric", "text": "Exit code for success?", "marks": 2, "topic": "Shell", "key": { "answer": 0, "tolerance": 0 } }
+
+### admin.questions.create (multi, ordering and matching look the same: config + key)
+POST {{base}}/admin/exams/{{examId}}/questions
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "type": "ordering", "text": "Order the steps", "marks": 4, "topic": "SwiftUI",
+  "config": { "scoring": "positional", "items": [ { "text": "action runs" }, { "text": "@State changes" }, { "text": "body recomputed" } ] } }
+
+### admin.exams.publish dryRun → lists every problem (missing key, missing window)
+POST {{base}}/admin/exams/{{examId}}/publish
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "dryRun": true }
+
+### admin.questions.update (set the key)
+PATCH {{base}}/admin/exams/{{examId}}/questions/{{questionId}}
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "key": { "optionId": "op_state" } }
+
+### admin.questions.previewScore
+POST {{base}}/admin/exams/{{examId}}/questions/{{questionId}}/preview-score
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "response": { "optionId": "op_state" } }
+
+### admin.questions.reorder (must list every question id once; copy them from admin.exams.get)
+PUT {{base}}/admin/exams/{{examId}}/questions/order
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "order": ["{{questionId}}"] }
+
+### admin.exams.updateSettings
+PUT {{base}}/admin/exams/{{examId}}/settings
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "settings": { "durationMinutes": 20, "opensAt": "2026-10-23T00:00:00Z", "closesAt": "2026-10-30T18:00:00Z", "maxAttempts": 1,
+  "shuffleQuestions": true, "shuffleOptions": true,
+  "resultPolicy": { "visibility": "after_submit", "passPercent": 40, "holdAutoEnded": true } } }
+
+### admin.exams.updateProctoring (a preset on its own…)
+PUT {{base}}/admin/exams/{{examId}}/proctoring
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "proctoring": { "preset": "lenient" } }
+
+### admin.exams.updateProctoring (…or any part of the config → preset becomes "custom")
+PUT {{base}}/admin/exams/{{examId}}/proctoring
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "proctoring": { "autoEnd": { "enabled": true, "maxFlags": 3 }, "rules": { "idle": { "counts": true } } } }
+
+### admin.exams.publish
+POST {{base}}/admin/exams/{{examId}}/publish
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{}
+
+### admin.questions.delete on a published exam → 409 EXAM_LOCKED
+DELETE {{base}}/admin/exams/{{examId}}/questions/{{questionId}}
+Authorization: Bearer {{admin}}
+
+### admin.exams.unpublish (only while nobody has started)
+POST {{base}}/admin/exams/{{examId}}/unpublish
+Authorization: Bearer {{admin}}
+
+### admin.exams.delete (drafts only)
+DELETE {{base}}/admin/exams/{{examId}}
+Authorization: Bearer {{admin}}
+
+### ───────── student ─────────
+
+### exams.list
+# @name studentExams
+GET {{base}}/exams
+Authorization: Bearer {{student}}
+
+### exams.get
+GET {{base}}/exams/{{seedExamId}}
+Authorization: Bearer {{student}}
+
+### attempts.start (or resume the open attempt)
+# @name startAttempt
+POST {{base}}/exams/{{seedExamId}}/attempts
+Authorization: Bearer {{student}}
+Content-Type: application/json
+
+{ "consent": { "capture": true, "events": true, "terms": true, "termsVersion": "2026-10-23" },
+  "systemCheck": { "camera": "ok", "face": "ok", "screen": "granted", "displays": 1 } }
+
+### attempts.get
+GET {{base}}/attempts/{{attemptId}}
+Authorization: Bearer {{student}}
+
+### answers.save (response shape depends on the type; null clears)
+PUT {{base}}/attempts/{{attemptId}}/answers/{{firstQuestionId}}
+Authorization: Bearer {{student}}
+Content-Type: application/json
+
+{ "revision": 1, "response": null, "timeSpentSec": 12, "marked": true }
+
+### attempts.events (blur + fullscreen within 2 s → one flag)
+POST {{base}}/attempts/{{attemptId}}/events
+Authorization: Bearer {{student}}
+Content-Type: application/json
+
+{ "events": [
+  { "seq": 1, "type": "window_blur", "phase": "start", "questionId": "{{firstQuestionId}}" },
+  { "seq": 2, "type": "fullscreen_exit", "phase": "start" },
+  { "seq": 3, "type": "window_blur", "phase": "end", "payload": { "awaySec": 3 } } ] }
+
+### attempts.heartbeat
+POST {{base}}/attempts/{{attemptId}}/heartbeat
+Authorization: Bearer {{student}}
+Content-Type: application/json
+
+{ "seq": 1, "sensors": { "fullscreen": true, "focused": true, "displays": 1, "camera": "live", "faces": 1, "faceDetector": "ok", "online": true }, "events": [] }
+
+### attempts.evidence (raw JPEG ≤ 1 MB; must start with FF D8 FF; idempotent on kind + seq)
+POST {{base}}/attempts/{{attemptId}}/evidence?kind=screen&seq=1&capturedAt=2026-10-23T10:15:30Z&reason=interval
+Authorization: Bearer {{student}}
+Content-Type: image/jpeg
+
+< ./scripts/sample.jpg
+
+### attempts.submit (idempotent)
+POST {{base}}/attempts/{{attemptId}}/submit
+Authorization: Bearer {{student}}
+
+### attempts.receipt
+GET {{base}}/attempts/{{attemptId}}/receipt
+Authorization: Bearer {{student}}
+
+### attempts.result (404 RESULTS_NOT_AVAILABLE until visible)
+GET {{base}}/attempts/{{attemptId}}/result
+Authorization: Bearer {{student}}
+
+### me.attempts
+GET {{base}}/me/attempts
+Authorization: Bearer {{student}}
+
+### me.analytics
+GET {{base}}/me/analytics
+Authorization: Bearer {{student}}
+
+### ───────── admin: live, review, results ─────────
+
+### admin.home
+GET {{base}}/admin/home
+Authorization: Bearer {{admin}}
+
+### admin.live
+GET {{base}}/admin/exams/{{seedExamId}}/live?since=2026-01-01T00:00:00Z
+Authorization: Bearer {{admin}}
+
+### admin.reviewQueue (status pending|cleared|suspicious|disqualified|all, rule, sort risk|flags|recent)
+GET {{base}}/admin/exams/{{seedExamId}}/review-queue?status=all&sort=risk
+Authorization: Bearer {{admin}}
+
+### admin.attempts.get (flags, events, captures with offsets, risk, answers)
+# @name attemptDetail
+GET {{base}}/admin/attempts/{{attemptId}}
+Authorization: Bearer {{admin}}
+
+### admin.evidence (image bytes, not JSON)
+GET {{base}}/admin/attempts/{{attemptId}}/evidence/screen/2026-10-23T10-15-30Z_0001.jpg
+Authorization: Bearer {{admin}}
+
+### admin.flags.dismiss
+POST {{base}}/admin/attempts/{{attemptId}}/flags/{{attemptDetail.response.body.data.flags[0].id}}/dismiss
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "note": "Network blip" }
+
+### admin.attempts.review (note required except for pending)
+PUT {{base}}/admin/attempts/{{attemptId}}/review
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "status": "cleared", "note": "Notification pulled focus; nothing else." }
+
+### admin.attempts.extend (in-progress attempts only)
+POST {{base}}/admin/attempts/{{attemptId}}/extend
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "minutes": 10, "reason": "Power cut" }
+
+### admin.attempts.end
+POST {{base}}/admin/attempts/{{attemptId}}/end
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "reason": "Left the room" }
+
+### admin.attempts.resume (only ended by flags or by admin)
+POST {{base}}/admin/attempts/{{attemptId}}/resume
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "extraFlags": 2, "reason": "Ended by mistake" }
+
+### admin.exams.extendInProgress
+POST {{base}}/admin/exams/{{seedExamId}}/extend-in-progress
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "minutes": 5, "reason": "Platform issue" }
+
+### admin.attempts.release (409 ATTEMPT_HELD while held)
+POST {{base}}/admin/attempts/{{attemptId}}/release
+Authorization: Bearer {{admin}}
+
+### admin.results.list
+GET {{base}}/admin/exams/{{seedExamId}}/results
+Authorization: Bearer {{admin}}
+
+### admin.results.publish dryRun
+POST {{base}}/admin/exams/{{seedExamId}}/results/publish
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "dryRun": true }
+
+### admin.results.publish
+POST {{base}}/admin/exams/{{seedExamId}}/results/publish
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{}
+
+### admin.results.csv (text/csv, not JSON)
+GET {{base}}/admin/exams/{{seedExamId}}/results.csv
+Authorization: Bearer {{admin}}
+
+### admin.analytics
+GET {{base}}/admin/exams/{{seedExamId}}/analytics
+Authorization: Bearer {{admin}}
+
+### ───────── admin: students ─────────
+
+### admin.users.list
+GET {{base}}/admin/users
+Authorization: Bearer {{admin}}
+
+### admin.users.create (password omitted → one-time XXXX-XXXX-XXXX returned)
+# @name createStudent
+POST {{base}}/admin/users
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "rollNo": "23CS070", "name": "Tara Nair" }
+
+### admin.users.update (name, active; turning off signs them out)
+PATCH {{base}}/admin/users/{{userId}}
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "active": false }
+
+### admin.users.resetPassword
+POST {{base}}/admin/users/{{userId}}/reset-password
+Authorization: Bearer {{admin}}
+
+### admin.users.import (dryRun true checks only)
+POST {{base}}/admin/users/import
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "dryRun": true, "rows": [ { "rollNo": "23CS071", "name": "Riya Mehta" }, { "rollNo": "23CS042", "name": "Asha Rao" }, { "rollNo": "", "name": "Neel" } ] }
+
+### auth.logout
+POST {{base}}/auth/logout
+Authorization: Bearer {{student}}

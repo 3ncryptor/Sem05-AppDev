@@ -1,0 +1,47 @@
+'use strict';
+// Seed exam: CLI Apps (20 min, results right after submitting, Lenient proctoring).
+
+const b = require('./build');
+
+module.exports = () => ({
+  code: 'CLI-01',
+  title: 'CLI Apps',
+  description: 'Shell basics, flags and arguments, standard streams, exit codes and Node command-line tools.',
+  durationMinutes: 20,
+  visibility: 'after_submit',
+  preset: 'lenient',
+  questions: [
+    b.single('Shell basics', 2, 'Which command prints the current working directory?',
+      ['`cd`', '`pwd`', '`ls`', '`whoami`'], 1,
+      '`pwd` means "print working directory". `cd` changes it, `ls` lists files and `whoami` prints your user name.'),
+    b.single('stdin/stdout', 2, 'What does `2>&1` do in this command?\n\n```bash\nnode build.js > out.txt 2>&1\n```',
+      ['Sends stderr to the same place as stdout, so both end up in out.txt', 'Sends stdout to stderr instead of out.txt', 'Runs the command twice', 'Appends to out.txt instead of overwriting it'], 0,
+      'File descriptor 2 is stderr and 1 is stdout. `2>&1` points stderr at wherever stdout points, which is already out.txt. Appending would be `>>`.'),
+    b.single('Node CLI', 2, 'You run this command. What is `process.argv[2]`?\n\n```bash\nnode app.js --verbose input.txt\n```',
+      ["`'--verbose'`", "`'input.txt'`", "`'app.js'`", 'The path to the node binary'], 0,
+      '`process.argv[0]` is the node executable, `[1]` is the script path, and the user arguments start at index 2, so `[2]` is `--verbose`.'),
+    b.multi('stdin/stdout', 3, 'Which of these are standard streams that every process starts with?',
+      ['stdin', 'stdout', 'stderr', 'stdlog', 'stdnet'], [0, 1, 2],
+      'Every process gets three standard streams: stdin (0), stdout (1) and stderr (2). There is no stdlog or stdnet.'),
+    b.multi('Exit codes', 3, 'Which of these run `deploy` only if `build` succeeded (exit code 0)?',
+      ['`build && deploy`', '`build; deploy`', '`build || deploy`', '`if build; then deploy; fi`'], [0, 3],
+      '`&&` runs the right side only after a zero exit code, and `if` tests the exit code too. `;` always runs both, and `||` runs `deploy` only when `build` fails.'),
+    b.trueFalse('Flags and arguments', 1, 'In `ls -la`, the combined flag `-la` means the same as `-l -a`.', true,
+      'Most Unix tools let you combine single-letter flags after one dash, so `-la` is `-l` (long format) plus `-a` (all files).'),
+    b.trueFalse('Exit codes', 1, 'A non-zero exit code always means the program crashed.', false,
+      'Non-zero just means "not success", and programs use it for normal outcomes. For example `grep` exits with 1 when it finds no matching line.'),
+    b.shortText('Flags and arguments', 2, 'Which `ls` flag lists hidden files too (names that start with a dot)? Type just the flag.', ['-a', '--all'], true,
+      '`ls -a` (or `--all`) shows entries starting with a dot, such as `.git` and `.env`. Flags are case-sensitive: `-A` is a different flag.'),
+    b.shortText('Shell basics', 2, 'Which command opens the manual page for another command, as in `___ ls`?', ['man'], false,
+      '`man ls` opens the manual for `ls`. Press `q` to leave it.'),
+    b.numeric('Exit codes', 2, 'What exit code does a successful command return?\n\n```bash\n$ true\n$ echo $?\n```', 0, 0, null,
+      'By convention 0 means success and anything from 1 to 255 means some kind of failure. `$?` holds the last exit code.'),
+    b.ordering('stdin/stdout', 4, 'Put the stages of this pipeline in the order the data flows through them.\n\n```bash\ncat app.log | grep ERROR | wc -l\n```',
+      ['`cat` reads app.log and writes it to stdout', '`grep` reads that from stdin and keeps lines containing ERROR', '`wc -l` counts the lines it receives', 'The shell shows the count in the terminal'],
+      'Each `|` connects the stdout of the left command to the stdin of the right one, so data flows left to right and the last command writes to the terminal.'),
+    b.matching('Node CLI', 4, 'Match each Node.js API to its job in a command-line tool.',
+      [['`process.argv`', 'The command-line arguments'], ['`process.exit(code)`', 'Ends the process with an exit code'], ['`process.stdin`', 'Input that is piped or typed in'], ['`readline.createInterface`', 'Reads input one line at a time']],
+      ['Lists the files in a folder'],
+      '`argv` holds the arguments, `exit` sets the exit code, `stdin` is the input stream, and `readline` wraps a stream to give you one line at a time. Listing files is `fs.readdir`.'),
+  ],
+});

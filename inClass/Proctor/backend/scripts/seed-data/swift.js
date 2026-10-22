@@ -1,0 +1,47 @@
+'use strict';
+// Seed exam: Swift Apps (25 min, results right after submitting, Monitor-only proctoring).
+
+const b = require('./build');
+
+module.exports = () => ({
+  code: 'SWF-01',
+  title: 'Swift Apps',
+  description: 'Optionals, structs and classes, closures, SwiftUI views and state, and Xcode build basics.',
+  durationMinutes: 25,
+  visibility: 'after_submit',
+  preset: 'monitor',
+  questions: [
+    b.single('Optionals', 2, 'What does this expression evaluate to when `name` is `nil`?\n\n```swift\nname ?? "Guest"\n```',
+      ['`"Guest"`', '`nil`', 'It crashes', 'An empty string'], 0,
+      '`??` is the nil-coalescing operator: it unwraps the optional, or uses the default on the right when the optional is nil.'),
+    b.single('SwiftUI views and state', 2, 'Which property wrapper gives a SwiftUI view its own local, mutable state?',
+      ['`@State`', '`@Binding`', '`@Environment`', '`@IBOutlet`'], 0,
+      '`@State` is owned by the view. `@Binding` refers to state owned by someone else, `@Environment` reads shared values, and `@IBOutlet` is UIKit.'),
+    b.single('Xcode build basics', 2, 'In Xcode, which shortcut builds and runs the app?',
+      ['⌘R', '⌘B', '⌘U', '⌘.'], 0,
+      '⌘R builds and runs, ⌘B only builds, ⌘U runs the tests and ⌘. stops the running app.'),
+    b.multi('Structs vs classes', 3, 'Which statements are true of Swift structs?',
+      ['They are value types, copied on assignment', 'They can have methods', 'They can conform to protocols', 'They support inheritance', 'They can have a `deinit`'], [0, 1, 2],
+      'Structs are value types with methods and protocol conformance. Inheritance and `deinit` are only for classes.'),
+    b.multi('Closures', 3, 'Which of these sort `nums = [3, 1, 2]` in ascending order?',
+      ['`nums.sorted()`', '`nums.sorted(by: <)`', '`nums.sorted { $0 < $1 }`', '`nums.sorted(by: >)`'], [0, 1, 2],
+      'The first three all sort ascending: the default order, the `<` operator as a function, and a trailing closure. `>` sorts descending.'),
+    b.trueFalse('Structs vs classes', 1, 'A `struct` is a reference type.', false,
+      'Structs are value types: assigning one to a new variable copies it. Classes are reference types.'),
+    b.trueFalse('Optionals', 1, 'Force-unwrapping a `nil` optional with `!` crashes the app at runtime.', true,
+      "That's why `if let`, `guard let` and `??` are preferred: they handle nil without crashing."),
+    b.shortText('Optionals', 2, 'Which keyword unwraps an optional and exits early when it is `nil`?\n\n```swift\n____ let user = user else { return }\n```', ['guard'], true,
+      '`guard let` binds the value for the rest of the scope; its `else` branch must exit (return, throw, break or continue).'),
+    b.shortText('Closures', 2, 'Which attribute marks a closure parameter that may be called after the function returns?', ['@escaping', 'escaping'], true,
+      'Closures are non-escaping by default. `@escaping` is needed when you store the closure or call it later, for example in a completion handler.'),
+    b.numeric('Structs vs classes', 2, 'What does this print?\n\n```swift\nstruct Point { var x = 0 }\nvar a = Point()\nvar b = a\nb.x = 5\nprint(a.x)\n```', 0, 0, null,
+      '`b = a` copies the struct, so changing `b.x` leaves `a.x` at 0. With a class, both names would point at one object and it would print 5.'),
+    b.ordering('SwiftUI views and state', 4, 'Put these in order for a SwiftUI button that changes `@State`.',
+      ["The button's action closure runs", 'The `@State` value changes', "SwiftUI recomputes the view's `body`", 'The screen shows the updated view'],
+      'SwiftUI views are a function of their state: changing state makes SwiftUI call `body` again and update what changed.'),
+    b.matching('Optionals', 4, 'Match each Swift keyword to what it does.',
+      [['`let`', 'Declares a constant'], ['`var`', 'Declares a variable'], ['`guard`', 'Exits early unless a condition is true'], ['`defer`', 'Runs code when the current scope exits']],
+      ['Declares a function'],
+      '`let` and `var` declare constants and variables, `guard` requires a condition or exits, and `defer` runs its block as the scope ends. Functions are declared with `func`.'),
+  ],
+});
