@@ -23,3 +23,6 @@ backend/data/users.json
 backend/data/seed-credentials.txt
 backend/data/*.tmp
 backend/data/exams.json
+
+# All captured screenshots and webcam photos (client copies and server uploads). Local only.
+evidence/

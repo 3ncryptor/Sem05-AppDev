@@ -1138,3 +1138,19 @@ Recorded after the backend and frontend specialists finished Loop 1 (2026-10-23)
 - Extend isn't capped at the window close.
 - Dismissing a flag never reopens an ended attempt.
 - A heartbeat gap is a silence of more than 30 s, recorded at the next heartbeat. Each gap adds 5 risk points.
+
+## 24. Evidence location (decided 2026-10-23, overrides §4 and §19.4)
+
+All screenshots, webcam photos and identity photos live in one folder at the Proctor root, next to `app/` and `backend/`. The folder is gitignored and never leaves the user's machine through git.
+
+```
+Proctor/
+  evidence/
+    client/<attemptCode>/{screen,camera,identity}/…jpg + manifest.json   ← the app's local-first copies
+    server/<userId>/<attemptId>/{screen,camera,identity}/…jpg            ← what the backend stored on upload
+           <userId>/<attemptId>/events.jsonl, flags.json
+```
+
+- **App:** when not packaged, the evidence root is `<Proctor>/evidence/client`. When packaged (the DMG on another Mac), there's no repo folder, so it falls back to `userData/evidence`. `ATHENA_EVIDENCE_DIR` overrides both.
+- **Backend:** `EVIDENCE_DIR` defaults to `<Proctor>/evidence/server`. The smoke script still uses a temp folder.
+- **Unchanged:** the path-traversal guards. Every file path is built from validated ids and must resolve inside its evidence root.
