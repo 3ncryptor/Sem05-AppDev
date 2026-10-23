@@ -1154,3 +1154,26 @@ Proctor/
 - **App:** when not packaged, the evidence root is `<Proctor>/evidence/client`. When packaged (the DMG on another Mac), there's no repo folder, so it falls back to `userData/evidence`. `ATHENA_EVIDENCE_DIR` overrides both.
 - **Backend:** `EVIDENCE_DIR` defaults to `<Proctor>/evidence/server`. The smoke script still uses a temp folder.
 - **Unchanged:** the path-traversal guards. Every file path is built from validated ids and must resolve inside its evidence root.
+
+## 25. Proctoring images live in `backend/proctorImages/` (2026-10-23, replaces §24)
+
+The user's decision: one clear folder of images, inside the backend folder, readable by a person, gitignored and local only.
+
+```
+backend/
+  proctorImages/                         ← gitignored
+    23CS042/                             ← roll number
+      ATH-7K4Q-9M2X/                     ← attempt code (also on the student's receipt)
+        webcam/2026-10-25T10-15-30Z_0014.jpg
+        screen/2026-10-25T10-15-30Z_0014.jpg
+        identity/2026-10-25T10-02-11Z_0001.jpg
+    _archive/<time>/…                    ← where `npm run seed` moves old images (never deletes them)
+  data/records/<userId>/<attemptId>/     ← gitignored: flags.json, captures.json, events.jsonl
+```
+
+- **The API doesn't change.** It still uses kind `camera` and file names like `camera/<name>.jpg`; only the folder on disk is named `webcam`. `EVIDENCE_DIR` still overrides the image root.
+- **The app's local copy is now a hidden staging area,** not a folder for people:
+  - Images wait in `userData/pending-uploads/<attemptCode>/` with a `manifest.json` until the server confirms them, and are then removed from staging.
+  - Crash safety is unchanged: staging survives a crash, and the worker resumes from the manifest.
+  - The root `evidence/` folder from §24 is dropped.
+- **Settings and the done page:** "Show evidence folder" becomes "N images waiting to upload" (or "All images uploaded ✓"). The "Delete local evidence" button is removed, because there are no lasting local copies any more.

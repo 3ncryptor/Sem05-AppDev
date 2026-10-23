@@ -2,6 +2,7 @@
 // Athena exam server. Builds the Express app in the order of BUILD_PLAN §19.1 and listens on HOST:PORT
 // (127.0.0.1 by default, so only this Mac can reach it unless HOST is set).
 
+const path = require('node:path');
 const express = require('express');
 const { loadConfig } = require('./config');
 const store = require('./lib/store');
@@ -57,7 +58,7 @@ function start() {
     process.exit(1);
   }
   store.init(config.dataDir);
-  attemptFiles.setEvidenceRoot(config.evidenceDir);
+  attemptFiles.setRoots({ records: path.join(config.dataDir, 'records'), images: config.evidenceDir });
   auth.setTokenTtlHours(config.tokenTtlHours);
   const server = createApp().listen(config.port, config.host, () => {
     process.stdout.write(`Athena server on http://${config.host}:${config.port} (data: ${config.dataDir}, evidence: ${config.evidenceDir})\n`);

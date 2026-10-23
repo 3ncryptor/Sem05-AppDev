@@ -24,5 +24,6 @@ backend/data/seed-credentials.txt
 backend/data/*.tmp
 backend/data/exams.json
 
-# All captured screenshots and webcam photos (client copies and server uploads). Local only.
-evidence/
+# Proctoring images (webcam, screen, identity) and per-attempt records. Local only, never committed.
+backend/proctorImages/
+backend/data/records/

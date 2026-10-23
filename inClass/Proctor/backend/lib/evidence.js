@@ -1,6 +1,7 @@
 'use strict';
 // Evidence images: upload from the student's main process, download for admins.
-// Stored at evidence/<userId>/<attemptId>/<kind>/<capturedAt with dashes>_<seq padded to 4>.jpg
+// Stored at proctorImages/<rollNo>/<attemptCode>/<webcam|screen|identity>/<capturedAt with dashes>_<seq padded to 4>.jpg
+// (attemptFiles.imagePath). The API still names files "<kind>/<name>.jpg" so clients don't change.
 
 const fsp = require('node:fs/promises');
 const path = require('node:path');
@@ -44,7 +45,7 @@ function attachToFlag(flags, capture) {
 }
 
 async function saveCapture(attempt, capture, body) {
-  const absolute = files.attemptPath(attempt, capture.kind, path.basename(capture.file));
+  const absolute = files.imagePath(attempt, capture.kind, path.basename(capture.file));
   await fsp.mkdir(path.dirname(absolute), { recursive: true });
   await store.writeFileAtomic(absolute, body);
   await files.writeCaptures(attempt, [...(await files.readCaptures(attempt)), capture]);
@@ -85,7 +86,7 @@ async function readEvidence(attemptId, kind, fileName) {
   const attempt = store.findById('attempts', attemptId);
   if (!attempt || !EVIDENCE_KINDS.includes(kind) || !FILE_NAME.test(fileName)) throw notFound('This file');
   try {
-    return await fsp.readFile(files.attemptPath(attempt, kind, fileName));
+    return await fsp.readFile(files.imagePath(attempt, kind, fileName));
   } catch (err) {
     if (err.code === 'ENOENT') throw notFound('This file');
     throw err;

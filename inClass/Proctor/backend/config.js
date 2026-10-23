@@ -29,9 +29,9 @@ function readHost() {
   return host;
 }
 
-/** Evidence lives at the Proctor root (evidence/server), next to app/ and backend/, unless EVIDENCE_DIR says otherwise. */
+/** Proctoring images live in backend/proctorImages (gitignored, local only) unless EVIDENCE_DIR says otherwise. */
 function readEvidenceDir() {
-  const dir = path.resolve(process.env.EVIDENCE_DIR || path.join(__dirname, '..', 'evidence', 'server'));
+  const dir = path.resolve(process.env.EVIDENCE_DIR || path.join(__dirname, 'proctorImages'));
   if (dir === path.parse(dir).root) throw new Error('EVIDENCE_DIR must not be the file-system root');
   return dir;
 }

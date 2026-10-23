@@ -31,6 +31,8 @@ function clearData(dataDir) {
   store.FILES.forEach((name) => {
     ['', '.tmp'].forEach((suffix) => fs.rmSync(path.join(dataDir, `${name}.json${suffix}`), { force: true }));
   });
+  // Flag/event JSON for the attempts being removed. Images are never deleted (see archiveEvidence).
+  fs.rmSync(path.join(dataDir, 'records'), { recursive: true, force: true });
 }
 
 const ARCHIVE = '_archive';
