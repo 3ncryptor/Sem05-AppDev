@@ -1,5 +1,5 @@
 'use strict';
-// Per-attempt files under DATA_DIR/evidence/<userId>/<attemptId>/:
+// Per-attempt files under EVIDENCE_DIR/<userId>/<attemptId>/ (default <Proctor>/evidence/server, BUILD_PLAN §24):
 //   flags.json, captures.json, events.jsonl, and screen/ camera/ identity/ image folders.
 // Every path is built from validated ids and server-made names, then checked with path.resolve
 // to sit inside the evidence root (path traversal guard, BUILD_PLAN §19.4).
@@ -9,8 +9,16 @@ const store = require('./store');
 const { ID_PATTERN } = require('./ids');
 const { AppError } = require('./errors');
 
+let root = null;
+
+/** Set once at startup from config.evidenceDir. Folders inside it are created lazily on first write. */
+function setEvidenceRoot(dir) {
+  root = path.resolve(dir);
+}
+
 function evidenceRoot() {
-  return path.resolve(store.getDataDir(), 'evidence');
+  if (!root) throw new Error('Evidence folder not configured');
+  return root;
 }
 
 /** @param {...string} parts @returns {string} absolute path, guaranteed inside the evidence root */
@@ -58,5 +66,5 @@ async function readAll(attempt) {
 }
 
 module.exports = {
-  evidenceRoot, attemptPath, readFlags, writeFlags, readCaptures, writeCaptures, readEvents, appendEvents, readAll,
+  setEvidenceRoot, evidenceRoot, attemptPath, readFlags, writeFlags, readCaptures, writeCaptures, readEvents, appendEvents, readAll,
 };

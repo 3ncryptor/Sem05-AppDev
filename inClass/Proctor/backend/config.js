@@ -8,7 +8,8 @@ const path = require('node:path');
  * @typedef {object} Config
  * @property {number} port
  * @property {string} host
- * @property {string} dataDir      absolute path of the JSON files and evidence folder
+ * @property {string} dataDir      absolute path of the JSON files
+ * @property {string} evidenceDir  absolute path of uploaded evidence (BUILD_PLAN §24)
  * @property {number} tokenTtlHours
  */
 
@@ -28,12 +29,20 @@ function readHost() {
   return host;
 }
 
+/** Evidence lives at the Proctor root (evidence/server), next to app/ and backend/, unless EVIDENCE_DIR says otherwise. */
+function readEvidenceDir() {
+  const dir = path.resolve(process.env.EVIDENCE_DIR || path.join(__dirname, '..', 'evidence', 'server'));
+  if (dir === path.parse(dir).root) throw new Error('EVIDENCE_DIR must not be the file-system root');
+  return dir;
+}
+
 /** @returns {Config} */
 function loadConfig() {
   return Object.freeze({
     port: readInt('PORT', 3000, 1, 65535),
     host: readHost(),
     dataDir: path.resolve(process.env.DATA_DIR || path.join(__dirname, 'data')),
+    evidenceDir: readEvidenceDir(),
     tokenTtlHours: readInt('TOKEN_TTL_HOURS', 12, 1, 168),
   });
 }

@@ -7,6 +7,7 @@ const { loadConfig } = require('./config');
 const store = require('./lib/store');
 const auth = require('./lib/auth');
 const http = require('./lib/http');
+const attemptFiles = require('./lib/attemptFiles');
 
 /** @returns {import('express').Express} */
 function createApp() {
@@ -56,9 +57,10 @@ function start() {
     process.exit(1);
   }
   store.init(config.dataDir);
+  attemptFiles.setEvidenceRoot(config.evidenceDir);
   auth.setTokenTtlHours(config.tokenTtlHours);
   const server = createApp().listen(config.port, config.host, () => {
-    process.stdout.write(`Athena server on http://${config.host}:${config.port} (data: ${config.dataDir})\n`);
+    process.stdout.write(`Athena server on http://${config.host}:${config.port} (data: ${config.dataDir}, evidence: ${config.evidenceDir})\n`);
   });
   server.on('error', (err) => {
     process.stderr.write(`Server error: ${err.message}\n`);

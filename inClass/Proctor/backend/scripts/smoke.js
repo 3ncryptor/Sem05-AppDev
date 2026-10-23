@@ -31,9 +31,9 @@ async function waitForServer(api) {
   throw new Error(`Server did not start on ${BASE}`);
 }
 
-function startServer(dataDir) {
+function startServer(dataDir, evidenceDir) {
   const child = spawn(process.execPath, [path.join(__dirname, '..', 'server.js')], {
-    env: { ...process.env, PORT, HOST: '127.0.0.1', DATA_DIR: dataDir },
+    env: { ...process.env, PORT, HOST: '127.0.0.1', DATA_DIR: dataDir, EVIDENCE_DIR: evidenceDir },
     stdio: ['ignore', 'ignore', 'pipe'],
   });
   child.stderr.on('data', (chunk) => process.stderr.write(`[server] ${chunk}`));
@@ -42,8 +42,10 @@ function startServer(dataDir) {
 
 async function main() {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'athena-smoke-'));
-  const seeded = await seed({ dataDir });
-  const server = startServer(dataDir);
+  // Evidence goes into the temp folder too, never into the real <Proctor>/evidence.
+  const evidenceDir = path.join(dataDir, 'evidence');
+  const seeded = await seed({ dataDir, evidenceDir });
+  const server = startServer(dataDir, evidenceDir);
   const api = makeClient(BASE);
   const { step, results } = makeRecorder();
   const ctx = {};

@@ -6,12 +6,14 @@ Express 5 + JSON files. The contract is BUILD_PLAN.md Part 2 (§18 routes, §19 
 
 ```bash
 npm install
-npm run seed     # RESETS data/: 1 admin, 10 students, 4 open exams. Passwords → data/seed-credentials.txt
+npm run seed     # RESETS data/ (old evidence is moved to evidence/server/_archive/<time>/): 1 admin, 10 students, 4 open exams. Passwords → data/seed-credentials.txt
 npm start        # http://127.0.0.1:3000  (HOST=0.0.0.0 to let a second Mac connect)
 npm run smoke    # full story over HTTP on port 3100 with a temporary data folder; prints PASS/FAIL
 ```
 
-Environment: `PORT` (3000), `HOST` (127.0.0.1), `DATA_DIR` (backend/data), `TOKEN_TTL_HOURS` (12).
+Environment: `PORT` (3000), `HOST` (127.0.0.1), `DATA_DIR` (backend/data), `EVIDENCE_DIR` (`<Proctor>/evidence/server`), `TOKEN_TTL_HOURS` (12).
+
+Uploaded evidence is stored at `EVIDENCE_DIR/<userId>/<attemptId>/` (`screen/`, `camera/`, `identity/`, `events.jsonl`, `flags.json`, `captures.json`). The folder is gitignored; `npm run seed` never deletes evidence: it moves existing folders into `_archive/<timestamp>/`.
 
 ## Layout
 
