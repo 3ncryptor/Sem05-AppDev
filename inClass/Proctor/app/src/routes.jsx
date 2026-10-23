@@ -5,6 +5,18 @@ import { HomeRedirect, RequireRole } from './features/auth/RequireRole.jsx'
 import { LoginPage } from './features/auth/LoginPage.jsx'
 import { ServerPage } from './features/auth/ServerPage.jsx'
 import { ExamWorkspace } from './features/admin/ExamWorkspace.jsx'
+import { DonePage } from './features/exam/DonePage.jsx'
+import { ExamProvider } from './features/exam/ExamProvider.jsx'
+import { ExamRoom } from './features/exam/ExamRoom.jsx'
+import { ReviewPage } from './features/exam/ReviewPage.jsx'
+import { BeginPage } from './features/pretest/BeginPage.jsx'
+import { PhotoPage } from './features/pretest/PhotoPage.jsx'
+import { PretestLayout } from './features/pretest/PretestLayout.jsx'
+import { ResumePage } from './features/pretest/ResumePage.jsx'
+import { RulesPage } from './features/pretest/RulesPage.jsx'
+import { SystemCheckPage } from './features/pretest/SystemCheckPage.jsx'
+import { ExamDetailPage } from './features/student/ExamDetailPage.jsx'
+import { ExamsPage } from './features/student/ExamsPage.jsx'
 import { Placeholder } from './features/placeholder/Placeholder.jsx'
 import { SelftestPage } from './features/selftest/SelftestPage.jsx'
 import { SettingsPage } from './features/settings/SettingsPage.jsx'
@@ -27,21 +39,39 @@ const studentRoutes = {
       element: <StudentShell />,
       children: [
         { index: true, element: <Navigate to="exams" replace /> },
-        { path: 'exams', element: later('C1', 'Exams', 3) },
-        { path: 'exams/:examId', element: later('C2', 'Exam detail', 3) },
+        { path: 'exams', element: <ExamsPage /> },
+        { path: 'exams/:examId', element: <ExamDetailPage /> },
         { path: 'results', element: later('C16', 'Results', 8) },
         { path: 'results/:attemptId', element: later('C15', 'Result', 8) },
         { path: 'analytics', element: later('C17', 'My analytics', 8) },
       ],
     },
     // Quiet-room screens: no sidebar (SCREENS §0.2).
-    { path: 'exams/:examId/start/check', element: later('C3', 'Step 1 · System check', 3, true) },
-    { path: 'exams/:examId/start/rules', element: later('C4', 'Step 2 · Rules, terms and consent', 3, true) },
-    { path: 'exams/:examId/start/photo', element: later('C5', 'Step 3 · Identity photo', 3, true) },
-    { path: 'exams/:examId/start/begin', element: later('C6', 'Step 4 · Begin', 3, true) },
-    { path: 'attempts/:attemptId', element: later('C7', 'The exam room', 4, true) },
-    { path: 'attempts/:attemptId/review', element: later('C12', 'Review & submit', 4, true) },
-    { path: 'attempts/:attemptId/done', element: later('C14', 'Done', 4, true) },
+    {
+      path: 'exams/:examId/start',
+      element: <PretestLayout />,
+      children: [
+        { index: true, element: <Navigate to="check" replace /> },
+        { path: 'check', element: <SystemCheckPage /> },
+        { path: 'rules', element: <RulesPage /> },
+        { path: 'photo', element: <PhotoPage /> },
+        { path: 'begin', element: <BeginPage /> },
+      ],
+    },
+    {
+      path: 'attempts/:attemptId',
+      children: [
+        {
+          element: <ExamProvider />,
+          children: [
+            { index: true, element: <ExamRoom /> },
+            { path: 'review', element: <ReviewPage /> },
+          ],
+        },
+        { path: 'resume', element: <ResumePage /> },
+        { path: 'done', element: <DonePage /> },
+      ],
+    },
   ],
 }
 

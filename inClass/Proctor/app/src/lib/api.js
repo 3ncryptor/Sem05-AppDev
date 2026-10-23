@@ -44,9 +44,21 @@ export const ipc = {
   serverPing: () => unwrap(() => window.athena.server.ping()),
   appInfo: () => unwrap(() => window.athena.app.info()),
   themeSet: (mode) => unwrap(() => window.athena.theme.set({ mode })),
-  evidenceSummary: () => unwrap(() => window.athena.evidence.summary({})),
-  evidenceOpenFolder: () => unwrap(() => window.athena.evidence.openFolder({})),
+  evidenceSummary: (attemptId) => unwrap(() => window.athena.evidence.summary(attemptId ? { attemptId } : {})),
+  evidenceOpenFolder: (attemptId) => unwrap(() => window.athena.evidence.openFolder(attemptId ? { attemptId } : {})),
   evidenceDeleteLocal: () => unwrap(() => window.athena.evidence.deleteLocal()),
+  evidenceSave: (payload) => unwrap(() => window.athena.evidence.save(payload)),
+  mediaAccess: (kind) => unwrap(() => window.athena.system.mediaAccess({ kind })),
+  askCamera: () => unwrap(() => window.athena.system.askCamera()),
+  displays: () => unwrap(() => window.athena.system.displays()),
+  openPrivacy: (pane) => unwrap(() => window.athena.system.openPrivacy({ pane })),
+  relaunch: () => unwrap(() => window.athena.system.relaunch()),
+  examEnter: (attemptId) => unwrap(() => window.athena.exam.enter({ attemptId })),
+  examExit: () => unwrap(() => window.athena.exam.exit()),
+  examFullscreen: () => unwrap(() => window.athena.exam.fullscreen()),
+  examEvent: (event) => unwrap(() => window.athena.exam.event(event)),
+  confirmSubmit: (counts) => unwrap(() => window.athena.exam.confirmSubmit(counts)),
+  saveReceiptPdf: (attemptId, code) => unwrap(() => window.athena.files.saveReceiptPdf({ attemptId, code })),
 }
 
 /** User-facing copy for error codes (BUILD_PLAN §20). Screens may override with their own wording. */
@@ -57,6 +69,10 @@ const MESSAGES = Object.freeze({
   UNAUTHENTICATED: 'Please sign in again.',
   NOT_FOUND: "This doesn't exist any more.",
   SERVER_UNREACHABLE: "Can't reach the exam server.",
+  EXAM_NOT_OPEN: "This exam isn't open right now.",
+  NO_ATTEMPTS_LEFT: "You've used all your attempts for this exam.",
+  ATTEMPT_NOT_ACTIVE: 'This attempt has already ended.',
+  TIME_UP: "Time's up for this attempt.",
 })
 
 /** @param {unknown} error */

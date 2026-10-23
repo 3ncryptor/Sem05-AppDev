@@ -1,8 +1,13 @@
 // Athena main process: app lifecycle, profiles, single-instance lock, app:// and wiring (BUILD_PLAN §17.4).
 import { app, BrowserWindow } from 'electron'
 import path from 'node:path'
-import { registerApiHandlers } from './api.js'
-import { registerEvidenceHandlers } from './evidence.js'
+import { registerApiHandlers, request, requestRaw } from './api.js'
+import { handleForced, handleWarnings, installQuitGuard, registerExamHandlers } from './exam.js'
+import { registerFileHandlers } from './files.js'
+import { flag, isSelftest, isSpike, wantsFakeMedia } from './flags.js'
+import { initHeartbeat } from './heartbeat.js'
+import { initQueue } from './queue.js'
+import { initEvidence, registerEvidenceHandlers } from './evidence.js'
 import { createLogger } from './log.js'
 import { buildMenu } from './menu.js'
 import { handleAppScheme, registerAppScheme } from './protocol.js'
@@ -21,17 +26,19 @@ const PROFILE_PATTERN = /^[a-z0-9][a-z0-9-]{0,31}$/
 
 // ---- command-line flags ----------------------------------------------------------------------------
 
-/** Reads `--name=value` or a bare `--name` from argv. */
-function flag(name) {
-  const prefix = `--${name}=`
-  const match = process.argv.find((arg) => arg === `--${name}` || arg.startsWith(prefix))
-  if (!match) return null
-  return match === `--${name}` ? true : match.slice(prefix.length)
-}
-
-const isSelftest = flag('selftest') === true
-const isSpike = flag('spike') === true
 const requestedProfile = flag('profile')
+
+// --fake-media swaps the camera for Chromium's test pattern so the camera steps can be driven by a script.
+// It is refused in the packaged app, where a fake camera would defeat proctoring.
+if (wantsFakeMedia && app.isPackaged) {
+  console.error('[athena] --fake-media is only available in development')
+  process.exit(2)
+}
+export const fakeMedia = wantsFakeMedia
+if (fakeMedia) {
+  app.commandLine.appendSwitch('use-fake-device-for-media-stream')
+  app.commandLine.appendSwitch('use-fake-ui-for-media-stream')
+}
 
 function resolveProfile() {
   if (typeof requestedProfile === 'string') {
@@ -79,17 +86,21 @@ function registerIpc() {
   registerApiHandlers()
   registerSystemHandlers()
   registerEvidenceHandlers()
+  registerExamHandlers()
+  registerFileHandlers()
   handle('app:info', () => ({
     version: app.getVersion(),
     electron: process.versions.electron,
     profile,
     isPackaged: app.isPackaged,
     theme: getSettings().theme,
+    fakeMedia,
   }))
 }
 
 function openMainWindow() {
   mainWindow = createMainWindow({ url: uiUrl({ hash: isSpike ? '/selftest' : '' }) })
+  installQuitGuard(mainWindow)
   mainWindow.on('closed', () => {
     mainWindow = null
   })
@@ -104,6 +115,11 @@ function start() {
     return
   }
   restoreSession()
+  // Wiring: queue, heartbeat and evidence get the HTTP client from here, so they don't import each other.
+  const replies = { onWarnings: handleWarnings, onForced: handleForced }
+  initQueue({ request, ...replies })
+  initHeartbeat({ request, ...replies })
+  initEvidence({ requestRaw })
   buildMenu()
   openMainWindow()
   log.info(`ready · profile ${profile} · userData ${app.getPath('userData')} · ${app.isPackaged ? 'packaged' : 'dev'}`)

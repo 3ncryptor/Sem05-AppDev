@@ -1,6 +1,7 @@
 // macOS permission and display checks (BUILD_PLAN §17.2 system:*). Used by C3 System check (Phase 3).
 import { app, screen, shell, systemPreferences } from 'electron'
 import { getActiveAttemptId } from './exam.js'
+import { wantsFakeMedia } from './flags.js'
 import { IpcError, handle, objectPayload, oneOf } from './validate.js'
 
 const MEDIA_KINDS = /** @type {const} */ (['camera', 'screen'])
@@ -21,6 +22,8 @@ function relaunch() {
 export function registerSystemHandlers() {
   handle('system:mediaAccess', (payload) => {
     const kind = oneOf(objectPayload(payload).kind, 'kind', MEDIA_KINDS)
+    // Dev --fake-media: the fake camera needs no macOS permission, so report granted instead of prompting.
+    if (wantsFakeMedia) return 'granted'
     return systemPreferences.getMediaAccessStatus(kind)
   })
   handle('system:askCamera', () => systemPreferences.askForMediaAccess('camera'))

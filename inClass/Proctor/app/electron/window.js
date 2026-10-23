@@ -77,6 +77,15 @@ function logRendererInDev(contents) {
 }
 
 let sessionLocked = false
+/** @type {BrowserWindow | null} the app window (not the hidden self-test one) */
+let mainWindow = null
+
+export const getMainWindow = () => (mainWindow && !mainWindow.isDestroyed() ? mainWindow : null)
+
+/** Sends one main → renderer event to the app window, if it's open. */
+export function broadcast(channel, payload) {
+  getMainWindow()?.webContents.send(channel, payload)
+}
 
 /**
  * @param {{ url: string, show?: boolean, backgroundThrottling?: boolean }} options
@@ -112,7 +121,10 @@ export function createMainWindow({ url, show = true, backgroundThrottling = true
   })
   lockDownContents(window.webContents)
   logRendererInDev(window.webContents)
-  if (show) window.once('ready-to-show', () => window.show())
+  if (show) {
+    mainWindow = window
+    window.once('ready-to-show', () => window.show())
+  }
   window.loadURL(url).catch((error) => log.error(`loadURL failed: ${error.message}`))
   return window
 }

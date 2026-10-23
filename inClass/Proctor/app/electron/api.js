@@ -3,7 +3,9 @@
 // fills path params, attaches the token it holds, and calls the server with net.fetch.
 import { net } from 'electron'
 import { createLogger } from './log.js'
-import { rememberAttempt } from './exam.js'
+import { markSubmitted } from './evidence.js'
+import { exitExam, rememberAttempt } from './exam.js'
+import { enqueueAnswer, flush } from './queue.js'
 import { PATH_ID_PATTERN, ROUTES, SPECIAL_PARAM_PATTERNS, isKnownRoute } from './routes.js'
 import { clearSession, getToken, setSession, setUser } from './session.js'
 import { getSettings, updateSettings } from './settings.js'
@@ -110,6 +112,50 @@ export async function request(name, params = {}) {
   return envelope
 }
 
+/**
+ * Sends raw bytes (evidence JPEGs). Leftover params go in the query string, as §21 shows.
+ * @param {string} name @param {Record<string, unknown>} params @param {Buffer} body @param {string} contentType
+ */
+export async function requestRaw(name, params, body, contentType) {
+  const route = ROUTES[name]
+  if (!route) throw new IpcError('IPC_REJECTED', `Unknown route ${name}`)
+  const { path, rest } = fillPath(route.path, params)
+  const headers = { Accept: 'application/json', 'Content-Type': contentType }
+  const token = getToken()
+  if (token) headers.Authorization = `Bearer ${token}`
+  const url = `${getSettings().serverUrl}/api${path}${toQuery(rest)}`
+  try {
+    const response = await net.fetch(url, { method: route.method, headers, body, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) })
+    return await readEnvelope(response)
+  } catch (error) {
+    log.warn(`${name} unreachable: ${error?.name ?? 'Error'}`)
+    return unreachable()
+  }
+}
+
+const SUBMIT_FLUSH_MS = 15_000
+
+/** Queued routes (answers.save) go to queue.js and return at once with the queue state. */
+function enqueue(name, params) {
+  if (name !== 'answers.save') throw new IpcError('IPC_REJECTED', `No queue for ${name}`)
+  const { attemptId, questionId, revision, response, timeSpentSec, marked } = params
+  fillPath(ROUTES[name].path, { attemptId, questionId })
+  if (!Number.isInteger(revision) || revision < 1) throw new IpcError('IPC_REJECTED', 'revision must be a positive integer')
+  const time = Number.isInteger(timeSpentSec) && timeSpentSec >= 0 ? timeSpentSec : 0
+  return { queued: true, ...enqueueAnswer({ attemptId, questionId, revision, response: response ?? null, timeSpentSec: time, marked: marked === true }) }
+}
+
+/** §22.7: send every queued answer first; if that can't finish, the renderer shows "waiting for the connection". */
+async function submit(params) {
+  if (!(await flush(SUBMIT_FLUSH_MS))) {
+    throw new IpcError('ANSWERS_PENDING', "We're waiting for the connection to send your last answers.")
+  }
+  const data = passThrough(await request('attempts.submit', params))
+  exitExam()
+  await markSubmitted(params.attemptId).catch(() => null)
+  return data
+}
+
 // ---- IPC handlers ---------------------------------------------------------------------------------
 
 /** @param {unknown} payload */
@@ -119,6 +165,8 @@ async function handleApiRequest(payload) {
   if (ROUTES[name].internal) throw new IpcError('IPC_REJECTED', `Route ${name} is internal`)
   const safeParams = objectPayload(params)
   if (jsonBytes(safeParams) > MAX_PARAMS_BYTES) throw new IpcError('IPC_REJECTED', 'params over 256 KB')
+  if (ROUTES[name].queued) return enqueue(name, safeParams)
+  if (name === 'attempts.submit') return submit(safeParams)
   return passThrough(await request(name, safeParams))
 }
 

@@ -132,3 +132,38 @@ kbd,
     scroll-behavior: auto !important;
   }
 }
+
+/* Receipt PDF (receipt:savePdf): print only the receipt card, in plain black on white. */
+.print-only {
+  display: none;
+}
+
+@media print {
+  body {
+    background: #fff;
+    overflow: visible;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .print-receipt,
+  .print-receipt * {
+    visibility: visible;
+    color: #000 !important;
+  }
+
+  .print-receipt {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #fff !important;
+    border: 1px solid #999 !important;
+  }
+
+  .print-receipt .print-only {
+    display: block;
+  }
+}
