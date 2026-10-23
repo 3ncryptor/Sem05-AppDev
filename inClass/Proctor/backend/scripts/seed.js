@@ -31,26 +31,9 @@ function clearData(dataDir) {
   store.FILES.forEach((name) => {
     ['', '.tmp'].forEach((suffix) => fs.rmSync(path.join(dataDir, `${name}.json${suffix}`), { force: true }));
   });
-  // Flag/event JSON for the attempts being removed. Images are never deleted (see archiveEvidence).
+  // Flag/event JSON for the attempts being removed. The seed never touches proctorImages/:
+  // every attempt has its own code folder, so old and new images can sit side by side.
   fs.rmSync(path.join(dataDir, 'records'), { recursive: true, force: true });
-}
-
-const ARCHIVE = '_archive';
-
-/**
- * Evidence is never deleted. The seed removes the attempts, so their folders are moved out of the
- * way into EVIDENCE_DIR/_archive/<timestamp>/ with fs.rename (atomic on the same volume).
- * @returns {{ count: number, folder: string|null }}
- */
-function archiveEvidence(evidenceDir) {
-  if (!fs.existsSync(evidenceDir)) return { count: 0, folder: null };
-  const users = fs.readdirSync(evidenceDir, { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== ARCHIVE);
-  if (users.length === 0) return { count: 0, folder: null };
-  const stamp = `${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}Z`;
-  const folder = path.join(evidenceDir, ARCHIVE, stamp);
-  fs.mkdirSync(folder, { recursive: true });
-  users.forEach((d) => fs.renameSync(path.join(evidenceDir, d.name), path.join(folder, d.name)));
-  return { count: users.length, folder };
 }
 
 async function makeUser(rollNo, name, role, nowIso) {
@@ -80,12 +63,11 @@ function makeExam(spec, nowMs) {
 }
 
 /**
- * @param {{ dataDir: string, evidenceDir: string }} options
+ * @param {{ dataDir: string }} options
  * @returns {Promise<{ admin: { rollNo: string, password: string }, students: { rollNo: string, name: string, password: string }[], exams: object[] }>}
  */
-async function seed({ dataDir, evidenceDir }) {
+async function seed({ dataDir }) {
   clearData(dataDir);
-  const archived = archiveEvidence(evidenceDir);
   store.init(dataDir);
   const nowMs = clock.now();
   const nowIso = clock.iso(nowMs);
@@ -100,7 +82,6 @@ async function seed({ dataDir, evidenceDir }) {
     admin: { rollNo: 'admin', password: admin.password },
     students: students.map((s) => ({ rollNo: s.user.rollNo, name: s.user.name, password: s.password })),
     exams: exams.map((e) => ({ id: e.id, title: e.title, questions: e.questions.length })),
-    archived,
   };
 }
 
@@ -117,12 +98,10 @@ function credentialsText(result) {
 
 async function main() {
   const config = loadConfig();
-  const result = await seed({ dataDir: config.dataDir, evidenceDir: config.evidenceDir });
+  const result = await seed({ dataDir: config.dataDir });
   const text = credentialsText(result);
   const file = path.join(config.dataDir, 'seed-credentials.txt');
   fs.writeFileSync(file, text, { mode: 0o600 });
-  const { count, folder } = result.archived;
-  process.stdout.write(count ? `Archived ${count} evidence folder${count === 1 ? '' : 's'} to ${folder}\n` : 'No evidence to archive.\n');
   process.stdout.write(`Seeded ${config.dataDir}\n${result.exams.map((e) => `  exam: ${e.title} (${e.questions} questions)`).join('\n')}\n\n${text}\nSaved to ${file}\n`);
 }
 

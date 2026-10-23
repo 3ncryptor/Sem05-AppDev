@@ -1167,7 +1167,7 @@ backend/
         webcam/2026-10-25T10-15-30Z_0014.jpg
         screen/2026-10-25T10-15-30Z_0014.jpg
         identity/2026-10-25T10-02-11Z_0001.jpg
-    _archive/<time>/…                    ← where `npm run seed` moves old images (never deletes them)
+    (npm run seed never touches this folder; every attempt has its own code folder)
   data/records/<userId>/<attemptId>/     ← gitignored: flags.json, captures.json, events.jsonl
 ```
 
