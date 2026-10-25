@@ -1,14 +1,14 @@
 // C4 Step 2 · Rules, terms and consent. Consent stays in memory and goes with attempts.start in C6.
-import { ArrowLeftRight, Check, Clock, Copy, Flag, Maximize, Monitor, ScanFace, SquareArrowRight } from 'lucide-react'
+import { ArrowLeftRight, Check, Clock, Copy } from 'lucide-react'
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router'
 import { Button } from '../../components/Button.jsx'
 import { Checkbox } from '../../components/Checkbox.jsx'
 import { usePretest } from './pretestContext.js'
-import { CAPTURE_ITEMS, examRules, flagLines } from './rulesModel.js'
+import { CAPTURE_ITEMS, examRules } from './rulesModel.js'
 import styles from './Pretest.module.css'
 
-const RULE_ICONS = { fullscreen: Maximize, switch: SquareArrowRight, face: ScanFace, display: Monitor, clipboard: Copy }
+const RULE_ICONS = { clipboard: Copy }
 
 function Line({ icon: Icon, children }) {
   return (
@@ -67,24 +67,13 @@ export function RulesPage() {
             </section>
           )}
           <section className={styles.block}>
-            <ul className={styles.ruleList}>
-              <Line icon={Flag}>
-                {flagLines(exam).map((line) => (
-                  <span key={line} className={styles.block1}>
-                    {line}
-                  </span>
-                ))}
-              </Line>
-            </ul>
-          </section>
-          <section className={styles.block}>
             <h2 className={styles.label}>What Athena captures</h2>
             <div className={styles.checks}>
               {CAPTURE_ITEMS.map((item) => (
                 <Checkbox key={item.id} label={item.label} checked={ticks[item.id]} onChange={() => toggle(item.id)} />
               ))}
             </div>
-            <p className={styles.soft}>Saved on this Mac and on your examiner’s server.</p>
+            <p className={styles.soft}>Saved in your examiner’s screenshots folder, under your name and this exam.</p>
           </section>
         </>
       )}

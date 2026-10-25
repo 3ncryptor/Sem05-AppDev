@@ -7,6 +7,7 @@ import { ExamContext } from './examContext.js'
 import { examReducer, initialExamState } from './examReducer.js'
 import { readLastQuestion, writeLastQuestion } from './lastQuestion.js'
 import { useMainEvents } from './useMainEvents.js'
+import { useWebcamPhotos } from './useWebcamPhotos.js'
 
 const TICK_MS = 1000
 
@@ -50,6 +51,7 @@ export function ExamProvider() {
   }, [attemptId, navigate])
 
   useMainEvents({ attemptId, dispatch, stateRef, toast, navigate })
+  useWebcamPhotos({ attemptId, isRunning: state.status === 'ready' && state.attempt?.status === 'in_progress' })
 
   // Time per question: count visible seconds on whichever question is open.
   useEffect(() => {

@@ -62,8 +62,6 @@ contextBridge.exposeInMainWorld('athena', {
   evidence: {
     save: invoke('evidence:save'),
     summary: invoke('evidence:summary'),
-    openFolder: invoke('evidence:openFolder'),
-    deleteLocal: invoke('evidence:deleteLocal'),
     adminImage: invoke('evidence:adminImage'),
   },
   files: {

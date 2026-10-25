@@ -24,8 +24,12 @@ backend/data/seed-credentials.txt
 backend/data/*.tmp
 backend/data/exams.json
 
-# Proctoring images (webcam, screen, identity) and per-attempt records. Local only, never committed.
+# Exam screenshots (webcam + screen) and per-attempt records. Local only, never committed.
+backend/screenshots/
 backend/proctorImages/
 backend/data/records/
 # Old v2 client staging folder from Loop 2 (superseded by userData staging, §25). Never commit.
 evidence/
+
+# start.sh / stop.sh process ids and logs
+.run/

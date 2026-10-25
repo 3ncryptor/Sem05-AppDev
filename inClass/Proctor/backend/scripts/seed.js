@@ -31,8 +31,8 @@ function clearData(dataDir) {
   store.FILES.forEach((name) => {
     ['', '.tmp'].forEach((suffix) => fs.rmSync(path.join(dataDir, `${name}.json${suffix}`), { force: true }));
   });
-  // Flag/event JSON for the attempts being removed. The seed never touches proctorImages/:
-  // every attempt has its own code folder, so old and new images can sit side by side.
+  // Flag/event JSON for the attempts being removed. The seed never touches screenshots/:
+  // file names carry the capture time, so images from before and after a reseed sit side by side.
   fs.rmSync(path.join(dataDir, 'records'), { recursive: true, force: true });
 }
 

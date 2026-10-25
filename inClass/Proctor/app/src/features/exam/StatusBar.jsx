@@ -1,5 +1,5 @@
-// C7 status bar: exam name · timer · save state · flags · camera dot. Every state has a word or a shape.
-import { CircleCheck, CloudOff, Flag, LoaderCircle, Timer } from 'lucide-react'
+// C7 status bar: exam name · timer · save state · camera dot. Every state has a word or a shape.
+import { CircleCheck, CloudOff, LoaderCircle, Timer } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { isLive, onCameraChange } from '../../proctoring/webcam.js'
 import { BrandMark } from '../shell/BrandMark.jsx'
@@ -40,16 +40,9 @@ function CameraDot() {
   )
 }
 
-function flagTone(count, max) {
-  if (count === 0) return ''
-  if (max && count >= max - 1) return styles.flagCritical
-  return styles.flagAttention
-}
-
 /** @param {{ state: object, msLeft: number | null, revisionKey: number }} props */
 export function StatusBar({ state, msLeft, revisionKey }) {
   const timer = timerDisplay(msLeft)
-  const showFlags = Boolean(state.proctoring?.enabled)
   return (
     <header className={`drag-region ${styles.statusBar}`}>
       <span className={styles.examTitle}>
@@ -61,13 +54,6 @@ export function StatusBar({ state, msLeft, revisionKey }) {
       </span>
       <span className={styles.statusRight} aria-live="polite">
         <SaveState net={state.net} revisionKey={revisionKey} />
-        {showFlags && (
-          <span className={`${styles.flags} ${flagTone(state.flagCount, state.maxFlags)}`}>
-            <Flag size={14} aria-hidden="true" /> {state.flagCount}
-            {state.maxFlags ? `/${state.maxFlags}` : ''}
-            <span className="visually-hidden"> flags</span>
-          </span>
-        )}
         <CameraDot />
       </span>
     </header>

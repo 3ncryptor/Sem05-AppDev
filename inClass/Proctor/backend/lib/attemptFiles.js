@@ -1,19 +1,25 @@
 'use strict';
 // Two folders per attempt (BUILD_PLAN §25):
 //   records: DATA_DIR/records/<userId>/<attemptId>/  flags.json, captures.json, events.jsonl
-//   images:  backend/proctorImages/<rollNo>/<attemptCode>/{webcam,screen,identity}/<time>_<seq>.jpg
-// Every path is built from validated ids and server-made names, then checked with path.resolve
-// to sit inside its root (path traversal guard, BUILD_PLAN §19.4).
+//   images:  backend/screenshots/<Candidate_Name>/<Test_Name>/{webcam,screen}/<Candidate_Name>-<Test_Name>-<time>.jpg
+// Names are cleaned to letters and digits in any script, plus '_' (so '-' only ever separates the parts of a
+// file name), then every path is checked with path.resolve to sit inside its root (path traversal guard).
+// Each capture record keeps the path it was saved under, so renaming a student or exam later doesn't lose it.
 
 const path = require('node:path');
 const store = require('./store');
 const { ID_PATTERN } = require('./ids');
 const { AppError } = require('./errors');
 
-const ROLL_NO = /^[A-Za-z0-9_-]{1,32}$/;
-const ATTEMPT_CODE = /^ATH-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
-// The API calls the webcam kind "camera"; on disk the folder says what it is.
-const IMAGE_FOLDER = Object.freeze({ camera: 'webcam', screen: 'screen', identity: 'identity' });
+const MAX_NAME_PART = 40;
+// The API calls the webcam kind "camera"; on disk the folder says what it is. The identity photo is a webcam photo too.
+const IMAGE_FOLDER = Object.freeze({ camera: 'webcam', screen: 'screen', identity: 'webcam' });
+
+/** "Aryan Vibhuti" → "Aryan_Vibhuti", "आर्यन शर्मा" keeps its letters. Never empty, never "." or "..", at most 40 characters. */
+function namePart(value) {
+  const cleaned = String(value || '').normalize('NFC').replace(/[^\p{L}\p{M}\p{N}]+/gu, '_').replace(/^_+|_+$/g, '');
+  return Array.from(cleaned).slice(0, MAX_NAME_PART).join('').replace(/_+$/, '') || 'unknown';
+}
 
 let roots = null;
 
@@ -37,17 +43,33 @@ function attemptPath(attempt, ...parts) {
   return insideRoot('records', attempt.userId, attempt.id, ...parts);
 }
 
-/**
- * Image file for one attempt, in a folder a person can browse: roll number, then attempt code.
- * @param {{ userId: string, code: string }} attempt @param {string} kind @param {string} fileName
- */
-function imagePath(attempt, kind, fileName) {
+/** The candidate's and the test's names as they appear on disk. @param {{ userId: string, examId: string }} attempt */
+function imageNames(attempt) {
   const user = store.findById('users', attempt.userId);
+  const exam = store.findById('exams', attempt.examId);
+  if (!user || !exam) throw new Error('Unknown student or exam for image path');
+  return { candidate: namePart(user.name), test: namePart(exam.title) };
+}
+
+/**
+ * Image file for one attempt, in a folder a person can browse: candidate, then test, then webcam or screen.
+ * A second attempt at the same test lands in the same folder; file names carry the time, so nothing clashes.
+ * @param {{ userId: string, examId: string }} attempt @param {string} kind @param {string} fileName
+ */
+function imageRelativePath(attempt, kind, fileName) {
   const folder = IMAGE_FOLDER[kind];
-  if (!user || !ROLL_NO.test(user.rollNo) || !ATTEMPT_CODE.test(attempt.code) || !folder) {
-    throw new Error('Bad name in image path');
-  }
-  return insideRoot('images', user.rollNo, attempt.code, folder, fileName);
+  if (!folder) throw new Error('Bad kind in image path');
+  const { candidate, test } = imageNames(attempt);
+  return [candidate, test, folder, fileName].join('/');
+}
+
+/** Absolute path of an image from the relative path stored in its capture record. */
+function storedImagePath(relativePath) {
+  return insideRoot('images', ...String(relativePath).split('/'));
+}
+
+function imagePath(attempt, kind, fileName) {
+  return storedImagePath(imageRelativePath(attempt, kind, fileName));
 }
 
 function readFlags(attempt) {
@@ -81,5 +103,5 @@ async function readAll(attempt) {
 }
 
 module.exports = {
-  setRoots, attemptPath, imagePath, readFlags, writeFlags, readCaptures, writeCaptures, readEvents, appendEvents, readAll,
+  setRoots, attemptPath, imageNames, imagePath, imageRelativePath, storedImagePath, readFlags, writeFlags, readCaptures, writeCaptures, readEvents, appendEvents, readAll,
 };

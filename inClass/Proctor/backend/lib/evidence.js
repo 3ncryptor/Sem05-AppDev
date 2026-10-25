@@ -1,7 +1,7 @@
 'use strict';
 // Evidence images: upload from the student's main process, download for admins.
-// Stored at proctorImages/<rollNo>/<attemptCode>/<webcam|screen|identity>/<capturedAt with dashes>_<seq padded to 4>.jpg
-// (attemptFiles.imagePath). The API still names files "<kind>/<name>.jpg" so clients don't change.
+// Stored at screenshots/<Candidate_Name>/<Test_Name>/<webcam|screen>/<Candidate_Name>-<Test_Name>-<YYYY-MM-DD_HH-mm-ss>.jpg
+// (attemptFiles.imagePath), in the server's local time. The API names files "<kind>/<name>.jpg".
 
 const fsp = require('node:fs/promises');
 const path = require('node:path');
@@ -14,15 +14,27 @@ const { ownAttempt } = require('./attempts');
 const files = require('./attemptFiles');
 
 const JPEG_MAGIC = Buffer.from([0xff, 0xd8, 0xff]);
-const FILE_NAME = /^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z_\d{4,9}\.jpg$/;
+const FILE_NAME = /^[\p{L}\p{M}\p{N}_-]{1,200}\.jpg$/u;
+const MAX_SAME_SECOND = 99;
 
-/** "2026-10-25T10:15:30.123Z" → "2026-10-25T10-15-30Z" (colons aren't allowed in some file systems). */
-function stamp(isoString) {
-  return `${isoString.slice(0, 19).replace(/:/g, '-')}Z`;
+const pad = (n) => String(n).padStart(2, '0');
+
+/** "2026-10-25T16:18:29.123Z" → "2026-10-25_21-48-29" in the server's time zone (no colons: Finder shows them as '/'). */
+function localStamp(isoString) {
+  const d = new Date(isoString);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
 }
 
-function fileNameFor(capturedAt, seq) {
-  return `${stamp(capturedAt)}_${String(seq).padStart(4, '0')}.jpg`;
+/** "Asha_Rao-CLI_Apps-2026-10-25_21-48-29.jpg", or "…_2.jpg" when a file with that name is already there. */
+async function freeFileName(attempt, kind, capturedAt) {
+  const { candidate, test } = files.imageNames(attempt);
+  const base = `${candidate}-${test}-${localStamp(capturedAt)}`;
+  for (let n = 1; n <= MAX_SAME_SECOND; n += 1) {
+    const name = n === 1 ? `${base}.jpg` : `${base}_${n}.jpg`;
+    const taken = await fsp.access(files.imagePath(attempt, kind, name)).then(() => true, () => false);
+    if (!taken) return name;
+  }
+  throw new AppError('VALIDATION_FAILED', 'Too many images in the same second.');
 }
 
 /** Checks the bytes before anything touches the disk. */
@@ -45,7 +57,7 @@ function attachToFlag(flags, capture) {
 }
 
 async function saveCapture(attempt, capture, body) {
-  const absolute = files.imagePath(attempt, capture.kind, path.basename(capture.file));
+  const absolute = files.storedImagePath(capture.path);
   await fsp.mkdir(path.dirname(absolute), { recursive: true });
   await store.writeFileAtomic(absolute, body);
   await files.writeCaptures(attempt, [...(await files.readCaptures(attempt)), capture]);
@@ -71,8 +83,10 @@ function uploadEvidence(user, attemptId, meta, body) {
     const attempt = ownAttempt(user, attemptId);
     const existing = (await files.readCaptures(attempt)).find((c) => c.kind === meta.kind && c.seq === meta.seq);
     if (existing) return { file: existing.file, duplicate: true };
+    const name = await freeFileName(attempt, meta.kind, meta.capturedAt);
     const capture = {
-      file: `${meta.kind}/${fileNameFor(meta.capturedAt, meta.seq)}`,
+      file: `${meta.kind}/${name}`,
+      path: files.imageRelativePath(attempt, meta.kind, name),
       kind: meta.kind, seq: meta.seq, capturedAt: meta.capturedAt, reason: meta.reason,
       receivedAt: clock.iso(), bytes: body.length,
     };
@@ -81,16 +95,21 @@ function uploadEvidence(user, attemptId, meta, body) {
   });
 }
 
-/** Admin download. kind and file are checked against fixed patterns, then the path is guarded. */
+/**
+ * Admin download. kind and file are checked against fixed patterns; the file is read from the path its
+ * capture record was saved under (older records without one fall back to today's names), then guarded.
+ */
 async function readEvidence(attemptId, kind, fileName) {
   const attempt = store.findById('attempts', attemptId);
   if (!attempt || !EVIDENCE_KINDS.includes(kind) || !FILE_NAME.test(fileName)) throw notFound('This file');
+  const capture = (await files.readCaptures(attempt)).find((c) => c.file === `${kind}/${fileName}`);
+  if (!capture) throw notFound('This file');
   try {
-    return await fsp.readFile(files.imagePath(attempt, kind, fileName));
+    return await fsp.readFile(capture.path ? files.storedImagePath(capture.path) : files.imagePath(attempt, kind, fileName));
   } catch (err) {
     if (err.code === 'ENOENT') throw notFound('This file');
     throw err;
   }
 }
 
-module.exports = { uploadEvidence, readEvidence, fileNameFor, stamp };
+module.exports = { uploadEvidence, readEvidence };

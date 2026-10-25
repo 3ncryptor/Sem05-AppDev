@@ -1,8 +1,9 @@
-// Local-first evidence (BUILD_PLAN §4, §24). Every image is written to this Mac BEFORE it's uploaded:
-//   <root>/<attemptCode>/{identity,camera,screen}/<time>_<seq>.jpg  +  manifest.json
+// Hidden upload staging (BUILD_PLAN §25). Every image is written to this Mac BEFORE it's uploaded:
+//   userData/pending-uploads/<attemptCode>/{identity,camera,screen}/<time>_<seq>.jpg  +  manifest.json
 // The manifest doubles as the upload queue: an entry is `uploaded: true` only after the server confirms it,
-// so a crash or a dropped network loses nothing. One upload at a time, oldest first.
-import { app, BrowserWindow, dialog, shell } from 'electron'
+// and its image file is then deleted from staging. A crash or a dropped network loses nothing, because the
+// worker resumes from the manifest. One upload at a time, oldest first. People read the images on the server.
+import { app } from 'electron'
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { getKnownAttempt } from './exam.js'
@@ -21,11 +22,10 @@ const IDLE_POLL_MS = 30_000
 /** Upload errors that won't change on retry: mark the entry skipped and move on. */
 const SKIP_CODES = new Set(['PAYLOAD_TOO_LARGE', 'VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'IPC_REJECTED'])
 
-/** Dev: <Proctor>/evidence/client. Packaged: userData/evidence. ATHENA_EVIDENCE_DIR overrides both. */
+/** userData/pending-uploads. ATHENA_EVIDENCE_DIR overrides it (testing only). */
 export function evidenceRoot() {
   if (process.env.ATHENA_EVIDENCE_DIR) return path.resolve(process.env.ATHENA_EVIDENCE_DIR)
-  if (!app.isPackaged) return path.resolve(app.getAppPath(), '..', 'evidence', 'client')
-  return path.join(app.getPath('userData'), 'evidence')
+  return path.join(app.getPath('userData'), 'pending-uploads')
 }
 
 /** Resolves `parts` under the root and refuses anything that lands outside it. */
@@ -111,11 +111,11 @@ export function saveImage({ attempt, kind, reason, buffer }) {
     await writeManifest(dir, { ...manifest, nextSeq: manifest.nextSeq + 1, entries: [...manifest.entries, entry] })
     log.info(`saved ${attempt.code}/${file}`)
     kickUploads()
-    return { file }
+    return { file, seq: entry.seq }
   })
 }
 
-/** After submit: the attempt can be deleted locally once every image is uploaded. */
+/** After submit: mark the manifest. Uploads of the remaining images carry on. */
 export async function markSubmitted(attemptId) {
   const dir = await dirForAttempt(attemptId)
   if (!dir) return
@@ -160,6 +160,7 @@ async function uploadOne({ dir, manifest, entry }) {
   const envelope = await deps.requestRaw('attempts.evidence', params, body, 'image/jpeg')
   if (envelope.ok) {
     await markEntry(dir, manifest.attemptId, entry.seq, { uploaded: true })
+    await rm(path.join(dir, entry.file), { force: true })
     return true
   }
   if (envelope.error.code === 'SERVER_UNREACHABLE') {
@@ -169,6 +170,7 @@ async function uploadOne({ dir, manifest, entry }) {
   if (SKIP_CODES.has(envelope.error.code)) {
     log.warn(`skipped ${entry.file}: ${envelope.error.code}`)
     await markEntry(dir, manifest.attemptId, entry.seq, { skipped: envelope.error.code })
+    await rm(path.join(dir, entry.file), { force: true })
     return true
   }
   log.warn(`upload of ${entry.file} failed: ${envelope.error.code}`)
@@ -210,63 +212,21 @@ export function initEvidence(wiring) {
 // ---- Settings and the done page -----------------------------------------------------------------------
 
 async function folderSummary(dir) {
-  const manifest = await readManifest(dir)
-  const entries = manifest?.entries ?? []
-  return {
-    images: entries.length,
-    bytes: entries.reduce((sum, entry) => sum + (entry.bytes ?? 0), 0),
-    pending: entries.filter((entry) => !entry.uploaded && !entry.skipped).length,
-    submitted: manifest?.status === 'submitted',
-  }
+  const entries = (await readManifest(dir))?.entries ?? []
+  const uploaded = entries.filter((entry) => entry.uploaded).length
+  return { images: entries.length, uploaded, pending: entries.filter((entry) => !entry.uploaded && !entry.skipped).length }
 }
 
+/** evidence:summary → { pending, uploaded, images } for one attempt, or for everything on this Mac. */
 async function summary(payload) {
   const { attemptId } = objectPayload(payload)
   const dirs = attemptId ? [await dirForAttempt(attemptId)].filter(Boolean) : await attemptDirs()
   const parts = await Promise.all(dirs.map(folderSummary))
   const total = (key) => parts.reduce((sum, part) => sum + part[key], 0)
-  return {
-    folder: dirs.length === 1 && attemptId ? dirs[0] : evidenceRoot(),
-    attempts: dirs.length,
-    images: total('images'),
-    bytes: total('bytes'),
-    pending: total('pending'),
-  }
-}
-
-async function openFolder(payload) {
-  const { attemptId } = objectPayload(payload)
-  await mkdir(evidenceRoot(), { recursive: true })
-  const dir = typeof attemptId === 'string' ? await dirForAttempt(attemptId) : null
-  const target = dir ? inside(path.basename(dir)) : evidenceRoot()
-  const failure = await shell.openPath(target)
-  if (failure) throw new IpcError('NOT_FOUND', failure)
-  return null
-}
-
-/** Deletes only attempts that are submitted AND fully uploaded, after a native confirm. */
-async function deleteLocal(_payload, event) {
-  const dirs = await attemptDirs()
-  const parts = await Promise.all(dirs.map(async (dir) => ({ dir, ...(await folderSummary(dir)) })))
-  const deletable = parts.filter((part) => part.submitted && part.pending === 0)
-  if (parts.length === 0) return { deleted: 0, kept: 0 }
-  const { response } = await dialog.showMessageBox(BrowserWindow.fromWebContents(event.sender), {
-    type: 'warning',
-    buttons: ['Delete', 'Cancel'],
-    defaultId: 1,
-    cancelId: 1,
-    message: `Delete local evidence for ${deletable.length} attempt${deletable.length === 1 ? '' : 's'}?`,
-    detail: 'Only attempts that are submitted and fully uploaded are deleted. Your examiner keeps their copy.',
-  })
-  if (response !== 0) return null
-  await Promise.all(deletable.map((part) => rm(inside(path.basename(part.dir)), { recursive: true, force: true })))
-  return { deleted: deletable.length, kept: parts.length - deletable.length }
+  return { pending: total('pending'), uploaded: total('uploaded'), images: total('images') }
 }
 
 export function registerEvidenceHandlers() {
   handle('evidence:save', saveEvidence)
   handle('evidence:summary', summary)
-  handle('evidence:openFolder', openFolder)
-  handle('evidence:deleteLocal', deleteLocal)
 }
-

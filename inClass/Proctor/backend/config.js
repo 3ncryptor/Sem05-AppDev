@@ -9,7 +9,7 @@ const path = require('node:path');
  * @property {number} port
  * @property {string} host
  * @property {string} dataDir      absolute path of the JSON files
- * @property {string} evidenceDir  absolute path of uploaded evidence (BUILD_PLAN §24)
+ * @property {string} evidenceDir  absolute path of the screenshots folder
  * @property {number} tokenTtlHours
  */
 
@@ -29,9 +29,9 @@ function readHost() {
   return host;
 }
 
-/** Proctoring images live in backend/proctorImages (gitignored, local only) unless EVIDENCE_DIR says otherwise. */
+/** Exam screenshots live in backend/screenshots (gitignored, local only) unless EVIDENCE_DIR says otherwise. */
 function readEvidenceDir() {
-  const dir = path.resolve(process.env.EVIDENCE_DIR || path.join(__dirname, 'proctorImages'));
+  const dir = path.resolve(process.env.EVIDENCE_DIR || path.join(__dirname, 'screenshots'));
   if (dir === path.parse(dir).root) throw new Error('EVIDENCE_DIR must not be the file-system root');
   return dir;
 }

@@ -1,6 +1,8 @@
-// The running exam (BUILD_PLAN §17.4): which attempt is active, fullscreen, the heartbeat, renderer events,
-// the submit confirm (C12) and the quit confirm (C13).
+// The running exam (BUILD_PLAN §17.4): which attempt is active, fullscreen, the heartbeat, the screenshot
+// timer (capture.js), renderer events, the submit confirm (C12) and the quit confirm (C13).
 import { app, dialog } from 'electron'
+import { startCapture, stopCapture } from './capture.js'
+import { saveImage } from './evidence.js'
 import { startHeartbeat, stopHeartbeat } from './heartbeat.js'
 import { createLogger } from './log.js'
 import { enqueueEvent, getNetStatus, persistNow } from './queue.js'
@@ -16,7 +18,7 @@ const RENDERER_EVENT_TYPES = /** @type {const} */ ([
   'face_detection_unavailable',
 ])
 
-/** @typedef {{ id: string, code: string, deadlineAt: string, status: string }} KnownAttempt */
+/** @typedef {{ id: string, code: string, deadlineAt: string, status: string, screenshots: object | null }} KnownAttempt */
 
 /** Attempts the server returned to this session (attempts.start / attempts.get). Only these can be entered. */
 const knownAttempts = new Map()
@@ -29,7 +31,10 @@ let quitConfirmed = false
 export function rememberAttempt(data) {
   const attempt = data?.attempt
   if (typeof attempt?.id !== 'string') return
-  knownAttempts.set(attempt.id, { id: attempt.id, code: attempt.code, deadlineAt: attempt.deadlineAt, status: attempt.status })
+  knownAttempts.set(attempt.id, {
+    id: attempt.id, code: attempt.code, deadlineAt: attempt.deadlineAt, status: attempt.status,
+    screenshots: data.proctoring?.screenshots ?? null,
+  })
   if (active?.id === attempt.id) active = knownAttempts.get(attempt.id)
 }
 
@@ -41,7 +46,7 @@ function requireAttemptId(value) {
   return value
 }
 
-/** exam:enter: fullscreen + heartbeat. Idempotent, so C6 and the exam room can both call it. */
+/** exam:enter: fullscreen + heartbeat + screenshots. Idempotent, so C6 and the exam room can both call it. */
 function enterExam(payload) {
   const attemptId = requireAttemptId(objectPayload(payload).attemptId)
   const attempt = knownAttempts.get(attemptId)
@@ -50,14 +55,21 @@ function enterExam(payload) {
   active = attempt
   getMainWindow()?.setFullScreen(true)
   startHeartbeat(attemptId)
+  startCapture({
+    attempt,
+    settings: attempt.screenshots,
+    save: saveImage,
+    requestCamera: () => broadcast('exam:capture-now', { attemptId }),
+  })
   return { ok: true, net: getNetStatus() }
 }
 
-/** Leaves the exam: stop the heartbeat and leave fullscreen. Evidence uploads keep going. */
+/** Leaves the exam: stop the heartbeat and screenshots, leave fullscreen. Evidence uploads keep going. */
 export function exitExam() {
   if (active) log.info(`exit ${active.id}`)
   if (active) knownAttempts.set(active.id, { ...active, status: 'submitted' })
   active = null
+  stopCapture()
   stopHeartbeat()
   getMainWindow()?.setFullScreen(false)
 }

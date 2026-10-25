@@ -63,7 +63,7 @@ export function ExamRoom() {
   const { attemptId } = useParams()
   const { state, actions } = useExam()
   const question = state.questions[state.index]
-  useClipboardBlock(state.proctoring?.enabled ? state.proctoring.rules?.clipboard : null, question?.id)
+  useClipboardBlock(state.proctoring?.enabled ? state.proctoring.rules?.clipboard : null)
 
   const shortcuts = useMemo(
     () => ({

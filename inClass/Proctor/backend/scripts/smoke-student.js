@@ -109,7 +109,7 @@ async function evidenceSteps({ api, step, ctx }) {
   const url = (seq) => `/api/attempts/${ctx.att1.id}/evidence?kind=screen&seq=${seq}&capturedAt=${encodeURIComponent(new Date().toISOString())}&reason=flag`;
   await step('a tiny valid JPEG is stored under the right name', async () => {
     const r = await api.post(url(1), { token: s1, raw: TINY_JPEG });
-    expect(r.status === 201 && /^screen\/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z_0001\.jpg$/.test(r.data.file) && !r.data.duplicate, JSON.stringify(r.json));
+    expect(r.status === 201 && /^screen\/[A-Za-z0-9_]+-[A-Za-z0-9_]+-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.jpg$/.test(r.data.file) && !r.data.duplicate, JSON.stringify(r.json));
     ctx.evidenceFile = r.data.file;
     const again = await api.post(url(1), { token: s1, raw: TINY_JPEG });
     expect(again.data.duplicate === true && again.data.file === r.data.file, 'retry was not idempotent');

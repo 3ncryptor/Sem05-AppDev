@@ -147,19 +147,19 @@ function effectiveMaxFlags(proctoring, attempt) {
   return proctoring.autoEnd.maxFlags + (attempt ? attempt.flagAllowance || 0 : 0);
 }
 
-/** Short lines for C2, e.g. "Camera photo about every 45–60 s". */
+/**
+ * Short lines for C2 and A3, e.g. "Webcam photo about every 45–60 s". Proctoring rules were removed on
+ * 2026-10-25: every exam now captures screenshots, so only the capture schedule is described.
+ */
 function summary(proctoring) {
-  if (!proctoring.enabled) return { enabled: false, lines: ['No proctoring for this exam'], text: 'No proctoring' };
   const { minSec, maxSec } = proctoring.screenshots;
   const every = minSec === maxSec ? `${minSec} s` : `${minSec}–${maxSec} s`;
-  const r = proctoring.rules;
   const lines = [
-    proctoring.cameraPhotos.withScreenshots ? `Camera photo about every ${every}` : null,
-    `Screen picture about every ${every}`,
-    r.noFace.on || r.multiFace.on ? 'Face must stay in view, alone' : null,
-    r.fullscreen.on ? (proctoring.blockMultipleDisplays ? 'Fullscreen, one display' : 'Fullscreen') : null,
-    proctoring.autoEnd.enabled ? `The exam ends at ${proctoring.autoEnd.maxFlags} flags` : 'Flags are reviewed; they never end the exam',
-  ].filter(Boolean);
+    'Identity photo before you begin',
+    `Screenshot of the Athena window about every ${every}`,
+    `Webcam photo about every ${every}`,
+    'Your examiner reviews the images after the exam',
+  ];
   return { enabled: true, lines, text: lines.join(' · ') };
 }
 

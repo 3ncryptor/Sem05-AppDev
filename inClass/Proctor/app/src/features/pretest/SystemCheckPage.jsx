@@ -11,12 +11,10 @@ import styles from './Pretest.module.css'
 
 const INITIAL = Object.fromEntries(ROWS.map((row) => [row.id, { status: 'waiting' }]))
 const ICONS = { waiting: Circle, checking: LoaderCircle, ok: Check, warn: TriangleAlert, unavailable: TriangleAlert, fail: CircleX, skipped: Check }
-const CAMERA_ROWS = ['camera', 'face', 'light']
+const CAMERA_ROWS = ['camera']
 
 function rowText(row, state) {
   if (state.status === 'ok') return row.okLabel ?? row.label
-  if (state.status === 'checking' && row.id === 'face') return 'Face: hold still for 2 seconds…'
-  if (state.status === 'unavailable') return 'Face check unavailable: the exam will run without it'
   if (state.status === 'skipped') return `${row.label}: skipped (dev only)`
   if (row.id === 'displays' && Number.isInteger(state.detail)) return `Displays: ${state.detail}`
   return row.label
@@ -27,7 +25,6 @@ export function SystemCheckPage() {
   const navigate = useNavigate()
   const video = useRef(null)
   const [rows, setRows] = useState(INITIAL)
-  const [progress, setProgress] = useState(0)
   const [running, setRunning] = useState(false)
 
   const setRow = (id, patch) => setRows((current) => ({ ...current, [id]: { ...current[id], ...patch } }))
@@ -44,8 +41,7 @@ export function SystemCheckPage() {
           continue
         }
         setRow(id, { status: 'checking', kind: null })
-        if (id === 'face') setProgress(0)
-        const result = await runRow(id, { video: video.current, exam, onProgress: setProgress })
+        const result = await runRow(id, { video: video.current, exam })
         setRow(id, result)
         if (id === 'camera' && result.status !== 'ok') cameraOk = false
       }
@@ -63,7 +59,7 @@ export function SystemCheckPage() {
   const rerun = (id) => run(id === 'camera' ? CAMERA_ROWS : [id])
   const passed = !running && allPassed(rows)
   const onContinue = () => {
-    setCheck({ passed: true, summary: checkSummary(rows), faceSkipped: rows.face.status !== 'ok' })
+    setCheck({ passed: true, summary: checkSummary(rows) })
     navigate('../rules')
   }
 
@@ -86,11 +82,6 @@ export function SystemCheckPage() {
                   <Icon size={16} aria-hidden="true" className={state.status === 'checking' ? styles.spin : ''} />
                   <span>{rowText(row, state)}</span>
                   <span className="visually-hidden">{state.status}</span>
-                  {row.id === 'face' && state.status === 'checking' && (
-                    <span className={styles.bar} role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
-                      <span style={{ width: `${progress * 100}%` }} />
-                    </span>
-                  )}
                 </span>
                 {failed && state.kind && (
                   <FixCard

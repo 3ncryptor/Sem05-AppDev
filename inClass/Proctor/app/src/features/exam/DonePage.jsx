@@ -1,5 +1,5 @@
 // C14 Done: the receipt, how the exam ended, evidence state, and what happens to results. Never a score.
-import { Check, FileDown, FolderOpen } from 'lucide-react'
+import { Check, FileDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { Banner } from '../../components/Banner.jsx'
@@ -34,7 +34,8 @@ function endingCopy(reason, firstName, maxFlags) {
 function evidenceLine(summary) {
   if (!summary) return '…'
   if (summary.images === 0) return 'no images'
-  return `${summary.images} image${summary.images === 1 ? '' : 's'}, ${summary.pending === 0 ? 'all uploaded ✓' : `${summary.pending} still uploading`}`
+  const count = `${summary.images} image${summary.images === 1 ? '' : 's'}`
+  return summary.pending === 0 ? `${count}, all uploaded ✓` : `${count}, ${summary.pending} waiting to upload`
 }
 
 export function DonePage() {
@@ -121,9 +122,6 @@ export function DonePage() {
             <div className={styles.doneButtons}>
               <Button icon={FileDown} onClick={onSavePdf} loading={saving}>
                 Save receipt (PDF)
-              </Button>
-              <Button icon={FolderOpen} onClick={() => ipc.evidenceOpenFolder(attemptId).catch(() => toast('No local evidence folder for this attempt.'))}>
-                Show evidence folder
               </Button>
             </div>
             {receipt.resultVisible ? (

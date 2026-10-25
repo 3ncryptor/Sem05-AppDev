@@ -1,5 +1,5 @@
-// C2 Exam detail: what the exam is, how it's proctored, and Get started (→ C3).
-import { ArrowRight, Camera, ChevronLeft, Flag, Maximize, MonitorUp, RotateCw, ScanFace } from 'lucide-react'
+// C2 Exam detail: what the exam is, what Athena captures during it, and Get started (→ C3).
+import { ArrowRight, Camera, ChevronLeft, Eye, MonitorUp, RotateCw } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { Banner } from '../../components/Banner.jsx'
 import { Button } from '../../components/Button.jsx'
@@ -12,13 +12,11 @@ import { useApi } from '../../lib/useApi.js'
 import { MY_STATUS } from './examCardModel.js'
 import styles from './Student.module.css'
 
-/** An icon for each proctoring summary line, picked by what the line talks about. */
+/** An icon for each capture summary line, picked by what the line talks about. */
 function iconFor(line) {
-  if (/camera/i.test(line)) return Camera
-  if (/fullscreen|display/i.test(line)) return Maximize
-  if (/screen/i.test(line)) return MonitorUp
-  if (/face/i.test(line)) return ScanFace
-  return Flag
+  if (/webcam|identity/i.test(line)) return Camera
+  if (/screenshot/i.test(line)) return MonitorUp
+  return Eye
 }
 
 const START_BLOCKED = {
@@ -83,7 +81,7 @@ export function ExamDetailPage() {
       </dl>
       <section aria-labelledby="proctoring-title" className={styles.proctoring}>
         <h2 id="proctoring-title" className={styles.sectionTitle}>
-          Proctoring
+          What Athena captures
         </h2>
         <ul className={styles.ruleList}>
           {(exam.proctoringSummary?.lines ?? []).map((line) => {
