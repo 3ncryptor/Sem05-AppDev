@@ -12,6 +12,7 @@ const { effectiveMaxFlags } = require('./proctoring');
 const { checklist } = require('./checklist');
 const { isHeld } = require('./visibility');
 const files = require('./attemptFiles');
+const { answeredCount } = require('./attemptViews');
 
 function studentOf(attempt) {
   const user = store.findById('users', attempt.userId);
@@ -53,6 +54,7 @@ function liveCard({ attempt, captures, risk }, exam, nowMs) {
   return {
     id: attempt.id, code: attempt.code, student: studentOf(attempt), status: attempt.status, submitReason: attempt.submitReason,
     startedAt: attempt.startedAt, deadlineAt: attempt.deadlineAt, lastSeenAt: attempt.lastSeenAt,
+    answered: answeredCount(attempt), questionCount: attempt.questionOrder.length,
     secondsSinceSeen: Math.round((nowMs - clock.ms(attempt.lastSeenAt)) / 1000),
     timeLeftSec: attempt.status === 'in_progress' ? Math.max(0, Math.round((clock.ms(attempt.deadlineAt) - nowMs) / 1000)) : 0,
     flagCount: attempt.flagCount, maxFlags: effectiveMaxFlags(exam.proctoring, attempt),

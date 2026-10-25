@@ -45,8 +45,6 @@ export const ipc = {
   appInfo: () => unwrap(() => window.athena.app.info()),
   themeSet: (mode) => unwrap(() => window.athena.theme.set({ mode })),
   evidenceSummary: (attemptId) => unwrap(() => window.athena.evidence.summary(attemptId ? { attemptId } : {})),
-  evidenceOpenFolder: (attemptId) => unwrap(() => window.athena.evidence.openFolder(attemptId ? { attemptId } : {})),
-  evidenceDeleteLocal: () => unwrap(() => window.athena.evidence.deleteLocal()),
   evidenceSave: (payload) => unwrap(() => window.athena.evidence.save(payload)),
   mediaAccess: (kind) => unwrap(() => window.athena.system.mediaAccess({ kind })),
   askCamera: () => unwrap(() => window.athena.system.askCamera()),
@@ -59,6 +57,12 @@ export const ipc = {
   examEvent: (event) => unwrap(() => window.athena.exam.event(event)),
   confirmSubmit: (counts) => unwrap(() => window.athena.exam.confirmSubmit(counts)),
   saveReceiptPdf: (attemptId, code) => unwrap(() => window.athena.files.saveReceiptPdf({ attemptId, code })),
+  /** One saved exam image as a `data:image/jpeg;base64,…` URL. kind: 'screen' | 'camera' | 'identity'; file: '<name>.jpg'. */
+  adminImage: (attemptId, kind, file) => unwrap(() => window.athena.evidence.adminImage({ attemptId, kind, file })),
+  /** Asks where to save, writes the exam's results CSV. Returns { path } or null if cancelled. */
+  exportResultsCsv: (examId, code) => unwrap(() => window.athena.files.exportResultsCsv({ examId, code })),
+  /** Native open dialog for a .csv file. Returns { name, text } or null if cancelled. */
+  openCsv: () => unwrap(() => window.athena.files.openCsv()),
 }
 
 /** User-facing copy for error codes (BUILD_PLAN §20). Screens may override with their own wording. */

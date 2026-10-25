@@ -1,0 +1,60 @@
+.page {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+
+.section {
+  margin-bottom: var(--space-3);
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  border-bottom: 1px solid var(--line);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+}
+
+.ok {
+  width: 16px;
+  color: var(--ok);
+  text-align: center;
+}
+
+.problem {
+  width: 16px;
+  color: var(--critical);
+  text-align: center;
+}
+
+.note {
+  margin-top: var(--space-2);
+  color: var(--ink-soft);
+}

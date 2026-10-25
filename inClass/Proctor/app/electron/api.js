@@ -133,6 +133,26 @@ export async function requestRaw(name, params, body, contentType) {
   }
 }
 
+/**
+ * GETs a route that answers with a file (an image or a CSV) instead of JSON.
+ * @param {string} name @param {Record<string, unknown>} params
+ * @returns {Promise<{ ok: true, buffer: Buffer } | { ok: false, error: { code: string, message: string } }>}
+ */
+export async function requestFile(name, params) {
+  const route = ROUTES[name]
+  if (!route || route.method !== 'GET') throw new IpcError('IPC_REJECTED', `Unknown file route ${name}`)
+  const { path, rest } = fillPath(route.path, params)
+  const { query, init } = buildInit('GET', rest)
+  try {
+    const response = await net.fetch(`${getSettings().serverUrl}/api${path}${query}`, { ...init, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) })
+    if (!response.ok) return { ok: false, error: (await readEnvelope(response)).error }
+    return { ok: true, buffer: Buffer.from(await response.arrayBuffer()) }
+  } catch (error) {
+    log.warn(`${name} unreachable: ${error?.name ?? 'Error'}`)
+    return unreachable()
+  }
+}
+
 const SUBMIT_FLUSH_MS = 15_000
 
 /** Queued routes (answers.save) go to queue.js and return at once with the queue state. */

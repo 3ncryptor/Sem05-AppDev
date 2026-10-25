@@ -17,7 +17,7 @@ function heldReason(attempt, exam) {
 function resultRow(attempt, exam) {
   return {
     attemptId: attempt.id, code: attempt.code, student: studentOf(attempt), status: attempt.status,
-    submitReason: attempt.submitReason, submittedAt: attempt.submittedAt, ...scoreSummary(attempt, exam),
+    submitReason: attempt.submitReason, startedAt: attempt.startedAt, submittedAt: attempt.submittedAt, ...scoreSummary(attempt, exam),
     flagCount: attempt.flagCount, risk: attempt.risk, review: attempt.review,
     held: isHeld(attempt, exam), heldReason: heldReason(attempt, exam), resultVisible: Boolean(attempt.resultVisibleAt),
   };
@@ -77,14 +77,14 @@ function csvCell(value) {
   return /[",\n\r]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
 }
 
-const CSV_HEADER = ['rollNo', 'name', 'status', 'submitReason', 'score', 'maxScore', 'percent', 'outcome', 'flags', 'riskScore', 'riskLevel', 'review', 'resultVisible', 'submittedAt'];
+const CSV_HEADER = ['rollNo', 'name', 'status', 'submitReason', 'score', 'maxScore', 'percent', 'outcome', 'resultVisible', 'startedAt', 'submittedAt'];
 
 /** admin.results.csv */
 async function resultsCsv(examId) {
   const { rows } = await listResults(examId);
   const lines = rows.map((r) => [
     r.student.rollNo, r.student.name, r.status, r.submitReason, r.score, r.maxScore, r.percent, r.outcome,
-    r.flagCount, r.risk.score, r.risk.level, r.review.status, r.resultVisible, r.submittedAt,
+    r.resultVisible, r.startedAt, r.submittedAt,
   ].map(csvCell).join(','));
   return [CSV_HEADER.join(','), ...lines].join('\r\n');
 }

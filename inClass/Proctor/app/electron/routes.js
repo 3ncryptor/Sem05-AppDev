@@ -85,7 +85,7 @@ export const PATH_ID_PATTERN = /^[a-z]{2}_[A-Za-z0-9-]{8,40}$/
  */
 export const SPECIAL_PARAM_PATTERNS = Object.freeze({
   kind: /^(screen|camera|identity)$/,
-  file: /^[\w.-]+\.jpg$/,
+  file: /^[\p{L}\p{M}\p{N}_.-]+\.jpg$/u,
 })
 
 /** @param {string} name */

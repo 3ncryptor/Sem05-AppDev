@@ -10,12 +10,18 @@ export function examStatusKey(exam, now = Date.now()) {
   return 'published'
 }
 
-/** @returns {{ label: string } | null} draft → Publish…; live/closed with "when I publish" → Publish results… */
+/**
+ * draft → Publish…; live/closed with "when I publish" → Publish results…; published before anyone starts → Unpublish….
+ * @returns {{ label: string, kind: 'publish' | 'unpublish' | 'results', variant: 'primary' | 'secondary' } | null}
+ */
 export function primaryAction(exam, statusKey) {
-  if (statusKey === 'draft') return { label: 'Publish…' }
+  if (statusKey === 'draft') return { label: 'Publish…', kind: 'publish', variant: 'primary' }
   const waitsForPublish = exam?.resultPolicy?.visibility === 'after_publish'
   if ((statusKey === 'live' || statusKey === 'closed') && waitsForPublish && !exam?.resultsPublishedAt) {
-    return { label: 'Publish results…' }
+    return { label: 'Publish results…', kind: 'results', variant: 'primary' }
+  }
+  if (exam?.status === 'published' && (exam?.counts?.started ?? 0) === 0) {
+    return { label: 'Unpublish…', kind: 'unpublish', variant: 'secondary' }
   }
   return null
 }
