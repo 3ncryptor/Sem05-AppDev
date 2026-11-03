@@ -1,3 +1,4 @@
+/* EmptyState, Skeleton, Kbd and StatTile (DESIGN.md). */
 .empty {
   display: grid;
   justify-items: center;
@@ -8,25 +9,37 @@
 }
 
 .emptyIcon {
-  color: var(--ink-faint);
-  margin-bottom: var(--space-1);
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--surface-sunk);
+  color: var(--ink-soft);
 }
 
 .emptyTitle {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 500;
   font-size: var(--text-lg);
+  line-height: var(--leading-lg);
 }
 
 .emptyText {
   max-width: 420px;
 }
 
+.empty > :last-child:not(p, .emptyIcon) {
+  margin-top: var(--space-3);
+}
+
+/* Static placeholder with a slow, quiet shimmer; reduced motion leaves it static. */
 .skeleton {
   display: block;
   background: linear-gradient(90deg, var(--surface-sunk) 0%, var(--line) 50%, var(--surface-sunk) 100%);
   background-size: 200% 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
+  animation: shimmer 1.6s ease-in-out infinite;
 }
 
 @keyframes shimmer {
@@ -44,19 +57,21 @@
   min-width: 20px;
   height: 20px;
   padding: 0 5px;
-  border: 1px solid var(--line-strong);
-  border-bottom-width: 2px;
-  border-radius: 5px;
-  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunk);
   color: var(--ink-soft);
-  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
   line-height: 1;
 }
 
 .tile {
   display: grid;
-  gap: var(--space-1);
-  padding: var(--space-4);
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
@@ -65,18 +80,24 @@
 .tileLabel {
   color: var(--ink-soft);
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
 .tileValue {
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
-  font-weight: 600;
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-2xl);
+  font-weight: 500;
+  letter-spacing: var(--tracking-title);
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--ink);
 }
 
 .tileDetail {
   color: var(--ink-soft);
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
 }

@@ -6,9 +6,11 @@ import { Outlet, useNavigate, useParams } from 'react-router'
 import { Banner } from '../../components/Banner.jsx'
 import { Button } from '../../components/Button.jsx'
 import { Chip } from '../../components/Chip.jsx'
+import { PageHeader } from '../../components/PageHeader.jsx'
 import { Skeleton } from '../../components/Skeleton.jsx'
 import { Tabs } from '../../components/Tabs.jsx'
 import { errorMessage } from '../../lib/api.js'
+import { formatWindow, plural } from '../../lib/format.js'
 import { EXAM_STATUS } from '../../lib/status.js'
 import { useApi } from '../../lib/useApi.js'
 import { PublishDialog } from './exams/PublishDialog.jsx'
@@ -28,22 +30,22 @@ function tabItems(base, counts) {
   ]
 }
 
+/** "15 min · 1 question · 25 Oct 22:17 to 28 Oct 22:18" (the code sits next to the title in mono). */
 function metaLine(exam) {
+  const questions = exam.questionCount ?? exam.questions?.length
   const parts = [
-    exam.code,
     exam.durationMinutes ? `${exam.durationMinutes} min` : null,
-    Number.isInteger(exam.questionCount ?? exam.questions?.length) ? `${exam.questionCount ?? exam.questions.length} questions` : null,
+    Number.isInteger(questions) ? plural(questions, 'question') : null,
+    exam.opensAt && exam.closesAt ? formatWindow(exam.opensAt, exam.closesAt) : 'Window not set',
   ]
   return parts.filter(Boolean).join(' · ')
 }
 
 function HeaderSkeleton() {
   return (
-    <div className={styles.header} aria-busy="true">
-      <div className={styles.titleBlock}>
-        <Skeleton width={240} height={26} />
-        <Skeleton width={180} height={14} />
-      </div>
+    <div className={styles.skeleton} aria-busy="true">
+      <Skeleton width={280} height={32} />
+      <Skeleton width={220} height={14} />
     </div>
   )
 }
@@ -81,22 +83,26 @@ export function ExamWorkspace() {
         </Banner>
       )}
       {exam && (
-        <header className={styles.header}>
-          <div className={styles.titleBlock}>
-            <h1 className={styles.title}>{exam.title}</h1>
-            <p className={styles.meta}>{metaLine(exam)}</p>
-          </div>
-          <div className={styles.actions}>
-            <Chip spec={EXAM_STATUS[statusKey]} pulse={statusKey === 'live'}>
-              {statusKey === 'live' && writing > 0 ? `Live now · ${writing} writing` : undefined}
-            </Chip>
-            {action && (
-              <Button variant={action.variant} onClick={onAction}>
+        <PageHeader
+          className={styles.header}
+          title={exam.title}
+          meta={
+            <>
+              <span className={styles.code}>{exam.code}</span>
+              <Chip spec={EXAM_STATUS[statusKey]} pulse={statusKey === 'live'}>
+                {statusKey === 'live' && writing > 0 ? `Live now · ${writing} writing` : undefined}
+              </Chip>
+            </>
+          }
+          description={metaLine(exam)}
+          actions={
+            action && (
+              <Button variant={action.variant} size="lg" onClick={onAction}>
                 {action.label}
               </Button>
-            )}
-          </div>
-        </header>
+            )
+          }
+        />
       )}
       <Tabs label="Exam sections" items={tabItems(base, counts)} />
       <div className={styles.tabBody}>

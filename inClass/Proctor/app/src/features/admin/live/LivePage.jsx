@@ -33,14 +33,14 @@ function columns(onAction) {
       label: 'Student',
       render: (a) => (
         <div className={styles.student}>
-          <span>{a.student.name}</span>
+          <span className={styles.name}>{a.student.name}</span>
           <span className={styles.roll}>{a.student.rollNo}</span>
         </div>
       ),
     },
     { key: 'status', label: 'Status', render: (a) => <Chip spec={statusSpec(a)} /> },
-    { key: 'startedAt', label: 'Started', render: (a) => timeOf(a.startedAt) },
-    { key: 'progress', label: 'Answered', align: 'right', render: (a) => `${a.answered ?? 0} / ${a.questionCount ?? '—'}` },
+    { key: 'startedAt', label: 'Started', render: (a) => <span className={styles.clock}>{timeOf(a.startedAt)}</span> },
+    { key: 'progress', label: 'Answered', align: 'right', render: (a) => <span className={styles.clock}>{`${a.answered ?? 0} / ${a.questionCount ?? '—'}`}</span> },
     {
       key: 'timeLeft',
       label: 'Time left',
@@ -68,7 +68,7 @@ function LoadingState() {
     <div className={styles.loading} aria-busy="true">
       <div className={styles.tiles}>
         {[0, 1, 2, 3].map((key) => (
-          <Skeleton key={key} height={76} radius={14} />
+          <Skeleton key={key} height={112} radius={10} />
         ))}
       </div>
       {[0, 1, 2, 3].map((key) => (
@@ -82,7 +82,8 @@ function UpdatedLine({ serverNow, nowMs, paused, refreshing, onTogglePause, onRe
   const ago = serverNow ? Math.max(0, Math.round((nowMs - Date.parse(serverNow)) / 1000)) : null
   return (
     <div className={styles.updated}>
-      <span className={styles.muted} aria-live="polite">
+      <span className={styles.status} aria-live="polite">
+        <span className={paused ? styles.pausedDot : styles.liveDot} aria-hidden="true" />
         {paused ? 'Paused' : ago === null ? 'Loading…' : `Updated ${agoLabel(ago)} ago`}
       </span>
       <Button variant="ghost" icon={RotateCw} onClick={onRefresh} loading={refreshing} aria-label="Refresh now" />
@@ -122,7 +123,10 @@ export function LivePage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h2 className={styles.title}>Live</h2>
+        <div className={styles.heading}>
+          <h2 className={styles.title}>Live</h2>
+          <p className={styles.muted}>Who is writing now, refreshed every 5 seconds.</p>
+        </div>
         <UpdatedLine
           serverNow={data?.serverNow}
           nowMs={nowMs}
@@ -140,10 +144,10 @@ export function LivePage() {
       )}
       {data && (
         <div className={styles.tiles}>
-          <StatTile label="Writing" value={counters.writing} />
-          <StatTile label="Online" value={counters.online} />
-          <StatTile label="Offline" value={counters.offline} detail={counters.offline ? 'No heartbeat for 30 s' : undefined} />
-          <StatTile label="Finished" value={counters.finished} />
+          <StatTile label="Writing" value={counters.writing} detail="attempts in progress" />
+          <StatTile label="Online" value={counters.online} detail="heartbeat in the last 30 s" />
+          <StatTile label="Offline" value={counters.offline} detail={counters.offline ? 'No heartbeat for 30 s' : 'everyone is connected'} />
+          <StatTile label="Finished" value={counters.finished} detail="submitted or ended" />
         </div>
       )}
       {data && attempts.length > 0 && (

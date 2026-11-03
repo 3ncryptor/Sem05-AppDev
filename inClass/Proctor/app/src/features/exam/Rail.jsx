@@ -1,6 +1,7 @@
-// C7 left rail: one button per question with a distinct shape per state (never colour alone).
+// C7 left rail: one button per question. A shape per state, never colour alone: answered = filled ink dot,
+// marked = accent ring, current = ink number on a raised cell; the word is in the aria-label.
 import { progressOf, questionState } from './examReducer.js'
-import { SHAPES, STATE_WORDS } from './railShapes.js'
+import { STATE_WORDS } from './railShapes.js'
 import styles from './Exam.module.css'
 
 export function Rail({ state, onGo }) {
@@ -19,7 +20,7 @@ export function Rail({ state, onGo }) {
                 aria-current={kind === 'current' ? 'step' : undefined}
                 aria-label={`Question ${index + 1}, ${STATE_WORDS[kind]}`}
               >
-                <span aria-hidden="true">{SHAPES[kind]}</span>
+                <span className={styles.railMark} aria-hidden="true" />
                 <span aria-hidden="true">{index + 1}</span>
               </button>
             </li>

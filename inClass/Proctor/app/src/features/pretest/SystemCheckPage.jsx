@@ -1,5 +1,5 @@
 // C3 Step 1 · System check. Rows run in order: waiting → checking → ✓ / ✕ (with a fix card) / ⚠.
-import { Check, Circle, CircleX, Lightbulb, LoaderCircle, TriangleAlert } from 'lucide-react'
+import { Check, ChevronLeft, Circle, CircleX, Lightbulb, LoaderCircle, TriangleAlert } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Button } from '../../components/Button.jsx'
@@ -11,6 +11,8 @@ import styles from './Pretest.module.css'
 
 const INITIAL = Object.fromEntries(ROWS.map((row) => [row.id, { status: 'waiting' }]))
 const ICONS = { waiting: Circle, checking: LoaderCircle, ok: Check, warn: TriangleAlert, unavailable: TriangleAlert, fail: CircleX, skipped: Check }
+/** Status as a word next to its icon (never colour alone). */
+const WORDS = { waiting: 'Waiting', checking: 'Checking', ok: 'Ready', warn: 'Warning', unavailable: 'Unavailable', fail: 'Needs a fix', skipped: 'Skipped' }
 const CAMERA_ROWS = ['camera']
 
 function rowText(row, state) {
@@ -64,10 +66,10 @@ export function SystemCheckPage() {
   }
 
   return (
-    <div className={styles.wide}>
+    <div className={styles.step}>
       <header className={styles.heading}>
         <h1 className={styles.title}>Let’s check your setup</h1>
-        <p className={styles.soft}>This takes about 2 minutes. Nothing is recorded yet.</p>
+        <p className={styles.lead}>This takes about 2 minutes. Nothing is recorded yet.</p>
       </header>
       <div className={styles.checkGrid}>
         <CameraPreview videoRef={video} ready={rows.camera.status === 'ok'} />
@@ -79,9 +81,11 @@ export function SystemCheckPage() {
             return (
               <li key={row.id} className={styles.row} data-status={state.status}>
                 <span className={styles.rowLine}>
-                  <Icon size={16} aria-hidden="true" className={state.status === 'checking' ? styles.spin : ''} />
-                  <span>{rowText(row, state)}</span>
-                  <span className="visually-hidden">{state.status}</span>
+                  <span className={styles.rowLabel}>{rowText(row, state)}</span>
+                  <span className={styles.rowStatus}>
+                    <Icon size={16} aria-hidden="true" className={state.status === 'checking' ? styles.spin : ''} />
+                    {WORDS[state.status]}
+                  </span>
                 </span>
                 {failed && state.kind && (
                   <FixCard
@@ -101,8 +105,10 @@ export function SystemCheckPage() {
         <Lightbulb size={16} aria-hidden="true" /> Turn on Do Not Disturb now: notifications can pull focus during the exam.
       </p>
       <div className={styles.footer}>
-        <Button onClick={() => navigate(`/student/exams/${exam.id}`)}>‹ Back</Button>
-        <Button variant="primary" onClick={onContinue} disabled={!passed}>
+        <Button variant="ghost" size="lg" icon={ChevronLeft} onClick={() => navigate(`/student/exams/${exam.id}`)}>
+          Back
+        </Button>
+        <Button variant="primary" size="lg" onClick={onContinue} disabled={!passed}>
           Continue
         </Button>
       </div>

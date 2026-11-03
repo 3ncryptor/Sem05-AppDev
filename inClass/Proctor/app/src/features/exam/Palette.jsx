@@ -1,7 +1,8 @@
 // C8 question palette: opens with Q over the stage's left edge; filters, a grid and the legend. Esc or Q closes.
 import { useState } from 'react'
+import seg from '../../components/Segmented.module.css'
 import { isAnsweredEntry, progressOf, questionState } from './examReducer.js'
-import { SHAPES, STATE_WORDS } from './railShapes.js'
+import { STATE_WORDS } from './railShapes.js'
 import styles from './Exam.module.css'
 
 const FILTERS = [
@@ -18,17 +19,17 @@ export function Palette({ state, onGo }) {
     <aside className={styles.palette} aria-label="Question palette">
       <div className={styles.paletteHead}>
         <h2 className={styles.paletteTitle}>Questions</h2>
-        <span className={styles.soft}>
+        <span className={styles.paletteCount}>
           {answered} of {total} answered
         </span>
       </div>
-      <div className={styles.paletteFilters} role="group" aria-label="Show">
+      <div className={seg.track} role="group" aria-label="Show">
         {FILTERS.map((f) => {
           const count = state.questions.filter((q) => f.match(state.answers[q.id])).length
           return (
-            <button key={f.id} type="button" aria-pressed={filter === f.id} className={styles.paletteFilter} onClick={() => setFilter(f.id)}>
+            <button key={f.id} type="button" aria-pressed={filter === f.id} className={seg.segment} onClick={() => setFilter(f.id)}>
               {f.label}
-              {f.id !== 'all' && ` ${count}`}
+              {f.id !== 'all' && <span className={seg.count}>{count}</span>}
             </button>
           )
         })}
@@ -45,15 +46,16 @@ export function Palette({ state, onGo }) {
               onClick={() => onGo(index)}
               aria-label={`Question ${index + 1}, ${STATE_WORDS[kind]}`}
             >
-              <span aria-hidden="true">{SHAPES[kind]}</span> {index + 1}
+              <span className={styles.railMark} aria-hidden="true" />
+              <span aria-hidden="true">{index + 1}</span>
             </button>
           )
         })}
       </div>
       <p className={styles.legend}>
-        {Object.entries(SHAPES).map(([kind, shape]) => (
-          <span key={kind}>
-            {shape} {STATE_WORDS[kind]}
+        {['answered', 'marked', 'seen', 'todo'].map((kind) => (
+          <span key={kind} className={styles[`rail_${kind}`]}>
+            <span className={styles.railMark} aria-hidden="true" /> {STATE_WORDS[kind]}
           </span>
         ))}
       </p>

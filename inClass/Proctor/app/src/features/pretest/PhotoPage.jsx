@@ -1,5 +1,5 @@
 // C5 Step 3 · Identity photo. Held in memory until C6 creates the attempt.
-import { Camera } from 'lucide-react'
+import { Camera, ChevronLeft } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router'
 import { Button } from '../../components/Button.jsx'
@@ -45,11 +45,13 @@ export function PhotoPage() {
   }
 
   return (
-    <article className={styles.card} aria-labelledby="photo-title">
-      <h1 id="photo-title" className={styles.title}>
-        Take your identity photo
-      </h1>
-      <p className={styles.soft}>Your examiner compares it with photos taken during the exam.</p>
+    <article className={styles.step} aria-labelledby="photo-title">
+      <header className={styles.heading}>
+        <h1 id="photo-title" className={styles.title}>
+          Take your identity photo
+        </h1>
+        <p className={styles.lead}>Your examiner compares it with photos taken during the exam.</p>
+      </header>
       <div className={styles.photoFrame}>
         <CameraPreview videoRef={video} ready={cameraReady} frozenUrl={taken?.url ?? null} />
       </div>
@@ -64,16 +66,20 @@ export function PhotoPage() {
         </p>
       )}
       <div className={styles.footer}>
-        <Button onClick={() => navigate('../rules')}>‹ Back</Button>
+        <Button variant="ghost" size="lg" icon={ChevronLeft} onClick={() => navigate('../rules')}>
+          Back
+        </Button>
         {taken ? (
           <span className={styles.footerRight}>
-            <Button onClick={onRetake}>Retake</Button>
-            <Button variant="primary" onClick={onUse}>
-              Use this photo →
+            <Button size="lg" onClick={onRetake}>
+              Retake
+            </Button>
+            <Button variant="primary" size="lg" onClick={onUse}>
+              Use this photo
             </Button>
           </span>
         ) : (
-          <Button variant="primary" icon={Camera} onClick={onTake} disabled={!canTake}>
+          <Button variant="primary" size="lg" icon={Camera} onClick={onTake} disabled={!canTake}>
             Take photo
           </Button>
         )}

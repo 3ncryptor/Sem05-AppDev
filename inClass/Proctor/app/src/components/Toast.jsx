@@ -6,7 +6,7 @@ import styles from './Toast.module.css'
 
 const DEFAULT_DURATION_MS = 4000
 const MAX_VISIBLE = 3
-const ICONS = { neutral: Info, ok: CircleCheck, attention: TriangleAlert, critical: CircleAlert }
+const ICONS = { neutral: Info, info: Info, ok: CircleCheck, attention: TriangleAlert, critical: CircleAlert }
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([])

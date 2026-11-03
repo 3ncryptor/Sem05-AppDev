@@ -1,40 +1,38 @@
 .workspace {
   display: grid;
-  gap: var(--space-4);
-  padding-top: var(--space-2);
+  gap: 0;
 }
 
 .header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-6);
+  margin-bottom: var(--space-6);
 }
 
-.titleBlock {
+.header p {
+  font-size: var(--text-md);
+}
+
+.skeleton {
   display: grid;
-  gap: var(--space-1);
-  min-width: 0;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
 }
 
-.title {
-  font-size: var(--text-2xl);
-  font-weight: 650;
-}
-
-.meta {
+.code {
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunk);
   color: var(--ink-soft);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex: none;
+  line-height: 18px;
 }
 
 .tabBody {
   min-height: 0;
+  padding-top: var(--space-6);
+}
+
+.workspace > [role='alert'] {
+  margin-bottom: var(--space-6);
 }

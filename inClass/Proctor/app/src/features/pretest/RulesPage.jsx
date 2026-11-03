@@ -1,5 +1,5 @@
 // C4 Step 2 · Rules, terms and consent. Consent stays in memory and goes with attempts.start in C6.
-import { ArrowLeftRight, Check, Clock, Copy } from 'lucide-react'
+import { ArrowLeftRight, Check, ChevronLeft, Clock, Copy } from 'lucide-react'
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router'
 import { Button } from '../../components/Button.jsx'
@@ -38,7 +38,7 @@ export function RulesPage() {
   }
 
   return (
-    <article className={styles.card} aria-labelledby="rules-title">
+    <article className={styles.step} aria-labelledby="rules-title">
       <h1 id="rules-title" className={styles.title}>
         Before you begin
       </h1>
@@ -73,7 +73,7 @@ export function RulesPage() {
                 <Checkbox key={item.id} label={item.label} checked={ticks[item.id]} onChange={() => toggle(item.id)} />
               ))}
             </div>
-            <p className={styles.soft}>Saved in your examiner’s screenshots folder, under your name and this exam.</p>
+            <p className={styles.hint}>Saved in your examiner’s screenshots folder, under your name and this exam.</p>
           </section>
         </>
       )}
@@ -85,11 +85,13 @@ export function RulesPage() {
         <Checkbox label="I have read and agree to the platform terms" checked={ticks.terms} onChange={() => toggle('terms')} />
       </section>
       <div className={styles.footer}>
-        <Button onClick={() => navigate('../check')}>‹ Back</Button>
+        <Button variant="ghost" size="lg" icon={ChevronLeft} onClick={() => navigate('../check')}>
+          Back
+        </Button>
         <span className={styles.footerRight}>
-          {!ready && <span className={styles.soft}>{needed === 4 ? 'All four are needed' : 'Please agree to the terms'}</span>}
-          <Button variant="primary" onClick={onContinue} disabled={!ready}>
-            I agree, continue →
+          {!ready && <span className={styles.hint}>{needed === 4 ? 'All four are needed' : 'Please agree to the terms'}</span>}
+          <Button variant="primary" size="lg" onClick={onContinue} disabled={!ready}>
+            I agree, continue
           </Button>
         </span>
       </div>

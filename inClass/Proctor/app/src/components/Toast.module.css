@@ -1,3 +1,4 @@
+/* Toasts: bottom centre, surface card with --shadow-overlay; tone shows on the icon only. */
 .region {
   position: fixed;
   left: 50%;
@@ -15,30 +16,41 @@
   align-items: center;
   gap: var(--space-2);
   max-width: 480px;
+  min-height: 40px;
   padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-pill);
-  background: var(--ink);
-  color: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
   box-shadow: var(--shadow-overlay);
+  font-size: var(--text-md);
   font-weight: 500;
   animation: in var(--duration-slow) var(--ease-out);
 }
 
+.toast svg {
+  color: var(--ink-soft);
+}
+
+.info svg {
+  color: var(--info);
+}
+
 .ok svg {
-  color: var(--ok-tint);
+  color: var(--ok);
 }
 
 .attention svg {
-  color: var(--attention-tint);
+  color: var(--attention);
 }
 
 .critical svg {
-  color: var(--critical-tint);
+  color: var(--critical);
 }
 
 @keyframes in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
 }

@@ -1,10 +1,22 @@
+/* Cards (DESIGN.md): surface, 1 px line, 10 px radius, 24 px padding, no shadow.
+   Clickable cards (a, button, or [data-interactive]) get --shadow-hover on hover. */
 .card {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  transition:
+    box-shadow var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
 }
 
 .padded {
   padding: var(--space-6);
+}
+
+a.card:hover,
+button.card:hover,
+.card[data-interactive]:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-hover);
+  text-decoration: none;
 }

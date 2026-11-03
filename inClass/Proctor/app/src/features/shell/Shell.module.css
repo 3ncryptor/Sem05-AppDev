@@ -1,3 +1,5 @@
+/* App shell: sidebar + content. Page padding 40 px (32 px under 1200 px, via --page-padding).
+   `.page` caps the content width: 1200 px admin, 960 px candidate (DESIGN.md). */
 .shell {
   display: flex;
   height: 100%;
@@ -16,30 +18,45 @@
   display: flex;
   align-items: center;
   height: var(--titlebar-height);
-  padding: 0 var(--space-8);
+  padding: 0 var(--page-padding);
 }
 
 .content {
   flex: 1;
   overflow: auto;
-  padding: 0 var(--space-8) var(--space-10);
+  padding: var(--space-4) var(--page-padding) var(--space-12);
+}
+
+.page {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+.admin {
+  --page-max: var(--content-admin);
+}
+
+.student {
+  --page-max: var(--content-student);
 }
 
 .crumbs {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
   color: var(--ink-soft);
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
 }
 
 .crumbs li {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
 .crumbs li + li::before {
@@ -49,6 +66,11 @@
 
 .crumbs a {
   color: var(--ink-soft);
+}
+
+.crumbs a:hover {
+  color: var(--ink);
+  text-decoration: none;
 }
 
 .crumbs [aria-current='page'] {

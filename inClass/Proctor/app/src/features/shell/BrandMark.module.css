@@ -1,26 +1,35 @@
+/* The Athena wordmark: an ink mark and the name in the serif face. No accent colour (DESIGN.md). */
 .brand {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-family: var(--font-display);
-  font-weight: 650;
-  letter-spacing: -0.01em;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: var(--tracking-title);
 }
 
 .mark {
-  width: 18px;
+  width: 14px;
   height: 14px;
-  border-radius: 4px;
-  background: var(--focus);
-  transform: skewX(-12deg);
+  border-radius: 3px;
+  background: var(--ink);
+  transform: rotate(45deg) scale(0.82);
+}
+
+.name {
+  padding-bottom: 1px;
 }
 
 .lg {
-  font-size: var(--text-xl);
+  font-size: var(--text-2xl);
+  gap: var(--space-3);
 }
 
 .lg .mark {
-  width: 24px;
+  width: 18px;
   height: 18px;
-  border-radius: 5px;
+  border-radius: 4px;
 }

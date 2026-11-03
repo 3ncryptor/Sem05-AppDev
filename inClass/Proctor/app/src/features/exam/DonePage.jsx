@@ -1,5 +1,6 @@
-// C14 Done: the receipt, how the exam ended, evidence state, and what happens to results. Never a score.
-import { Check, FileDown } from 'lucide-react'
+// C14 Done: a display-serif headline, how the exam ended, the receipt card (code in mono), evidence state and
+// what happens to results. Never a score.
+import { ArrowRight, Check, ChevronLeft, FileDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { Banner } from '../../components/Banner.jsx'
@@ -82,57 +83,80 @@ export function DonePage() {
   return (
     <QuietLayout>
       <article className={styles.done} aria-labelledby="done-title">
-        <span className={styles.check} aria-hidden="true">
-          <Check size={28} strokeWidth={2.5} />
-        </span>
         {error && (
           <Banner tone="critical" role="alert">
             {errorMessage(error)}
           </Banner>
         )}
-        {!receipt && !error && <Skeleton width={320} height={26} />}
+        {!receipt && !error && <Skeleton width={420} height={44} />}
         {receipt && (
           <>
-            <h1 id="done-title" className={styles.doneTitle}>
-              {copy.title}
-            </h1>
-            <div className={styles.doneLines}>
-              {copy.line && <p>{copy.line}</p>}
-              <p>
-                We received {receipt.received} of {receipt.total} answers.
+            <header className={styles.doneHead}>
+              <p className={styles.doneKicker}>
+                <Check size={14} aria-hidden="true" /> Submitted
               </p>
-              <p>Camera and screen capture are off.</p>
-            </div>
+              <h1 id="done-title" className={styles.doneTitle}>
+                {copy.title}
+              </h1>
+              <div className={styles.doneLines}>
+                {copy.line && <p>{copy.line}</p>}
+                <p>
+                  We received {receipt.received} of {receipt.total} answers. Camera and screen capture are off.
+                </p>
+              </div>
+            </header>
             <section className={`${styles.receipt} print-receipt`} aria-label="Receipt">
-              <p className={styles.receiptHead}>
-                <span>Receipt</span>
-                <span className="mono">{receipt.code}</span>
-              </p>
-              <p>
-                {receipt.examTitle} · Attempt {receipt.attemptNo}
-              </p>
-              <p>
-                Submitted {formatDateTime(receipt.submittedAt)} · {receipt.submitReason === 'student' ? 'by you' : copy.title.toLowerCase()}
-              </p>
-              <p>
-                Answers {receipt.received} / {receipt.total} · Evidence {evidenceLine(evidence)}
-              </p>
-              {receipt.studentName && <p className="print-only">Student: {receipt.studentName}</p>}
+              <div className={styles.receiptHead}>
+                <span className={styles.receiptLabel}>Receipt</span>
+                <span className={styles.receiptCode}>{receipt.code}</span>
+              </div>
+              <dl className={styles.receiptRows}>
+                <div>
+                  <dt>Exam</dt>
+                  <dd>
+                    {receipt.examTitle} · Attempt {receipt.attemptNo}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Submitted</dt>
+                  <dd>
+                    {formatDateTime(receipt.submittedAt)} · {receipt.submitReason === 'student' ? 'by you' : copy.title.toLowerCase()}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Answers</dt>
+                  <dd>
+                    {receipt.received} / {receipt.total}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Evidence</dt>
+                  <dd>{evidenceLine(evidence)}</dd>
+                </div>
+                {receipt.studentName && (
+                  <div className="print-only">
+                    <dt>Student</dt>
+                    <dd>{receipt.studentName}</dd>
+                  </div>
+                )}
+              </dl>
             </section>
-            <div className={styles.doneButtons}>
-              <Button icon={FileDown} onClick={onSavePdf} loading={saving}>
+            <div className={styles.doneActions}>
+              <Button icon={FileDown} size="lg" onClick={onSavePdf} loading={saving}>
                 Save receipt (PDF)
               </Button>
+              {receipt.resultVisible ? (
+                <Link to={`/student/results/${attemptId}`} className={styles.resultsLink}>
+                  View your results <ArrowRight size={14} aria-hidden="true" />
+                </Link>
+              ) : (
+                <p className={styles.soft}>Results will appear when your examiner publishes them.</p>
+              )}
             </div>
-            {receipt.resultVisible ? (
-              <Link to={`/student/results/${attemptId}`} className={styles.resultsLink}>
-                View your results →
-              </Link>
-            ) : (
-              <p className={styles.soft}>Results will appear when your examiner publishes them.</p>
-            )}
             <div className={styles.doneFooter}>
-              <Link to="/student/exams">Back to exams</Link>
+              <Link to="/student/exams" className={styles.backLink}>
+                <ChevronLeft size={14} aria-hidden="true" /> Back to exams
+              </Link>
             </div>
           </>
         )}

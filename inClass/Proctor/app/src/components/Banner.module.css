@@ -1,15 +1,20 @@
+/* Banner: a quiet notice. Status shows as a 2 px left rule plus a tinted icon, never a saturated fill. */
 .banner {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-control);
   border: 1px solid var(--line);
-  background: var(--surface-sunk);
+  border-left-width: 2px;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-size: var(--text-md);
+  line-height: var(--leading-md);
 }
 
 .icon {
   flex: none;
+  color: var(--ink-soft);
 }
 
 .message {
@@ -21,18 +26,28 @@
   flex: none;
 }
 
-.focus {
-  background: var(--focus-tint);
-  border-color: transparent;
+.neutral {
+  background: var(--surface-sunk);
+  border-left-color: var(--line-strong);
 }
 
+/* `focus` is the legacy name for the info tone. */
+.info,
+.focus {
+  background: var(--info-tint);
+  border-color: transparent;
+  border-left-color: var(--info);
+}
+
+.info .icon,
 .focus .icon {
-  color: var(--focus);
+  color: var(--info);
 }
 
 .ok {
   background: var(--ok-tint);
   border-color: transparent;
+  border-left-color: var(--ok);
 }
 
 .ok .icon {
@@ -42,6 +57,7 @@
 .attention {
   background: var(--attention-tint);
   border-color: transparent;
+  border-left-color: var(--attention);
 }
 
 .attention .icon {
@@ -51,6 +67,7 @@
 .critical {
   background: var(--critical-tint);
   border-color: transparent;
+  border-left-color: var(--critical);
 }
 
 .critical .icon {

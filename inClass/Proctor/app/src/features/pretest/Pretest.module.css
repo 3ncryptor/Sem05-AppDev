@@ -1,98 +1,110 @@
+/* Pre-test, resume and done (DESIGN.md "Pre-test"): no sidebar, a slim stepper in the title bar,
+   one centred 640 px column, no boxed card around the step. */
+
 .quiet {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: var(--canvas);
 }
 
-/* Title row: brand + exam on the left (after the traffic lights), stepper on the right. */
+/* Title bar: brand + exam left (after the traffic lights), stepper centred, an empty cell balancing the grid. */
 .titlebar {
   flex: none;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-6);
   height: var(--titlebar-height);
   padding: 0 var(--space-6) 0 88px;
   border-bottom: 1px solid var(--line);
 }
 
+:global(:fullscreen) .titlebar {
+  padding-left: var(--space-6);
+}
+
 .brandLine {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   min-width: 0;
   white-space: nowrap;
 }
 
 .examName {
   overflow: hidden;
-  text-overflow: ellipsis;
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--line-strong);
   color: var(--ink-soft);
-  font-weight: 500;
+  font-size: var(--text-md);
+  text-overflow: ellipsis;
 }
 
 .stage {
   flex: 1;
   overflow: auto;
-  display: grid;
-  justify-items: center;
-  align-content: start;
-  padding: var(--space-8) var(--space-6) var(--space-10);
+  padding: var(--space-12) var(--space-6) var(--space-16);
 }
 
-.card {
-  display: grid;
-  gap: var(--space-5);
+.column {
   width: min(640px, 100%);
-  padding: var(--space-8);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  margin: 0 auto;
 }
 
-.wide {
+/* One step: a column of blocks with even rhythm. */
+.step {
   display: grid;
-  gap: var(--space-5);
-  width: min(1000px, 100%);
+  gap: var(--space-8);
 }
 
 .heading {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
 .title {
-  font-size: var(--text-xl);
-  font-weight: 650;
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  line-height: var(--leading-2xl);
+  letter-spacing: var(--tracking-title);
 }
 
-.soft {
+.lead {
+  color: var(--ink-soft);
+  font-size: var(--text-base);
+  line-height: var(--leading-base);
+}
+
+.soft,
+.hint {
   color: var(--ink-soft);
 }
 
+.hint {
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+}
+
 .label {
-  margin-bottom: var(--space-2);
   color: var(--ink-soft);
   font-family: var(--font-ui);
   font-size: var(--text-xs);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  line-height: var(--leading-xs);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
 .block {
   display: grid;
-  gap: var(--space-2);
-}
-
-.block1 {
-  display: block;
+  gap: var(--space-3);
 }
 
 .ruleList {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -102,17 +114,18 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
+  line-height: var(--leading-base);
 }
 
 .ruleLine svg {
   flex: none;
-  margin-top: 2px;
-  color: var(--ink-soft);
+  margin-top: 3px;
+  color: var(--ink-faint);
 }
 
 .checks {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
 .terms {
@@ -124,15 +137,22 @@
   background: var(--surface-sunk);
   color: var(--ink-soft);
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
   white-space: pre-wrap;
 }
 
+/* Back left (ghost), the step's one primary action right, on a hairline. */
 .footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding-top: var(--space-2);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+
+.footer > :first-child {
+  margin-left: calc(-1 * var(--space-4));
 }
 
 .footerRight {
@@ -150,6 +170,8 @@
 }
 
 .errorText {
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--critical);
   color: var(--critical);
 }
 
@@ -159,12 +181,13 @@
   position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
+  border: 1px solid var(--line);
   border-radius: var(--radius-card);
   background: var(--surface-sunk);
-  border: 1px solid var(--line);
 }
 
 .video {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -181,7 +204,7 @@ img.video {
   top: 46%;
   width: 34%;
   aspect-ratio: 3 / 4;
-  border: 2px dashed rgb(255 255 255 / 0.7);
+  border: 1.5px dashed rgb(255 255 255 / 0.6);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
@@ -193,6 +216,7 @@ img.video {
   display: grid;
   place-items: center;
   color: var(--ink-faint);
+  font-size: var(--text-sm);
 }
 
 .photoFrame {
@@ -201,11 +225,10 @@ img.video {
 }
 
 .faceStatus {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
+  margin-top: calc(-1 * var(--space-4));
   color: var(--ink-soft);
+  font-size: var(--text-sm);
+  text-align: center;
 }
 
 .okText {
@@ -216,50 +239,68 @@ img.video {
 
 .checkGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: 232px minmax(0, 1fr);
   align-items: start;
-  gap: var(--space-6);
+  gap: var(--space-8);
 }
 
+/* Calm rows on hairlines: the label left, the status as an icon plus a word right. */
 .rows {
   display: grid;
-  gap: var(--space-3);
   margin: 0;
-  padding: var(--space-5);
+  padding: 0;
   list-style: none;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
+  border-top: 1px solid var(--line);
 }
 
 .row {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line);
 }
 
 .rowLine {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  min-height: 22px;
-  color: var(--ink-soft);
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 24px;
 }
 
-[data-status='ok'] > .rowLine,
-.rowLine[data-status='ok'] {
+.rowLabel {
+  min-width: 0;
   color: var(--ink);
 }
 
-[data-status='ok'] svg {
+[data-status='waiting'] .rowLabel {
+  color: var(--ink-soft);
+}
+
+.rowStatus {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-faint);
+  font-size: var(--text-sm);
+}
+
+[data-status='checking'] .rowStatus {
+  color: var(--ink-soft);
+}
+
+[data-status='ok'] .rowStatus,
+[data-status='skipped'] .rowStatus {
   color: var(--ok);
 }
 
-[data-status='fail'] > .rowLine svg {
+[data-status='fail'] .rowStatus {
   color: var(--critical);
 }
 
-[data-status='warn'] > .rowLine svg,
-[data-status='unavailable'] > .rowLine svg {
+[data-status='warn'] .rowStatus,
+[data-status='unavailable'] .rowStatus {
   color: var(--attention);
 }
 
@@ -273,40 +314,26 @@ img.video {
   }
 }
 
-.bar {
-  flex: 1;
-  max-width: 96px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--surface-sunk);
-  overflow: hidden;
-}
-
-.bar span {
-  display: block;
-  height: 100%;
-  background: var(--focus);
-  transition: width 200ms linear;
-}
-
+/* Fix notes sit under their row with a 2 px status rule, never a filled card. */
 .fixCard {
   display: grid;
   gap: var(--space-2);
-  margin-left: 24px;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-control);
-  background: var(--critical-tint);
+  padding: var(--space-1) 0 var(--space-1) var(--space-4);
+  border-left: 2px solid var(--critical);
+  color: var(--ink-soft);
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
 }
 
 .fixWarn {
-  background: var(--attention-tint);
+  border-left-color: var(--attention);
 }
 
 .fixTitle {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  color: var(--ink);
   font-size: var(--text-md);
   font-weight: 600;
 }
@@ -325,13 +352,14 @@ img.video {
 }
 
 .fixNote {
-  color: var(--ink-soft);
+  color: var(--ink-faint);
 }
 
 .fixActions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  padding-top: var(--space-1);
 }
 
 .tip {
@@ -339,4 +367,15 @@ img.video {
   align-items: center;
   gap: var(--space-2);
   color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.tip svg {
+  color: var(--ink-faint);
+}
+
+@media (max-width: 720px) {
+  .checkGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

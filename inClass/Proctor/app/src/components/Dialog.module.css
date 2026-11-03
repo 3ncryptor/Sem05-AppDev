@@ -1,7 +1,9 @@
+/* Dialogs (DESIGN.md): surface, 10 px radius, --shadow-overlay, 24 px padding, --text-xl title,
+   footer right-aligned (secondary then primary). Fade + scale from 0.98. Sheet docks right. */
 .dialog {
   padding: 0;
   border: 1px solid var(--line);
-  background: var(--surface-raised);
+  background: var(--surface);
   color: var(--ink);
   box-shadow: var(--shadow-overlay);
 }
@@ -11,7 +13,7 @@
 }
 
 .dialog[open] {
-  animation: rise var(--duration-slow) var(--ease-out);
+  animation: pop var(--duration-slow) var(--ease-out);
 }
 
 .dialog[open]::backdrop {
@@ -20,6 +22,7 @@
 
 .dialog.dialog {
   width: min(480px, calc(100vw - 64px));
+  max-height: calc(100vh - 64px);
   border-radius: var(--radius-card);
 }
 
@@ -52,12 +55,15 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-5) var(--space-6) var(--space-3);
+  padding: var(--space-6) var(--space-6) var(--space-4);
 }
 
 .title {
-  font-size: var(--text-lg);
+  font-family: var(--font-ui);
+  font-size: var(--text-xl);
+  line-height: var(--leading-xl);
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .description {
@@ -70,19 +76,21 @@
   place-items: center;
   width: 28px;
   height: 28px;
-  margin: -4px -8px 0 0;
+  margin: 0 -6px 0 0;
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--ink-soft);
+  transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 .close:hover {
-  background: var(--hover);
+  background: var(--surface-sunk);
+  color: var(--ink);
 }
 
 .body {
-  padding: var(--space-2) var(--space-6) var(--space-5);
+  padding: 0 var(--space-6) var(--space-6);
   overflow: auto;
 }
 
@@ -98,10 +106,22 @@
   border-top: 1px solid var(--line);
 }
 
-@keyframes rise {
+/* The danger button in a dialog footer is the confirmed destructive action: fill it. */
+.footer [data-variant='danger'] {
+  background: var(--critical);
+  border-color: var(--critical);
+  color: var(--on-critical);
+}
+
+.footer [data-variant='danger']:hover:not(:disabled) {
+  background: var(--critical-hover);
+  border-color: var(--critical-hover);
+}
+
+@keyframes pop {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.98);
+    transform: scale(0.98);
   }
 }
 
@@ -113,7 +133,7 @@
 
 @keyframes slide {
   from {
-    transform: translateX(24px);
+    transform: translateX(16px);
     opacity: 0;
   }
 }

@@ -1,18 +1,24 @@
+/* Chips (DESIGN.md): pill, 20 px, --text-xs uppercase, semantic tint with its own text colour. */
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 22px;
+  gap: 5px;
+  height: 20px;
   padding: 0 var(--space-2);
   border-radius: var(--radius-pill);
-  font-size: var(--text-sm);
-  font-weight: 500;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .symbol {
-  font-size: 11px;
+  font-size: 9px;
   line-height: 1;
+  letter-spacing: 0;
 }
 
 .neutral {
@@ -20,9 +26,11 @@
   color: var(--ink-soft);
 }
 
+/* `focus` is the legacy name for the info tone. */
+.info,
 .focus {
-  background: var(--focus-tint);
-  color: var(--focus);
+  background: var(--info-tint);
+  color: var(--info);
 }
 
 .ok {
@@ -40,7 +48,7 @@
   color: var(--critical);
 }
 
-/* "Live now" pulses gently (SCREENS A0). Reduced motion stops it via base.css. */
+/* "Live now" pulses gently. Reduced motion stops it via base.css. */
 .pulse {
   animation: pulse 2.4s ease-in-out infinite;
 }

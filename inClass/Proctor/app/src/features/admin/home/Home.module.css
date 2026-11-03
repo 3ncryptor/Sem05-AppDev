@@ -1,26 +1,34 @@
 .page {
   display: grid;
-  gap: var(--space-5);
-  padding-top: var(--space-2);
+  gap: var(--space-6);
 }
 
-.title {
-  font-size: var(--text-2xl);
-  font-weight: 650;
+/* PageHeader brings its own 32 px bottom margin; the grid gap covers spacing here. */
+.page > header {
+  margin-bottom: var(--space-2);
 }
 
 .tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
 }
 
 .section {
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
   color: var(--ink-soft);
+  font-family: var(--font-ui);
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
@@ -31,32 +39,82 @@
   list-style: none;
 }
 
-.row {
+/* Each attention row carries a 2 px semantic rule on the left (DESIGN.md: never a whole fill). */
+.attention {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 44px;
+  min-height: 56px;
+  padding: var(--space-2) 0 var(--space-2) var(--space-4);
   border-bottom: 1px solid var(--line);
+  position: relative;
 }
 
-.row:last-child {
+.attention::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--space-3);
+  bottom: var(--space-3);
+  width: 2px;
+  border-radius: 2px;
+  background: var(--line-strong);
+}
+
+.toneAttention::before {
+  background: var(--attention);
+}
+
+.toneCritical::before {
+  background: var(--critical);
+}
+
+.attention:last-child {
   border-bottom: none;
 }
 
-.symbol {
-  width: 16px;
-  color: var(--ink-soft);
-  text-align: center;
+.attentionText {
+  display: grid;
+  flex: 1;
+  min-width: 0;
 }
 
 .rowTitle {
-  font-weight: 600;
+  color: var(--ink);
+  font-size: var(--text-md);
+  font-weight: 500;
 }
 
 .rowText {
-  flex: 1;
-  min-width: 0;
   color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.timeline {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.event {
+  display: grid;
+  grid-template-columns: 44px 12px minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: baseline;
+  padding: var(--space-2) 0;
+  position: relative;
+}
+
+/* A hairline joins the markers into a quiet vertical timeline. */
+.event:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: calc(44px + var(--space-3) + 5px);
+  top: 22px;
+  bottom: -6px;
+  width: 1px;
+  background: var(--line);
 }
 
 .time {
@@ -66,6 +124,40 @@
   font-variant-numeric: tabular-nums;
 }
 
+.marker {
+  width: 7px;
+  height: 7px;
+  margin-left: 2px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  align-self: center;
+}
+
+.eventText {
+  color: var(--ink);
+  font-size: var(--text-md);
+  line-height: var(--leading-md);
+}
+
+.score {
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
 .quiet {
   color: var(--ink-soft);
+  font-size: var(--text-md);
+}
+
+@media (max-width: 1100px) {
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

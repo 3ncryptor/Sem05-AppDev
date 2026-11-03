@@ -5,7 +5,7 @@ import { Banner } from '../../components/Banner.jsx'
 import { Button } from '../../components/Button.jsx'
 import { Chip } from '../../components/Chip.jsx'
 import { Skeleton } from '../../components/Skeleton.jsx'
-import { StatTile } from '../../components/StatTile.jsx'
+import { PageHeader } from '../../components/PageHeader.jsx'
 import { errorMessage } from '../../lib/api.js'
 import { formatWindow, plural } from '../../lib/format.js'
 import { useApi } from '../../lib/useApi.js'
@@ -17,6 +17,27 @@ function iconFor(line) {
   if (/webcam|identity/i.test(line)) return Camera
   if (/screenshot/i.test(line)) return MonitorUp
   return Eye
+}
+
+function Fact({ label, value }) {
+  return (
+    <div className={styles.fact}>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  )
+}
+
+/** A hairline-separated section of the reading column: small label on the left, content on the right. */
+function DetailSection({ id, title, children }) {
+  return (
+    <section className={styles.detailSection} aria-labelledby={id}>
+      <h2 id={id} className={styles.sectionLabel}>
+        {title}
+      </h2>
+      <div className={styles.detailBody}>{children}</div>
+    </section>
+  )
 }
 
 const START_BLOCKED = {
@@ -32,7 +53,7 @@ export function ExamDetailPage() {
 
   if (error) {
     return (
-      <div className={styles.page}>
+      <div className={`${styles.page} ${styles.reading}`}>
         <Banner tone="critical" role="alert" action={<Button icon={RotateCw} onClick={refetch}>Retry</Button>}>
           {errorMessage(error)}
         </Banner>
@@ -41,7 +62,7 @@ export function ExamDetailPage() {
   }
   if (!exam) {
     return (
-      <div className={styles.page} aria-busy="true">
+      <div className={`${styles.page} ${styles.reading}`} aria-busy="true">
         <Skeleton width={260} height={28} />
         <Skeleton width="70%" />
       </div>
@@ -54,35 +75,32 @@ export function ExamDetailPage() {
     navigate(resuming ? `/student/attempts/${exam.openAttemptId}/resume` : `/student/exams/${examId}/start/check`)
 
   return (
-    <div className={`${styles.page} ${styles.narrow}`}>
-      <Link to="/student/exams" className={styles.back}>
-        <ChevronLeft size={16} aria-hidden="true" /> Exams
-      </Link>
-      <header className={styles.detailHeader}>
-        <div>
-          <h1 className={styles.title}>{exam.title}</h1>
-          {exam.description && <p className={styles.subtitle}>{exam.description}</p>}
-        </div>
-        <Chip spec={MY_STATUS[exam.myStatus]} />
-      </header>
-      <div className={styles.tiles}>
-        <StatTile label="Duration" value={`${exam.durationMinutes} min`} />
-        <StatTile label="Questions" value={exam.questionCount} />
-        <StatTile label="Marks" value={exam.totalMarks} />
-        <StatTile label="Pass mark" value={`${exam.resultPolicy?.passPercent ?? '—'}%`} />
-      </div>
+    <div className={`${styles.page} ${styles.reading} page-enter`}>
+      <PageHeader
+        breadcrumb={
+          <Link to="/student/exams" className={styles.back}>
+            <ChevronLeft size={14} aria-hidden="true" /> Exams
+          </Link>
+        }
+        title={exam.title}
+        meta={<Chip spec={MY_STATUS[exam.myStatus]} />}
+        description={exam.description}
+      />
       <dl className={styles.facts}>
-        <dt>Window</dt>
-        <dd>
-          {formatWindow(exam.opensAt, exam.closesAt)} · {plural(exam.attemptsLeft, 'attempt')} left
-        </dd>
-        <dt>Results</dt>
-        <dd>{visibility}</dd>
+        {exam.code && <Fact label="Code" value={<span className="mono">{exam.code}</span>} />}
+        <Fact label="Duration" value={`${exam.durationMinutes} min`} />
+        <Fact label="Questions" value={exam.questionCount} />
+        <Fact label="Marks" value={exam.totalMarks} />
+        <Fact label="Pass mark" value={`${exam.resultPolicy?.passPercent ?? '—'}%`} />
       </dl>
-      <section aria-labelledby="proctoring-title" className={styles.proctoring}>
-        <h2 id="proctoring-title" className={styles.sectionTitle}>
-          What Athena captures
-        </h2>
+      <DetailSection id="window-title" title="When">
+        <p>{formatWindow(exam.opensAt, exam.closesAt)}</p>
+        <p className={styles.soft}>{plural(exam.attemptsLeft, 'attempt')} left</p>
+      </DetailSection>
+      <DetailSection id="results-title" title="Results">
+        <p>{visibility}</p>
+      </DetailSection>
+      <DetailSection id="proctoring-title" title="What Athena captures">
         <ul className={styles.ruleList}>
           {(exam.proctoringSummary?.lines ?? []).map((line) => {
             const Icon = iconFor(line)
@@ -93,11 +111,13 @@ export function ExamDetailPage() {
             )
           })}
         </ul>
-      </section>
-      <p className={styles.note}>
-        Before you start you'll check your setup (about 2 minutes), read the rules and take an identity photo. The clock
-        starts only when you press Begin.
-      </p>
+      </DetailSection>
+      <DetailSection id="before-title" title="Before you start">
+        <p className={styles.soft}>
+          You'll check your setup (about 2 minutes), read the rules and take an identity photo. The clock starts only when
+          you press Begin.
+        </p>
+      </DetailSection>
       <div className={styles.actions}>
         {!exam.canStart && exam.cannotStartReason && <p className={styles.blocked}>{START_BLOCKED[exam.cannotStartReason]}</p>}
         <Button variant="primary" size="lg" onClick={onStart} disabled={!exam.canStart}>

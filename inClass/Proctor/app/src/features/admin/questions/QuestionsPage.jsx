@@ -1,6 +1,6 @@
 // A4 Questions (the builder) · #/admin/exams/:examId/questions. Outline + editor + preview.
 // Published exams are read-only; the server refuses edits with EXAM_LOCKED.
-import { ListPlus, RotateCw } from 'lucide-react'
+import { ListPlus, Lock, RotateCw } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { useParams } from 'react-router'
 import { Banner } from '../../../components/Banner.jsx'
@@ -110,7 +110,7 @@ function Builder({ exam }) {
 
   return (
     <div className={styles.page}>
-      {readOnly && <Banner tone="focus">{LOCKED_TEXT}</Banner>}
+      {readOnly && <Banner tone="neutral" icon={Lock}>{LOCKED_TEXT}</Banner>}
       {questions.length === 0 ? (
         <EmptyState icon={ListPlus} title="No questions yet."
           action={!readOnly && <Button variant="primary" onClick={() => setPickerOpen(true)}>Add question</Button>}>

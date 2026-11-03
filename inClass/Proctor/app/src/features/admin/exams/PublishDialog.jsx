@@ -1,6 +1,6 @@
 // A7 Publish checklist: a dry run lists every problem and warning, then Publish sends it for real.
 // Also the Unpublish confirmation, since both live behind the exam header's one primary action.
-import { RotateCw } from 'lucide-react'
+import { AlertTriangle, CircleCheck, CircleX, RotateCw } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Banner } from '../../../components/Banner.jsx'
@@ -29,19 +29,17 @@ function summaryLine(summary) {
     .join(' · ')
 }
 
-function ItemGroup({ symbol, tone, title, items, onGo }) {
+function ItemGroup({ icon: Icon, tone, title, items, onGo }) {
   if (items.length === 0) return null
   return (
     <div className={styles.group}>
       <p className={`${styles.groupTitle} ${styles[tone]}`}>
-        <span aria-hidden="true">{symbol}</span> {title}
+        <Icon size={14} aria-hidden="true" /> {title}
       </p>
       <ul className={styles.items}>
         {items.map((item, index) => (
           <li key={`${item.code}-${item.questionId ?? index}`} className={styles.item}>
-            <span>
-              <span aria-hidden="true" className={styles[tone]}>{symbol}</span> {item.message}
-            </span>
+            <span className={styles.itemText}>{item.message}</span>
             {TARGET_LABEL[item.target] && (
               <Button variant="ghost" onClick={() => onGo(item.target)}>
                 {TARGET_LABEL[item.target]}
@@ -59,10 +57,10 @@ function Checklist({ result, onGo }) {
   const warnings = result.warnings.filter(isRelevant)
   return (
     <div className={styles.checklist}>
-      <ItemGroup symbol="✕" tone="problem" title={`${plural(problems.length, 'problem')} must be fixed`} items={problems} onGo={onGo} />
-      <ItemGroup symbol="⚠" tone="warning" title={`${plural(warnings.length, 'thing')} to check (won't block)`} items={warnings} onGo={onGo} />
-      <p>
-        <span aria-hidden="true" className={styles.ok}>✓</span> {summaryLine(result.summary)}
+      <ItemGroup icon={CircleX} tone="problem" title={`${plural(problems.length, 'problem')} must be fixed`} items={problems} onGo={onGo} />
+      <ItemGroup icon={AlertTriangle} tone="warning" title={`${plural(warnings.length, 'thing')} to check (won't block)`} items={warnings} onGo={onGo} />
+      <p className={styles.summary}>
+        <CircleCheck size={16} aria-hidden="true" className={styles.ok} /> {summaryLine(result.summary)}
       </p>
       <p className={styles.note}>After publishing, questions are locked. Settings stay editable within limits.</p>
     </div>

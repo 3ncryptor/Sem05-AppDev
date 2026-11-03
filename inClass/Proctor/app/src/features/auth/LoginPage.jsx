@@ -7,7 +7,6 @@ import { Input } from '../../components/Input.jsx'
 import { errorMessage, ipc } from '../../lib/api.js'
 import { hostOf } from '../../lib/format.js'
 import { useLocal } from '../../lib/useLocal.js'
-import { BrandMark } from '../shell/BrandMark.jsx'
 import { homeFor } from './authContext.js'
 import { CenteredLayout } from './CenteredLayout.jsx'
 import { useAuth } from './useAuth.js'
@@ -62,11 +61,11 @@ export function LoginPage() {
 
   return (
     <CenteredLayout footer={footer}>
-      <form className={styles.card} onSubmit={onSubmit} noValidate aria-labelledby="login-title">
+      <form className={styles.form} onSubmit={onSubmit} noValidate aria-labelledby="login-title">
         <div className={styles.heading}>
-          <BrandMark size="lg" />
+          <h1 className={styles.wordmark}>Athena</h1>
           <p id="login-title" className={styles.subtitle}>
-            Sign in to take or manage exams
+            Sign in to take or manage proctored exams.
           </p>
         </div>
         <div className={styles.fields}>

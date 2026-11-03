@@ -1,34 +1,16 @@
 .page {
   display: grid;
   gap: var(--space-5);
-  padding-top: var(--space-2);
 }
 
-.header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.title {
-  font-size: var(--text-2xl);
-  font-weight: 650;
-}
-
-.subtitle {
-  color: var(--ink-soft);
-  font-size: var(--text-lg);
-}
-
-.headerActions,
-.rowActions {
-  display: flex;
-  gap: var(--space-2);
+.page > header {
+  margin-bottom: var(--space-3);
 }
 
 .rowActions {
+  display: flex;
   justify-content: flex-end;
+  gap: var(--space-1);
 }
 
 .toolbar {
@@ -36,69 +18,59 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-}
-
-.filters {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 28px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--ink-soft);
-  font-weight: 500;
-}
-
-.filter:hover {
-  color: var(--ink);
-}
-
-.filter[aria-pressed='true'] {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--canvas);
-}
-
-.filterCount {
-  font-variant-numeric: tabular-nums;
-  opacity: 0.7;
+  flex-wrap: wrap;
 }
 
 .search {
   width: 260px;
 }
 
-.loading,
-.form {
+.loading {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .form {
+  display: grid;
   gap: var(--space-4);
 }
 
+.student {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-1) 0;
+}
+
+.name {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.roll,
 .mono {
   font-family: var(--font-mono);
+}
+
+.roll {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
 }
 
 .muted {
   color: var(--ink-soft);
 }
 
+/* One-time password: a sunk well with the secret in mono and Copy at the right. */
 .secret {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-4);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
   margin-bottom: var(--space-3);
   border: 1px solid var(--line);
   border-radius: var(--radius-control);
@@ -108,8 +80,10 @@
 .secretValue {
   font-family: var(--font-mono);
   font-size: var(--text-xl);
+  line-height: var(--leading-xl);
   letter-spacing: 0.04em;
   user-select: all;
+  cursor: text;
 }
 
 .importHead {
@@ -117,13 +91,61 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunk);
+  font-size: var(--text-md);
+}
+
+.fileName {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
 }
 
 .counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
   color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.countOk {
+  color: var(--ok);
+}
+
+.countWarn {
+  color: var(--attention);
+}
+
+.countBad {
+  color: var(--critical);
 }
 
 .scroll {
   max-height: 320px;
   overflow: auto;
+}
+
+.dropzone {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface-sunk);
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: var(--text-md);
+}
+
+.dropzone code {
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-sm);
 }

@@ -1,22 +1,25 @@
+/* Question builder (DESIGN.md "Builder"): quiet outline, editor card, preview on a sunk panel. */
 .page {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-6);
+  padding-top: var(--space-6);
 }
 
 .builder {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) 320px;
-  gap: var(--space-5);
+  grid-template-columns: 248px minmax(0, 1fr) 340px;
+  gap: var(--space-6);
   align-items: start;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1240px) {
   .builder {
-    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-columns: 220px minmax(0, 1fr);
   }
 
   .preview {
     grid-column: 2;
+    position: static;
   }
 }
 
@@ -24,10 +27,13 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
   color: var(--ink-soft);
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
@@ -36,41 +42,46 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
-  gap: var(--space-2);
+  gap: var(--space-3);
   position: sticky;
-  top: var(--space-2);
+  top: var(--space-4);
 }
 
 .outlineCount {
+  color: var(--ink-faint);
   font-family: var(--font-mono);
+  font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
-  font-weight: 400;
 }
 
 .outlineList {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 2px;
-  list-style: none;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 .outlineRow {
+  position: relative;
   display: flex;
   min-width: 0;
   align-items: center;
+  border: 1px solid transparent;
   border-radius: var(--radius-control);
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .outlineRow:hover {
-  background: var(--hover);
+  background: var(--surface-sunk);
 }
 
 .selected,
 .selected:hover {
-  background: var(--focus-tint);
+  border-color: var(--line);
+  background: var(--surface);
 }
 
 .outlineMain {
@@ -79,26 +90,40 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2);
+  min-height: 36px;
+  padding: var(--space-1) var(--space-2);
   border: 0;
-  background: none;
-  color: var(--ink);
-  font: inherit;
-  font-size: var(--text-sm);
-  text-align: left;
-  cursor: pointer;
   border-radius: var(--radius-control);
+  background: none;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: var(--text-md);
+  line-height: var(--leading-md);
+  text-align: left;
+}
+
+.selected .outlineMain {
+  color: var(--ink);
+}
+
+.outlineMain:focus-visible {
+  outline-offset: -2px;
 }
 
 .outlineNo {
-  width: 1.5em;
-  color: var(--ink-soft);
+  flex: none;
+  width: 2ch;
+  color: var(--ink-faint);
   font-family: var(--font-mono);
+  font-size: var(--text-sm);
   text-align: right;
 }
 
 .outlineSymbol {
+  flex: none;
+  width: 1.25em;
   color: var(--ink-soft);
+  text-align: center;
 }
 
 .outlineStem {
@@ -110,8 +135,12 @@
 }
 
 .outlineMarks {
+  flex: none;
+  min-width: 3ch;
   color: var(--ink-soft);
   font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-align: right;
 }
 
 .warn {
@@ -119,22 +148,45 @@
   color: var(--attention);
 }
 
+/* Reorder buttons float over the marks on hover so the row width never jumps. */
 .outlineMove {
+  position: absolute;
+  top: 50%;
+  right: 2px;
   display: none;
+  gap: 2px;
+  padding-left: var(--space-2);
+  transform: translateY(-50%);
+  background: inherit;
 }
 
 .outlineRow:hover .outlineMove,
-.outlineRow:focus-within .outlineMove,
-.selected .outlineMove {
+.outlineRow:focus-within .outlineMove {
   display: flex;
+}
+
+.outlineRow:hover .outlineMove {
+  background: var(--surface-sunk);
+}
+
+.selected:hover .outlineMove,
+.selected:focus-within .outlineMove {
+  background: var(--surface);
+}
+
+.outlineMove > button {
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
 }
 
 /* Editor */
 .editor {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-6);
   min-width: 0;
-  padding: var(--space-5);
+  padding: var(--space-8);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
@@ -147,18 +199,62 @@
   gap: var(--space-3);
 }
 
+.editorHeading {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.editorEyebrow {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+}
+
 .editorTitle {
-  font-size: var(--text-lg);
-  font-weight: 600;
+  font-size: var(--text-xl);
+  line-height: var(--leading-xl);
+}
+
+.editorTools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .editorFields {
   display: grid;
-  gap: var(--space-4);
+  gap: 0;
   min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
+}
+
+.section {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-6) 0;
+  border-top: 1px solid var(--line);
+}
+
+.section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.section:last-child {
+  padding-bottom: 0;
+}
+
+.sectionLabel {
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+  line-height: var(--leading-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .group {
@@ -172,8 +268,11 @@
 
 .legend {
   margin-bottom: var(--space-2);
+  padding: 0;
+  color: var(--ink);
   font-size: var(--text-sm);
-  font-weight: 600;
+  line-height: var(--leading-sm);
+  font-weight: 500;
 }
 
 .inlineRow {
@@ -181,6 +280,14 @@
   flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--space-4);
+}
+
+.inlineRow > * {
+  flex: 1 1 160px;
+}
+
+.inlineRow > .narrow {
+  flex: 0 0 120px;
 }
 
 .narrow {
@@ -206,7 +313,8 @@
 .marker {
   display: flex;
   align-items: center;
-  min-width: 44px;
+  flex: none;
+  min-width: 40px;
   height: var(--control-height);
 }
 
@@ -221,28 +329,54 @@
   color: var(--ink-soft);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-  cursor: pointer;
+}
+
+.keyChoice input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--ink);
 }
 
 .pairDash {
   align-self: center;
+  flex: none;
   color: var(--ink-faint);
+  font-family: var(--font-mono);
 }
 
 .fieldError {
   color: var(--critical);
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
 }
 
 .hint {
   color: var(--ink-soft);
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
 }
 
 .saveStatus {
-  justify-self: end;
-  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-faint);
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  white-space: nowrap;
+}
+
+.saveStatus::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}
+
+.saveSaved {
+  color: var(--ok);
 }
 
 .saveError {
@@ -254,59 +388,97 @@
   display: grid;
   gap: var(--space-3);
   position: sticky;
-  top: var(--space-2);
+  top: var(--space-4);
+  min-width: 0;
+}
+
+.previewPanel {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--surface-sunk);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
 }
 
 .previewCard {
   display: grid;
   gap: var(--space-3);
-  padding: var(--space-4);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
 }
 
 .previewMeta {
   color: var(--ink-soft);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+}
+
+/* The stem reads as the student sees it: serif, one step under the exam room's size. */
+.previewCard [data-mode] > :first-child {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  line-height: var(--leading-lg);
+}
+
+.previewCheck {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line-strong);
 }
 
 .score {
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: 500;
 }
 
 /* Type picker */
 .typeGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .typeCard {
   display: grid;
   gap: var(--space-1);
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--line);
   border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--ink);
   font: inherit;
   text-align: left;
-  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
 }
 
 .typeCard:hover:not(:disabled) {
-  background: var(--hover);
+  background: var(--surface-sunk);
   border-color: var(--line-strong);
 }
 
 .typeName {
-  font-weight: 600;
+  display: flex;
+  gap: var(--space-2);
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+
+.typeName > span {
+  color: var(--ink-soft);
 }
 
 .typeHint {
   color: var(--ink-soft);
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+}
+
+.checkRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
 }

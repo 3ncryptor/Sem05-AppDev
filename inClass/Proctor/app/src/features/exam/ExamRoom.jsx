@@ -19,7 +19,7 @@ import { useShortcuts } from './useShortcuts.js'
 import { useTimerMoments } from './useTimerMoments.js'
 import styles from './Exam.module.css'
 
-/** Shared by C7 and C12: the status bar, the progress hairline and the C11 banners. */
+/** Shared by C7 and C12: the status bar, the progress hairline and the C11 banners. No entry motion in the room. */
 export function ExamChrome({ state, children }) {
   const toast = useToast()
   const msLeft = useTimeLeft(state.deadlineAt, state.offsetMs)
@@ -102,9 +102,6 @@ export function ExamRoom() {
         {state.paletteOpen && <Palette state={state} onGo={actions.go} />}
         <Stage state={state} actions={actions} attemptId={attemptId} />
       </div>
-      <p className={styles.keyLegend} aria-hidden="true">
-        1–9 choose · N/P · M mark · Q questions
-      </p>
     </ExamChrome>
   )
 }

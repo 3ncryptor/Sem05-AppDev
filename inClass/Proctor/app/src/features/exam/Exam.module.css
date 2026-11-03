@@ -1,3 +1,6 @@
+/* The exam room (DESIGN.md "Exam room"): the quietest screen. No entry motion; colour only for the timer
+   states and the save state. Review (C12) shares the chrome; Done (C14) sits in the pre-test quiet layout. */
+
 .room {
   display: flex;
   flex-direction: column;
@@ -36,8 +39,8 @@
   gap: var(--space-4);
   height: 48px;
   padding: 0 var(--space-5) 0 88px;
-  background: var(--surface);
   border-bottom: 1px solid var(--line);
+  background: var(--canvas);
 }
 
 /* Fullscreen hides the traffic lights, so the title can sit at the edge. */
@@ -46,12 +49,11 @@
 }
 
 .examTitle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
   min-width: 0;
   overflow: hidden;
-  font-weight: 600;
+  color: var(--ink);
+  font-size: var(--text-md);
+  font-weight: 500;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -60,22 +62,36 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  height: 28px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-control);
+  color: var(--ink);
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: var(--text-base);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.timer_attention {
-  color: var(--attention);
+.timer svg {
+  color: var(--ink-faint);
 }
 
+/* 10–5 min stays calm; the tint starts at the seconds threshold (5 min) and turns critical in the last minute. */
 .timer_attentionBold {
+  background: var(--attention-tint);
   color: var(--attention);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .timer_critical {
+  background: var(--critical-tint);
   color: var(--critical);
-  font-weight: 700;
+  font-weight: 600;
+}
+
+.timer_attentionBold svg,
+.timer_critical svg {
+  color: currentColor;
 }
 
 .statusRight {
@@ -83,14 +99,16 @@
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-4);
+  min-width: 0;
 }
 
 .save {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   color: var(--ink-soft);
   font-size: var(--text-sm);
+  white-space: nowrap;
 }
 
 .savedFade {
@@ -108,37 +126,15 @@
   color: var(--attention);
 }
 
-.flags {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-pill);
-  background: var(--surface-sunk);
-  color: var(--ink-soft);
-  font-size: var(--text-sm);
-  font-variant-numeric: tabular-nums;
-}
-
-.flagAttention {
-  background: var(--attention-tint);
-  color: var(--attention);
-}
-
-.flagCritical {
-  background: var(--critical-tint);
-  color: var(--critical);
-}
-
 .camera {
   display: inline-flex;
   align-items: center;
 }
 
 .dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
 }
 
 .dotLive {
@@ -149,22 +145,26 @@
   background: var(--critical);
 }
 
+/* Answered progress: a quiet ink hairline under the bar. */
 .progress {
   flex: none;
   height: 2px;
-  background: var(--line);
+  background: transparent;
 }
 
 .progress span {
   display: block;
   height: 100%;
-  background: var(--focus);
+  background: var(--line-strong);
   transition: width var(--duration-slow) var(--ease-out);
 }
 
 .banner {
   flex: none;
-  padding: var(--space-3) var(--space-5) 0;
+  width: 100%;
+  max-width: calc(var(--stage-width) + 2 * var(--space-8));
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-8) 0;
 }
 
 /* ---- body: rail + stage ---------------------------------------------------------------------------------- */
@@ -180,7 +180,7 @@
   flex: none;
   display: flex;
   flex-direction: column;
-  width: 56px;
+  width: 64px;
   border-right: 1px solid var(--line);
   overflow-y: auto;
 }
@@ -189,105 +189,120 @@
   display: grid;
   gap: 2px;
   margin: 0;
-  padding: var(--space-3) var(--space-1);
+  padding: var(--space-4) var(--space-2);
   list-style: none;
 }
 
 .railItem {
-  display: flex;
+  display: grid;
+  grid-template-columns: 8px 1fr;
   align-items: center;
-  justify-content: center;
-  gap: 3px;
+  gap: 6px;
   width: 100%;
-  height: 30px;
-  border: 0;
-  border-radius: var(--radius-sm);
+  height: 32px;
+  padding: 0 var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
   background: transparent;
-  color: var(--ink-soft);
+  color: var(--ink-faint);
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
+  text-align: right;
+  transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 .railItem:hover {
-  background: var(--hover);
-}
-
-.rail_answered {
+  background: var(--surface-sunk);
   color: var(--ink);
 }
 
-.rail_marked {
-  color: var(--attention);
+/* The state shape: nothing (not yet), filled ink dot (answered), accent ring (marked), hairline ring (seen). */
+.railMark {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
 }
 
-.rail_current {
-  background: var(--focus-tint);
-  color: var(--focus);
-  font-weight: 700;
+.rail_seen,
+.rail_answered,
+.rail_marked {
+  color: var(--ink-soft);
+}
+
+.rail_seen .railMark {
+  box-shadow: inset 0 0 0 1px var(--ink-faint);
+}
+
+.rail_answered .railMark {
+  background: var(--ink);
+}
+
+.rail_marked .railMark {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.rail_current,
+.rail_current:hover {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.rail_current .railMark {
+  width: 2px;
+  height: 14px;
+  margin-left: 2px;
+  border-radius: 1px;
+  background: var(--ink);
 }
 
 .railCount {
   margin-top: auto;
-  padding: var(--space-3) 0;
+  padding: var(--space-4) 0;
   color: var(--ink-faint);
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
+  font-variant-numeric: tabular-nums;
   text-align: center;
 }
 
+/* C8 palette: a panel over the stage's left edge. It appears without motion (exam room rule). */
 .palette {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 56px;
+  left: 64px;
   z-index: 5;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  width: 280px;
+  width: 296px;
   padding: var(--space-5);
-  background: var(--surface-raised);
   border-right: 1px solid var(--line);
+  background: var(--surface);
   box-shadow: var(--shadow-overlay);
-  animation: slideIn var(--duration-slow) var(--ease-out);
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
 }
 
 .paletteHead {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  gap: var(--space-3);
 }
 
 .paletteTitle {
+  font-family: var(--font-ui);
   font-size: var(--text-lg);
-  font-weight: 650;
+  font-weight: 500;
+  line-height: var(--leading-lg);
+  letter-spacing: 0;
 }
 
-.paletteFilters {
-  display: flex;
-  gap: var(--space-1);
-}
-
-.paletteFilter {
-  height: 26px;
-  padding: 0 var(--space-2);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
+.paletteCount {
   color: var(--ink-soft);
   font-size: var(--text-sm);
-}
-
-.paletteFilter[aria-pressed='true'] {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--canvas);
 }
 
 .paletteGrid {
@@ -297,128 +312,195 @@
 }
 
 .paletteItem {
-  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-control);
   background: var(--surface);
-  color: var(--ink-soft);
+  color: var(--ink-faint);
   font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.paletteItem:hover {
+  background: var(--surface-sunk);
+  color: var(--ink);
+}
+
+.paletteItem.rail_current {
+  border-color: var(--ink);
+}
+
+.paletteItem.rail_current .railMark {
+  display: none;
 }
 
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1) var(--space-3);
+  gap: var(--space-2) var(--space-4);
   margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
   color: var(--ink-soft);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
 }
+
+.legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-soft);
+}
+
+.legend .rail_todo .railMark {
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+/* ---- stage --------------------------------------------------------------------------------------------- */
 
 .stage {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
+}
+
+.stageScroll {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: var(--space-8) var(--space-8) var(--space-6);
+  padding: var(--space-12) var(--space-8) var(--space-10);
 }
 
 .stageInner {
+  display: grid;
+  gap: var(--space-4);
   width: 100%;
   max-width: var(--stage-width);
   margin: 0 auto;
-  display: grid;
-  gap: var(--space-5);
-  animation: crossfade var(--duration) var(--ease-out);
 }
 
-@keyframes crossfade {
-  from {
-    opacity: 0;
-  }
-}
-
-.stageHead {
+.stageMeta {
   display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
 }
 
 .questionNo {
-  flex: 1;
   font-family: var(--font-ui);
-  font-size: var(--text-md);
-  font-weight: 600;
-  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: var(--leading-sm);
   letter-spacing: 0;
-}
-
-.marks {
   color: var(--ink-soft);
 }
 
-.markButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 28px;
-  padding: 0 var(--space-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--ink-soft);
-}
-
-.markButton:hover {
+.metaMarked {
   color: var(--ink);
-}
-
-.marked {
-  border-color: var(--attention);
-  background: var(--attention-tint);
-  color: var(--attention);
 }
 
 .clear {
   justify-self: start;
-  padding: 0;
+  margin-top: calc(-1 * var(--space-1));
+  padding: var(--space-1) 0;
   border: 0;
   background: none;
   color: var(--ink-soft);
+  font-size: var(--text-sm);
   text-decoration: underline;
+  text-decoration-color: var(--line-strong);
   text-underline-offset: 3px;
 }
 
+.clear:hover {
+  color: var(--ink);
+}
+
+/* Bottom bar: Previous left, key legend centre, Mark (ghost toggle) and Next (primary) right. */
 .stageNav {
+  flex: none;
+  padding: var(--space-3) var(--space-8);
+  border-top: 1px solid var(--line);
+}
+
+.stageNavInner {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  width: 100%;
+  gap: var(--space-4);
   max-width: var(--stage-width);
-  margin: auto auto 0;
-  padding-top: var(--space-8);
+  margin: 0 auto;
+}
+
+.stageNavInner > :first-child {
+  margin-left: calc(-1 * var(--space-4));
+}
+
+.stageNavRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stageNavRight button > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.markButton[aria-pressed='true'],
+.markButton[aria-pressed='true']:hover:not(:disabled) {
+  background: var(--surface-sunk);
+  color: var(--ink);
 }
 
 .keyLegend {
-  flex: none;
-  padding: var(--space-2) var(--space-5);
-  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
   color: var(--ink-faint);
   font-size: var(--text-xs);
-  text-align: right;
+  white-space: nowrap;
+}
+
+.keyLegend kbd {
+  min-width: 18px;
+  height: 18px;
+  font-size: 10px;
+}
+
+@media (max-width: 1080px) {
+  .keyLegend {
+    display: none;
+  }
 }
 
 .timesUp {
   flex: 1;
   display: grid;
   place-content: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  color: var(--ink-soft);
   text-align: center;
 }
 
 .timesUpTitle {
-  font-size: var(--text-2xl);
-  font-weight: 650;
-  color: var(--critical);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-display);
+  font-weight: 500;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
 }
 
 /* ---- C12 review ------------------------------------------------------------------------------------------- */
@@ -426,7 +508,7 @@
 .reviewWrap {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-8);
+  padding: var(--space-12) var(--space-8) var(--space-10);
 }
 
 .review {
@@ -437,17 +519,27 @@
 }
 
 .reviewTitle {
+  font-family: var(--font-serif);
   font-size: var(--text-2xl);
-  font-weight: 650;
+  font-weight: 500;
+  line-height: var(--leading-2xl);
+  letter-spacing: var(--tracking-title);
+}
+
+.reviewMeta {
+  margin-top: calc(-1 * var(--space-2));
+  margin-bottom: var(--space-4);
+  color: var(--ink-soft);
 }
 
 .label {
-  margin-top: var(--space-2);
+  margin-top: var(--space-4);
   color: var(--ink-soft);
   font-family: var(--font-ui);
   font-size: var(--text-xs);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  line-height: var(--leading-xs);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
@@ -456,112 +548,205 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
+  background: var(--surface);
 }
 
 .reviewRow {
   display: grid;
-  grid-template-columns: 16px 40px 1fr auto auto;
+  grid-template-columns: 8px 36px minmax(0, 1fr) auto auto;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-2) var(--space-4);
+  min-height: 52px;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
 }
 
 .reviewRow + .reviewRow {
   border-top: 1px solid var(--line);
 }
 
+.reviewRow.rail_todo .railMark {
+  box-shadow: inset 0 0 0 1px var(--ink-faint);
+}
+
 .reviewNo {
-  font-weight: 600;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
 }
 
 .reviewStem {
   overflow: hidden;
+  color: var(--ink);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
+.reviewState {
+  color: var(--ink-faint);
+  font-size: var(--text-sm);
+}
+
+.allDone {
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
 .reviewActions {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding-top: var(--space-2);
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+
+.reviewActions > :first-child {
+  margin-left: calc(-1 * var(--space-4));
+}
+
+.reviewSubmit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
 }
 
 /* ---- C14 done --------------------------------------------------------------------------------------------- */
 
 .done {
   display: grid;
-  justify-items: center;
-  gap: var(--space-4);
-  width: min(620px, 100%);
-  padding: var(--space-8);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  text-align: center;
+  gap: var(--space-8);
 }
 
-.check {
+.doneHead {
   display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--ok-tint);
-  color: var(--ok);
-  animation: draw 300ms var(--ease-out);
+  gap: var(--space-4);
 }
 
-@keyframes draw {
-  from {
-    opacity: 0;
-    transform: scale(0.6);
-  }
+.doneKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ok);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: var(--leading-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 .doneTitle {
-  font-size: var(--text-xl);
-  font-weight: 650;
+  font-family: var(--font-serif);
+  font-size: var(--text-display);
+  font-weight: 500;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
 }
 
 .doneLines {
   display: grid;
   gap: var(--space-1);
   color: var(--ink-soft);
+  font-size: var(--text-lg);
+  line-height: var(--leading-lg);
+  font-weight: 400;
 }
 
 .receipt {
   display: grid;
-  gap: var(--space-1);
-  justify-self: stretch;
-  padding: var(--space-4) var(--space-5);
+  gap: var(--space-5);
+  padding: var(--space-6);
   border: 1px solid var(--line);
-  border-radius: var(--radius-control);
-  background: var(--surface-sunk);
-  text-align: left;
+  border-radius: var(--radius-card);
+  background: var(--surface);
 }
 
 .receiptHead {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.receiptLabel {
   color: var(--ink-soft);
   font-size: var(--text-xs);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
-.doneButtons {
-  display: flex;
-  gap: var(--space-2);
+.receiptCode {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  letter-spacing: 0.04em;
 }
 
-.resultsLink {
-  font-weight: 600;
+.receiptRows {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.receiptRows > div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.receiptRows > :global(.print-only) {
+  display: none;
+}
+
+.receiptRows dt {
+  color: var(--ink-soft);
+}
+
+.receiptRows dd {
+  margin: 0;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+@media print {
+  .receiptRows > :global(.print-only) {
+    display: grid;
+  }
+}
+
+.doneActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.resultsLink,
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
 }
 
 .doneFooter {
-  justify-self: end;
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+
+.backLink {
+  color: var(--ink-soft);
+}
+
+.backLink:hover {
+  color: var(--ink);
 }

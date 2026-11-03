@@ -28,7 +28,7 @@ function LeaveDialog({ blocker }) {
       footer={
         <>
           <Button onClick={() => blocker.reset()}>Stay</Button>
-          <Button variant="danger" onClick={() => blocker.proceed()}>
+          <Button variant="dangerSolid" onClick={() => blocker.proceed()}>
             Discard and leave
           </Button>
         </>
@@ -96,7 +96,10 @@ function SettingsForm({ exam, onSaved }) {
       <DangerZone exam={exam} onChanged={onSaved} />
       {dirty && (
         <div className={styles.saveBar} role="region" aria-label="Unsaved changes">
-          <span>You have unsaved changes</span>
+          <span className={styles.saveText}>
+            <span className={styles.saveDot} aria-hidden="true" />
+            You have unsaved changes
+          </span>
           <div className={styles.saveActions}>
             <Button onClick={discard} disabled={saving}>Discard</Button>
             <Button variant="primary" onClick={submit} loading={saving}>
@@ -122,8 +125,8 @@ export function ExamSettingsPage() {
   if (!exam) {
     return (
       <div className={styles.page} aria-busy="true">
-        <Skeleton height={160} radius={14} />
-        <Skeleton height={160} radius={14} />
+        <Skeleton height={160} radius={10} />
+        <Skeleton height={160} radius={10} />
       </div>
     )
   }

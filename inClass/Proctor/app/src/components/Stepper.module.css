@@ -1,10 +1,12 @@
+/* Slim pre-test stepper: small numbered markers, ink for the current step, check for done. */
 .stepper {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
+  font-size: var(--text-md);
 }
 
 .step {
@@ -19,7 +21,7 @@
   content: '';
   width: 24px;
   height: 1px;
-  margin-right: var(--space-2);
+  margin-right: var(--space-1);
   background: var(--line-strong);
 }
 
@@ -30,6 +32,7 @@
   height: 20px;
   border-radius: 50%;
   border: 1px solid var(--line-strong);
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
 }
 
@@ -38,9 +41,9 @@
 }
 
 .current .marker {
-  border-color: var(--focus);
-  background: var(--focus);
-  color: var(--on-focus);
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--on-ink);
 }
 
 .done {
@@ -48,6 +51,11 @@
 }
 
 .done .marker {
-  border-color: var(--ok);
-  color: var(--ok);
+  border-color: var(--line-strong);
+  background: var(--surface-sunk);
+  color: var(--ink);
+}
+
+.done .marker svg.lucide {
+  stroke-width: 2.5;
 }

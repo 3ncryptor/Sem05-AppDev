@@ -1,5 +1,6 @@
-// The running exam (BUILD_PLAN §17.4): which attempt is active, fullscreen, the heartbeat, the screenshot
-// timer (capture.js), renderer events, the submit confirm (C12) and the quit confirm (C13).
+// The running exam (BUILD_PLAN §17.4): which attempt is active, the exam lock (kiosk in the packaged app,
+// fullscreen in development), the heartbeat, the screenshot timer (capture.js), renderer events, the submit
+// confirm (C12) and the quit confirm (C13).
 import { app, dialog } from 'electron'
 import { startCapture, stopCapture } from './capture.js'
 import { saveImage } from './evidence.js'
@@ -41,19 +42,36 @@ export function rememberAttempt(data) {
 export const getKnownAttempt = (id) => knownAttempts.get(id) ?? null
 export const getActiveAttemptId = () => active?.id ?? null
 
+/**
+ * Locks or unlocks the window for an exam. The packaged app uses kiosk mode: on macOS Electron hides the Dock
+ * and menu bar and turns off app switching, Force Quit, log out and Hide while it's on. Development only
+ * goes fullscreen, so DevTools and the rest of the Mac stay usable.
+ * Kiosk leaves fullscreen on exit only if it entered it, so the exit path leaves fullscreen explicitly.
+ */
+function lockWindow(locked) {
+  const window = getMainWindow()
+  if (!window || window.isDestroyed()) return
+  if (app.isPackaged) {
+    if (window.isKiosk() !== locked) window.setKiosk(locked)
+    if (!locked) window.setFullScreen(false)
+    return
+  }
+  window.setFullScreen(locked)
+}
+
 function requireAttemptId(value) {
   if (typeof value !== 'string' || !PATH_ID_PATTERN.test(value)) throw new IpcError('IPC_REJECTED', 'Bad attempt id')
   return value
 }
 
-/** exam:enter: fullscreen + heartbeat + screenshots. Idempotent, so C6 and the exam room can both call it. */
+/** exam:enter: exam lock + heartbeat + screenshots. Idempotent, so C6 and the exam room can both call it. */
 function enterExam(payload) {
   const attemptId = requireAttemptId(objectPayload(payload).attemptId)
   const attempt = knownAttempts.get(attemptId)
   if (!attempt) throw new IpcError('IPC_REJECTED', 'Unknown attempt')
   if (attempt.status !== 'in_progress') throw new IpcError('ATTEMPT_NOT_ACTIVE', 'This attempt has ended.')
   active = attempt
-  getMainWindow()?.setFullScreen(true)
+  lockWindow(true)
   startHeartbeat(attemptId)
   startCapture({
     attempt,
@@ -64,14 +82,14 @@ function enterExam(payload) {
   return { ok: true, net: getNetStatus() }
 }
 
-/** Leaves the exam: stop the heartbeat and screenshots, leave fullscreen. Evidence uploads keep going. */
+/** Leaves the exam: stop the heartbeat and screenshots, unlock the window. Evidence uploads keep going. */
 export function exitExam() {
   if (active) log.info(`exit ${active.id}`)
   if (active) knownAttempts.set(active.id, { ...active, status: 'submitted' })
   active = null
   stopCapture()
   stopHeartbeat()
-  getMainWindow()?.setFullScreen(false)
+  lockWindow(false)
 }
 
 /** The server ended the attempt (deadline, flags, examiner): stop and tell the renderer (C14). */
@@ -153,7 +171,7 @@ export function registerExamHandlers() {
   })
   handle('exam:fullscreen', () => {
     if (!active) throw new IpcError('ATTEMPT_NOT_ACTIVE', 'No exam is running')
-    getMainWindow()?.setFullScreen(true)
+    lockWindow(true)
     return null
   })
   handle('exam:event', reportEvent)

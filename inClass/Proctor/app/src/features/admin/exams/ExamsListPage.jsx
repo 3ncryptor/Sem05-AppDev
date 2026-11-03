@@ -1,5 +1,5 @@
 // A2 Exams: status filters, search, the exams table, and the New exam / Duplicate / Delete dialogs.
-import { Copy, Plus, RotateCw, Trash2 } from 'lucide-react'
+import { Copy, Plus, RotateCw, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Banner } from '../../../components/Banner.jsx'
@@ -7,6 +7,8 @@ import { Button } from '../../../components/Button.jsx'
 import { Chip } from '../../../components/Chip.jsx'
 import { EmptyState } from '../../../components/EmptyState.jsx'
 import { Input } from '../../../components/Input.jsx'
+import { PageHeader } from '../../../components/PageHeader.jsx'
+import { Segmented } from '../../../components/Segmented.jsx'
 import { Skeleton } from '../../../components/Skeleton.jsx'
 import { Table } from '../../../components/Table.jsx'
 import { errorMessage } from '../../../lib/api.js'
@@ -54,17 +56,20 @@ function columnsFor(handlers) {
 }
 
 function FilterBar({ exams, filter, onFilter, query, onQuery }) {
+  const options = FILTERS.map((f) => ({ value: f.id, label: f.label, count: exams.filter((row) => matchesFilter(row, f.id)).length }))
   return (
     <div className={styles.toolbar}>
-      <div className={styles.filters} role="group" aria-label="Filter exams">
-        {FILTERS.map((f) => (
-          <button key={f.id} type="button" className={styles.filter} aria-pressed={filter === f.id} onClick={() => onFilter(f.id)}>
-            {f.label} <span className={styles.filterCount}>{exams.filter((row) => matchesFilter(row, f.id)).length}</span>
-          </button>
-        ))}
-      </div>
+      <Segmented label="Filter exams" options={options} value={filter} onChange={onFilter} />
       <div className={styles.search}>
-        <Input label="Search exams" hideLabel placeholder="Search" type="search" value={query} onChange={(event) => onQuery(event.target.value)} />
+        <Input
+          label="Search exams"
+          hideLabel
+          placeholder="Search title or code"
+          type="search"
+          value={query}
+          onChange={(event) => onQuery(event.target.value)}
+          trailing={<Search size={14} aria-hidden="true" />}
+        />
       </div>
     </div>
   )
@@ -74,7 +79,7 @@ function LoadingRows() {
   return (
     <div className={styles.loading} aria-busy="true">
       {[0, 1, 2, 3].map((key) => (
-        <Skeleton key={key} height={36} />
+        <Skeleton key={key} height={44} />
       ))}
     </div>
   )
@@ -91,20 +96,14 @@ export function ExamsListPage() {
   const visible = exams.filter((row) => matchesFilter(row, filter) && matchesQuery(row, query))
   const columns = columnsFor({ onDuplicate: (row) => setCreating({ copyFrom: row }), onDelete: setDeleting })
   const newExam = (
-    <Button variant="primary" icon={Plus} onClick={() => setCreating({ copyFrom: null })}>
+    <Button variant="primary" size="lg" icon={Plus} onClick={() => setCreating({ copyFrom: null })}>
       New exam
     </Button>
   )
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Exams</h1>
-          <p className={styles.subtitle}>Build, publish and run exams.</p>
-        </div>
-        {newExam}
-      </header>
+    <div className={`${styles.page} page-enter`}>
+      <PageHeader title="Exams" description="Build, publish and run exams." actions={newExam} />
       {data && exams.length > 0 && <FilterBar exams={exams} filter={filter} onFilter={setFilter} query={query} onQuery={setQuery} />}
       {loading && !data && <LoadingRows />}
       {error && (

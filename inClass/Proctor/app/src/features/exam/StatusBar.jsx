@@ -1,8 +1,8 @@
-// C7 status bar: exam name · timer · save state · camera dot. Every state has a word or a shape.
+// C7 status bar (48 px): exam title left, mono timer centred, save state and camera dot right.
+// Every state has a word or a shape; colour only for the timer states and the save state.
 import { CircleCheck, CloudOff, LoaderCircle, Timer } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { isLive, onCameraChange } from '../../proctoring/webcam.js'
-import { BrandMark } from '../shell/BrandMark.jsx'
 import { timerDisplay } from './timer.js'
 import styles from './Exam.module.css'
 
@@ -45,12 +45,10 @@ export function StatusBar({ state, msLeft, revisionKey }) {
   const timer = timerDisplay(msLeft)
   return (
     <header className={`drag-region ${styles.statusBar}`}>
-      <span className={styles.examTitle}>
-        <BrandMark showName={false} />
-        {state.exam?.title}
-      </span>
+      <span className={styles.examTitle}>{state.exam?.title}</span>
       <span className={`${styles.timer} ${styles[`timer_${timer.tone}`] ?? ''}`} role="timer" aria-live="off">
-        <Timer size={15} aria-hidden="true" /> {timer.text}
+        <Timer size={14} aria-hidden="true" />
+        {timer.text}
       </span>
       <span className={styles.statusRight} aria-live="polite">
         <SaveState net={state.net} revisionKey={revisionKey} />

@@ -30,7 +30,9 @@ export function AdminShell() {
             <Breadcrumbs />
           </div>
           <main className={styles.content}>
-            <Outlet />
+            <div className={`${styles.page} ${styles.admin}`}>
+              <Outlet />
+            </div>
           </main>
         </div>
       </div>

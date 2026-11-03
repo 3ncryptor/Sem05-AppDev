@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Button } from '../../../components/Button.jsx'
-import { Card } from '../../../components/Card.jsx'
 import { DeleteExamDialog } from '../exams/DeleteExamDialog.jsx'
 import { NewExamDialog } from '../exams/NewExamDialog.jsx'
 import { PublishDialog } from '../exams/PublishDialog.jsx'
@@ -16,17 +15,37 @@ export function DangerZone({ exam, onChanged }) {
   const canUnpublish = exam.status === 'published' && exam.counts.started === 0
 
   return (
-    <Card>
-      <h2 className={styles.section}>Danger zone</h2>
-      <div className={styles.danger}>
-        <Button onClick={() => setOpen('duplicate')}>Duplicate</Button>
-        {canUnpublish && <Button onClick={() => setOpen('unpublish')}>Unpublish</Button>}
-        {exam.status === 'draft' && (
-          <Button variant="danger" onClick={() => setOpen('delete')}>
-            Delete draft
-          </Button>
+    <section className={styles.danger} aria-labelledby="danger-zone-title">
+      <h2 id="danger-zone-title" className={styles.dangerTitle}>Danger zone</h2>
+      <ul className={styles.dangerList}>
+        <li className={styles.dangerRow}>
+          <div>
+            <p className={styles.dangerLabel}>Duplicate</p>
+            <p className={styles.blockText}>Start a new draft with these questions and settings.</p>
+          </div>
+          <Button onClick={() => setOpen('duplicate')}>Duplicate</Button>
+        </li>
+        {canUnpublish && (
+          <li className={styles.dangerRow}>
+            <div>
+              <p className={styles.dangerLabel}>Unpublish</p>
+              <p className={styles.blockText}>Back to draft. Possible only while nobody has started.</p>
+            </div>
+            <Button onClick={() => setOpen('unpublish')}>Unpublish</Button>
+          </li>
         )}
-      </div>
+        {exam.status === 'draft' && (
+          <li className={styles.dangerRow}>
+            <div>
+              <p className={styles.dangerLabel}>Delete draft</p>
+              <p className={styles.blockText}>Removes the draft and its questions for good.</p>
+            </div>
+            <Button variant="danger" onClick={() => setOpen('delete')}>
+              Delete draft
+            </Button>
+          </li>
+        )}
+      </ul>
       {open === 'duplicate' && <NewExamDialog exams={[exam]} copyFrom={exam} onClose={close} />}
       {open === 'unpublish' && (
         <PublishDialog
@@ -40,6 +59,6 @@ export function DangerZone({ exam, onChanged }) {
         />
       )}
       {open === 'delete' && <DeleteExamDialog exam={exam} onClose={close} onDeleted={() => navigate('/admin/exams')} />}
-    </Card>
+    </section>
   )
 }

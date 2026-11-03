@@ -65,16 +65,21 @@ export function ServerPage() {
 
   return (
     <CenteredLayout>
-      <form className={styles.card} onSubmit={onSave} noValidate aria-labelledby="server-title">
+      <form className={styles.form} onSubmit={onSave} noValidate aria-labelledby="server-title">
         <div className={styles.heading}>
-          {!isChanging && <WifiOff size={20} aria-hidden="true" className={styles.icon} />}
+          {!isChanging && (
+            <span className={styles.icon}>
+              <WifiOff size={20} aria-hidden="true" />
+            </span>
+          )}
           <h1 id="server-title" className={styles.title}>
             {isChanging ? 'Exam server' : "Can't reach the exam server"}
           </h1>
+          {isChanging && <p className={styles.lead}>The address Athena uses to sign in and fetch exams.</p>}
         </div>
         {!isChanging && (
           <>
-            <p>
+            <p className={styles.lead}>
               Athena tried <span className="mono">{savedUrl || '…'}</span> and got no answer.
             </p>
             <ul className={styles.checks}>

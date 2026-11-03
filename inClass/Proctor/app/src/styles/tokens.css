@@ -1,88 +1,125 @@
-/* Design tokens (BUILD_PLAN §5.2, SCREENS §0). Light first; warm charcoal dark under data-theme="dark".
-   data-theme is set from main's nativeTheme (theme:changed), so the Settings override and macOS both work. */
+/* Design tokens: "calm editorial" (app/DESIGN.md is the contract). Light first; warm charcoal dark under
+   data-theme="dark". data-theme is set from main's nativeTheme (theme:changed), so Settings and macOS both work.
+   The second block in each theme holds backward-compatible aliases for names screens already use. */
 
 :root,
 :root[data-theme='light'] {
   color-scheme: light;
 
-  --canvas: #fbf8f2;
+  --canvas: #f7f6f3;
   --surface: #ffffff;
-  --surface-sunk: #f3efe7;
+  --surface-sunk: #f1efea;
   --surface-raised: #ffffff;
-  --sidebar: #f5f1e9;
-  --ink: #1e2529;
-  --ink-soft: #5a646b;
-  --ink-faint: #8b9298;
-  --line: #e7e1d7;
-  --line-strong: #d6cfc2;
+  --sidebar: #f2f1ed;
+  --ink: #1f2225;
+  --ink-soft: #6b6a66;
+  --ink-faint: #9a9893;
+  --line: #e8e6e1;
+  --line-strong: #d9d6cf;
 
-  --focus: #3b4cca;
-  --focus-hover: #3242b5;
-  --focus-tint: #eceefb;
-  --on-focus: #ffffff;
+  --accent: #2f5d8a;
+  --accent-hover: #264d73;
+  --accent-tint: #e8eff6;
 
-  --ok: #1f7a4d;
-  --ok-tint: #e6f2ea;
-  --attention: #b4690e;
-  --attention-tint: #fbf0e0;
-  --critical: #b3122f;
-  --critical-hover: #9c0f29;
-  --critical-tint: #fae8ea;
+  --ok: #346538;
+  --ok-tint: #edf3ec;
+  --attention: #956400;
+  --attention-tint: #fbf3db;
+  --critical: #9f2f2d;
+  --critical-hover: #872624;
+  --critical-tint: #fdebec;
+  --info: #1f6c9f;
+  --info-tint: #e1f3fe;
 
-  --hover: rgb(30 37 41 / 0.05);
-  --pressed: rgb(30 37 41 / 0.09);
-  --scrim: rgb(23 24 26 / 0.32);
-  --shadow-overlay: 0 1px 2px rgb(30 37 41 / 0.06), 0 12px 32px rgb(30 37 41 / 0.14);
-  --shadow-card: 0 1px 2px rgb(30 37 41 / 0.04);
+  /* Primary button: ink fill, one step lighter on hover. */
+  --ink-hover: #383c40;
+  --on-ink: var(--canvas);
+  --on-critical: #ffffff;
+
+  --hover: var(--surface-sunk);
+  --pressed: #e9e6df;
+  --scrim: rgb(0 0 0 / 0.32);
+  --shadow-overlay: 0 1px 2px rgb(31 34 37 / 0.05), 0 12px 32px rgb(31 34 37 / 0.1);
+  --shadow-hover: 0 2px 8px rgb(31 34 37 / 0.04);
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --canvas: #17181a;
-  --surface: #1f2023;
-  --surface-sunk: #141517;
-  --surface-raised: #26272b;
-  --sidebar: #1b1c1f;
-  --ink: #ece9e3;
-  --ink-soft: #a9a59e;
-  --ink-faint: #7b7872;
-  --line: #2c2d31;
-  --line-strong: #3a3b40;
+  --canvas: #161615;
+  --surface: #1e1e1c;
+  --surface-sunk: #121211;
+  --surface-raised: #232321;
+  --sidebar: #1a1a19;
+  --ink: #eceae5;
+  --ink-soft: #a3a09a;
+  --ink-faint: #75726d;
+  --line: #2a2a28;
+  --line-strong: #383733;
 
-  --focus: #8c98ff;
-  --focus-hover: #a1abff;
-  --focus-tint: #272b4a;
-  --on-focus: #12131a;
+  --accent: #8db4dd;
+  --accent-hover: #a6c5e6;
+  --accent-tint: #1c2733;
 
-  /* §5.2 gives one value for these; they are too dark on charcoal, so dark mode lifts them. */
-  --ok: #5bbf8a;
-  --ok-tint: #1c2c24;
-  --attention: #e3a04a;
-  --attention-tint: #2f2518;
-  --critical: #f06a7e;
-  --critical-hover: #f5899a;
-  --critical-tint: #33191e;
+  --ok: #8cc59a;
+  --ok-tint: #1f2a20;
+  --attention: #e2b85c;
+  --attention-tint: #2e2716;
+  --critical: #f0a09a;
+  --critical-hover: #f4b6b1;
+  --critical-tint: #331c1c;
+  --info: #8ec3eb;
+  --info-tint: #172634;
 
-  --hover: rgb(236 233 227 / 0.06);
-  --pressed: rgb(236 233 227 / 0.1);
+  --ink-hover: #d6d3cd;
+  --on-ink: var(--canvas);
+  --on-critical: #1e1e1c;
+
+  --hover: #262624;
+  --pressed: #2e2e2b;
   --scrim: rgb(0 0 0 / 0.5);
-  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px rgb(0 0 0 / 0.45);
-  --shadow-card: none;
+  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px rgb(0 0 0 / 0.4);
+  --shadow-hover: 0 2px 8px rgb(0 0 0 / 0.2);
 }
 
 :root {
-  /* Type: the system font, so nothing ships. SF Mono for timers and codes. */
-  --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
-  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+  /* Backward-compatible aliases: the old indigo "focus" family now points at the accent. */
+  --focus: var(--accent);
+  --focus-hover: var(--accent-hover);
+  --focus-tint: var(--accent-tint);
+  --on-focus: var(--canvas);
+  --shadow-card: none;
 
+  /* Type: macOS system fonts only (the CSP blocks web fonts; the app works offline). */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --font-serif: 'Iowan Old Style', 'Charter', Georgia, serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: var(--font-serif);
+
+  /* Sizes; line heights live in the matching --leading-* token. */
   --text-xs: 11px;
   --text-sm: 12px;
   --text-md: 13px;
-  --text-lg: 15px;
+  --text-base: 14px;
+  --text-lg: 16px;
   --text-xl: 20px;
-  --text-2xl: 26px;
+  --text-question: 22px;
+  --text-2xl: 30px;
+  --text-display: 44px;
+
+  --leading-xs: 16px;
+  --leading-sm: 18px;
+  --leading-md: 20px;
+  --leading-base: 22px;
+  --leading-lg: 24px;
+  --leading-xl: 28px;
+  --leading-question: 32px;
+  --leading-2xl: 36px;
+  --leading-display: 48px;
+
+  --tracking-label: 0.06em;
+  --tracking-title: -0.02em;
+  --tracking-display: -0.03em;
 
   /* 4 px grid */
   --space-1: 4px;
@@ -91,25 +128,42 @@
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
+  --space-7: 28px;
   --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
 
-  --radius-sm: 6px;
-  --radius-control: 10px;
-  --radius-card: 14px;
+  --radius-sm: 4px;
+  --radius-control: 6px;
+  --radius-thumb: 8px;
+  --radius-card: 10px;
   --radius-pill: 999px;
 
   --control-height: 32px;
   --control-height-lg: 40px;
   --titlebar-height: 44px;
-  --sidebar-width: 220px;
+  --sidebar-width: 232px;
   --sidebar-rail: 56px;
   --sheet-width: 440px;
-  --stage-width: 760px;
+  --stage-width: 720px;
+
+  --page-padding: 40px;
+  --content-admin: 1200px;
+  --content-student: 960px;
+  --content-reading: 720px;
+  --content-form: 480px;
+  --page-max: var(--content-admin);
 
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --duration-fast: 120ms;
   --duration: 160ms;
   --duration-slow: 180ms;
+}
+
+@media (max-width: 1199px) {
+  :root {
+    --page-padding: 32px;
+  }
 }

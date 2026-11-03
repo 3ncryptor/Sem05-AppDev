@@ -49,8 +49,14 @@ export function QuestionEditor({ examId, question, index, draft, onDraft, readOn
   return (
     <div className={styles.editor}>
       <div className={styles.editorHead}>
-        <h2 className={styles.editorTitle}>Q{index + 1} · {TYPE_META[draft.type]?.label}</h2>
-        {!readOnly && <Button variant="ghost" icon={Trash2} onClick={onDelete}>Delete</Button>}
+        <div className={styles.editorHeading}>
+          <span className={styles.editorEyebrow}>Question {index + 1}</span>
+          <h2 className={styles.editorTitle}>{TYPE_META[draft.type]?.label}</h2>
+        </div>
+        <div className={styles.editorTools}>
+          <SaveStatus status={autosave.status} />
+          {!readOnly && <Button variant="ghost" icon={Trash2} onClick={onDelete}>Delete</Button>}
+        </div>
       </div>
       {question.problems?.length > 0 && (
         <Banner tone="attention">Before publishing: {question.problems.join(', ')}.</Banner>
@@ -59,27 +65,34 @@ export function QuestionEditor({ examId, question, index, draft, onDraft, readOn
         <Banner tone="critical" role="alert">{autosave.message}</Banner>
       )}
       <fieldset className={styles.editorFields} disabled={readOnly}>
-        <div className={styles.inlineRow}>
-          <Select label="Type" options={TYPE_OPTIONS} value={draft.type} error={errors.type}
-            onChange={(event) => setNextType(event.target.value === draft.type ? null : event.target.value)} />
-          <div className={styles.narrow}>
-            <Input label="Marks" type="number" min={0.5} max={100} step={0.5} value={draft.marks} error={errors.marks}
-              onChange={(event) => change({ marks: event.target.value })} />
+        <section className={styles.section} aria-label="Basics">
+          <div className={styles.inlineRow}>
+            <Select label="Type" options={TYPE_OPTIONS} value={draft.type} error={errors.type}
+              onChange={(event) => setNextType(event.target.value === draft.type ? null : event.target.value)} />
+            <div className={styles.narrow}>
+              <Input label="Marks" type="number" min={0.5} max={100} step={0.5} value={draft.marks} error={errors.marks}
+                onChange={(event) => change({ marks: event.target.value })} />
+            </div>
           </div>
-        </div>
-        <Textarea label="Question" hint="Use ``` fences for code." rows={5} maxLength={5000} value={draft.text}
-          error={errors.text} onChange={(event) => change({ text: event.target.value })} />
-        {TypeEditor ? (
-          <TypeEditor draft={draft} errors={errors} onChange={change} />
-        ) : (
-          <Banner tone="critical">This question type ({draft.type}) has no editor.</Banner>
-        )}
-        <Input label="Topic" maxLength={60} value={draft.topic} error={errors.topic}
-          onChange={(event) => change({ topic: event.target.value })} />
-        <Textarea label="Explanation" hint="Shown with results, never during the exam." rows={3} maxLength={3000}
-          value={draft.explanation} error={errors.explanation} onChange={(event) => change({ explanation: event.target.value })} />
+          <Textarea label="Question" hint="Use ``` fences for code." rows={5} maxLength={5000} value={draft.text}
+            error={errors.text} onChange={(event) => change({ text: event.target.value })} />
+        </section>
+        <section className={styles.section} aria-labelledby="builder-key-label">
+          <h3 id="builder-key-label" className={styles.sectionLabel}>Answer key</h3>
+          {TypeEditor ? (
+            <TypeEditor draft={draft} errors={errors} onChange={change} />
+          ) : (
+            <Banner tone="critical">This question type ({draft.type}) has no editor.</Banner>
+          )}
+        </section>
+        <section className={styles.section} aria-labelledby="builder-details-label">
+          <h3 id="builder-details-label" className={styles.sectionLabel}>Details</h3>
+          <Input label="Topic" maxLength={60} value={draft.topic} error={errors.topic}
+            onChange={(event) => change({ topic: event.target.value })} />
+          <Textarea label="Explanation" hint="Shown with results, never during the exam." rows={3} maxLength={3000}
+            value={draft.explanation} error={errors.explanation} onChange={(event) => change({ explanation: event.target.value })} />
+        </section>
       </fieldset>
-      <SaveStatus status={autosave.status} />
       <TypeChangeDialog nextType={nextType} busy={changingType} onConfirm={confirmType} onClose={() => setNextType(null)} />
     </div>
   )

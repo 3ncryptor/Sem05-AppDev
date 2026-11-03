@@ -1,5 +1,4 @@
 // The A5 form sections. Each gets the form, a field setter and the error map; none keeps state.
-import { Card } from '../../../components/Card.jsx'
 import { Input } from '../../../components/Input.jsx'
 import { RadioGroup } from '../../../components/Radio.jsx'
 import { Switch } from '../../../components/Switch.jsx'
@@ -17,18 +16,22 @@ const VISIBILITY_OPTIONS = [
 /** onChange handler for a text-like input bound to `key`. */
 const text = (set, key) => (event) => set(key, event.target.value)
 
-function Section({ title, children }) {
+/** One settings group: title and a one-line description above its fields, hairline below. */
+export function Section({ title, description, children }) {
   return (
-    <Card>
-      <h2 className={styles.section}>{title}</h2>
+    <section className={styles.block}>
+      <header className={styles.blockHead}>
+        <h2 className={styles.section}>{title}</h2>
+        {description && <p className={styles.blockText}>{description}</p>}
+      </header>
       <div className={styles.fields}>{children}</div>
-    </Card>
+    </section>
   )
 }
 
 export function TimingSection({ form, set, errors, locked }) {
   return (
-    <Section title="Timing & window">
+    <Section title="Timing and window" description="How long each attempt lasts and when students can start.">
       <div className={styles.row}>
         <Input
           label="Duration (minutes)"
@@ -54,7 +57,7 @@ export function TimingSection({ form, set, errors, locked }) {
 
 export function AttemptsSection({ form, set, errors, locked }) {
   return (
-    <Section title="Attempts & order">
+    <Section title="Attempts and order" description="How many tries a student gets, and whether questions are shuffled.">
       <div className={styles.row}>
         <Input
           label="Attempts allowed"
@@ -79,7 +82,7 @@ export function AttemptsSection({ form, set, errors, locked }) {
 
 export function TextsSection({ form, set, errors }) {
   return (
-    <Section title="Instructions & terms">
+    <Section title="Instructions and terms" description="What students read before they begin.">
       <Textarea
         label="Instructions"
         hint="Shown on the exam page and the rules step."
@@ -104,7 +107,7 @@ export function TextsSection({ form, set, errors }) {
 
 export function ResultsSection({ form, set, errors }) {
   return (
-    <Section title="Results">
+    <Section title="Results" description="When students see their score, and what counts as a pass.">
       <RadioGroup legend="Show results" name="visibility" value={form.visibility} onChange={(value) => set('visibility', value)} options={VISIBILITY_OPTIONS} />
       <div className={styles.row}>
         <Input
@@ -124,7 +127,7 @@ export function ResultsSection({ form, set, errors }) {
 export function ScreenshotsSection({ form, set, errors, locked }) {
   const hint = locked ? 'Locked: a student has already started' : 'A screen and a webcam picture are saved at a random moment in this range.'
   return (
-    <Section title="Screenshots">
+    <Section title="Screenshots" description="Evidence saved during each attempt for review.">
       <div className={styles.row}>
         <Input
           label="Every (min seconds)"

@@ -27,17 +27,21 @@ export function Preview({ examId, question, index, total }) {
 
   return (
     <aside className={styles.preview} aria-label="Preview">
-      <p className={styles.panelLabel}>Preview</p>
-      <div className={styles.previewCard}>
-        <p className={styles.previewMeta}>
-          Q{index + 1} of {total} · {question.marks} {question.marks === 1 ? 'mark' : 'marks'}
-        </p>
-        <QuestionView question={question} response={response} onChange={answer} mode="preview" />
-      </div>
-      <p className={styles.hint}>Answer as a student to check the key (uses the last saved version).</p>
-      <div className={styles.inlineRow}>
-        <Button onClick={check} loading={loading} disabled={response === null}>Check answer</Button>
-        {result && <span className={result.isError ? styles.fieldError : styles.score} role="status">{result.text}</span>}
+      <p className={styles.panelLabel}>Student preview</p>
+      <div className={styles.previewPanel}>
+        <div className={styles.previewCard}>
+          <p className={styles.previewMeta}>
+            Question {index + 1} of {total} · {question.marks} {question.marks === 1 ? 'mark' : 'marks'}
+          </p>
+          <QuestionView question={question} response={response} onChange={answer} mode="preview" />
+        </div>
+        <div className={styles.previewCheck}>
+          <p className={styles.hint}>Answer as a student to check the key (uses the last saved version).</p>
+          <div className={styles.checkRow}>
+            <Button onClick={check} loading={loading} disabled={response === null}>Check answer</Button>
+            {result && <span className={result.isError ? styles.fieldError : styles.score} role="status">{result.text}</span>}
+          </div>
+        </div>
       </div>
     </aside>
   )

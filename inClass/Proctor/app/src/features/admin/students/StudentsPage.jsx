@@ -7,6 +7,8 @@ import { Chip } from '../../../components/Chip.jsx'
 import { Dialog } from '../../../components/Dialog.jsx'
 import { EmptyState } from '../../../components/EmptyState.jsx'
 import { Input } from '../../../components/Input.jsx'
+import { PageHeader } from '../../../components/PageHeader.jsx'
+import { Segmented } from '../../../components/Segmented.jsx'
 import { Skeleton } from '../../../components/Skeleton.jsx'
 import { Table } from '../../../components/Table.jsx'
 import { useToast } from '../../../components/toastContext.js'
@@ -33,11 +35,19 @@ const CONFIRM_COPY = {
 
 function columns(nowMs, onAction) {
   return [
-    { key: 'rollNo', label: 'Roll no', render: (u) => <span className={styles.mono}>{u.rollNo}</span> },
-    { key: 'name', label: 'Name' },
+    {
+      key: 'name',
+      label: 'Student',
+      render: (u) => (
+        <span className={styles.student}>
+          <span className={styles.name}>{u.name}</span>
+          <span className={styles.roll}>{u.rollNo}</span>
+        </span>
+      ),
+    },
     { key: 'status', label: 'Status', render: (u) => <Chip spec={u.active ? STUDENT_STATUS.active : STUDENT_STATUS.off} /> },
-    { key: 'attempts', label: 'Attempts', align: 'right' },
-    { key: 'lastActiveAt', label: 'Last active', render: (u) => lastActiveLabel(u.lastActiveAt, nowMs) },
+    { key: 'attempts', label: 'Attempts', align: 'right', render: (u) => <span className={styles.num}>{u.attempts}</span> },
+    { key: 'lastActiveAt', label: 'Last active', render: (u) => <span className={styles.muted}>{lastActiveLabel(u.lastActiveAt, nowMs)}</span> },
     {
       key: 'actions',
       label: 'Actions',
@@ -60,7 +70,7 @@ function LoadingRows() {
   return (
     <div className={styles.loading} aria-busy="true">
       {[0, 1, 2, 3, 4].map((key) => (
-        <Skeleton key={key} height={36} />
+        <Skeleton key={key} height={44} />
       ))}
     </div>
   )
@@ -69,13 +79,7 @@ function LoadingRows() {
 function FilterBar({ users, filter, onFilter, query, onQuery }) {
   return (
     <div className={styles.toolbar}>
-      <div className={styles.filters} role="group" aria-label="Filter students">
-        {FILTERS.map((f) => (
-          <button key={f.id} type="button" className={styles.filter} aria-pressed={filter === f.id} onClick={() => onFilter(f.id)}>
-            {f.label} <span className={styles.filterCount}>{users.filter(f.match).length}</span>
-          </button>
-        ))}
-      </div>
+      <Segmented label="Filter students" options={FILTERS.map((f) => ({ value: f.id, label: f.label, count: users.filter(f.match).length }))} value={filter} onChange={onFilter} />
       <div className={styles.search}>
         <Input
           label="Search students"
@@ -145,17 +149,17 @@ export function StudentsPage() {
   const confirmCopy = confirm ? CONFIRM_COPY[confirm.kind](confirm.user) : null
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Students</h1>
-          <p className={styles.subtitle}>Accounts that can sign in and take exams.</p>
-        </div>
-        <div className={styles.headerActions}>
-          <Button icon={FileUp} onClick={() => setDialog('import')}>Import from file</Button>
-          <Button variant="primary" icon={Plus} onClick={() => setDialog('add')}>Add student</Button>
-        </div>
-      </header>
+    <div className={`${styles.page} page-enter`}>
+      <PageHeader
+        title="Students"
+        description="Accounts that can sign in and take exams."
+        actions={
+          <>
+            <Button size="lg" icon={FileUp} onClick={() => setDialog('import')}>Import from file</Button>
+            <Button variant="primary" size="lg" icon={Plus} onClick={() => setDialog('add')}>Add student</Button>
+          </>
+        }
+      />
       {data && users.length > 0 && <FilterBar users={users} filter={filter} onFilter={setFilter} query={query} onQuery={setQuery} />}
       {loading && !data && <LoadingRows />}
       {error && (
@@ -182,7 +186,7 @@ export function StudentsPage() {
         footer={
           <>
             <Button onClick={() => setConfirm(null)}>Cancel</Button>
-            <Button variant="danger" onClick={runConfirmed} loading={actions.busy}>{confirmCopy?.action}</Button>
+            <Button variant="dangerSolid" onClick={runConfirmed} loading={actions.busy}>{confirmCopy?.action}</Button>
           </>
         }
       />

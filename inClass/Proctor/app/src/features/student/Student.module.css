@@ -1,183 +1,176 @@
+/* C1 Exams and C2 Exam detail (DESIGN.md "Candidate"). */
 .page {
   display: grid;
-  gap: var(--space-5);
-  padding-top: var(--space-2);
+  gap: var(--space-6);
 }
 
-.narrow {
-  max-width: 820px;
+/* The page header carries its own 32 px bottom margin; the grid gap shouldn't double it. */
+.page > header {
+  margin-bottom: var(--space-2);
 }
 
-.header {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.title {
-  font-size: var(--text-2xl);
-  font-weight: 650;
-}
-
-.subtitle {
-  color: var(--ink-soft);
-  font-size: var(--text-lg);
-}
-
-.filters {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 28px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--ink-soft);
-  font-weight: 500;
-}
-
-.filter:hover {
-  color: var(--ink);
-}
-
-.filter[aria-pressed='true'] {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--canvas);
-}
-
-.filterCount {
-  font-variant-numeric: tabular-nums;
-  opacity: 0.7;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--space-4);
-}
-
-.card {
-  display: grid;
-  align-content: start;
-  justify-items: start;
-  gap: var(--space-1);
-  min-height: 176px;
-  padding: var(--space-5);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-}
-
-.cardTitle {
-  margin-top: var(--space-2);
-  font-size: var(--text-lg);
-  font-weight: 650;
-}
-
-.cardMeta {
-  color: var(--ink-soft);
-}
-
-.cardLine {
-  color: var(--ink-soft);
-}
-
-.cardFooter {
-  justify-self: stretch;
-  display: flex;
-  justify-content: flex-end;
-  margin-top: auto;
-  padding-top: var(--space-3);
-}
-
-.linkButton {
-  display: inline-flex;
-  align-items: center;
-  height: var(--control-height);
-  padding: 0 var(--space-3);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-control);
-  background: var(--surface);
-  color: var(--ink);
-  font-weight: 500;
-  white-space: nowrap;
+.reading {
+  max-width: var(--content-reading);
 }
 
 .linkButton:hover {
-  background: var(--surface-sunk);
   text-decoration: none;
 }
 
-.linkPrimary,
-.linkPrimary:hover {
-  border-color: transparent;
-  background: var(--focus);
-  color: var(--on-focus);
+/* C1 sections */
+.section {
+  display: grid;
+  gap: var(--space-3);
 }
 
+.sectionLabel {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  line-height: var(--leading-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.sectionCount {
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 120px;
+  align-items: center;
+  gap: var(--space-5);
+  min-height: 72px;
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+}
+
+.rowMain {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.rowTitle {
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-lg);
+  line-height: var(--leading-lg);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowMeta {
+  display: flex;
+  flex-wrap: wrap;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.rowMeta > span + span::before {
+  content: '·';
+  padding: 0 var(--space-2);
+  color: var(--ink-faint);
+}
+
+.code {
+  color: var(--ink);
+  font-family: var(--font-mono);
+}
+
+.rowAction {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* C2 detail */
 .back {
   display: inline-flex;
   align-items: center;
   gap: 2px;
   width: fit-content;
-  color: var(--ink-soft);
-}
-
-.detailHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.detailHeader .subtitle {
-  margin-top: var(--space-1);
-}
-
-.tiles {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-3);
 }
 
 .facts {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: var(--space-2) var(--space-4);
+  display: flex;
+  flex-wrap: wrap;
   margin: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
-.facts dt,
-.sectionTitle {
+.fact {
+  display: grid;
+  gap: var(--space-1);
+  flex: 1 1 0;
+  min-width: 96px;
+  padding: var(--space-4) var(--space-5) var(--space-4) 0;
+}
+
+.fact + .fact {
+  padding-left: var(--space-5);
+  border-left: 1px solid var(--line);
+}
+
+.fact dt {
   color: var(--ink-soft);
-  font-family: var(--font-ui);
   font-size: var(--text-xs);
+  line-height: var(--leading-xs);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  padding-top: 2px;
 }
 
-.facts dd {
+.fact dd {
   margin: 0;
+  color: var(--ink);
+  font-size: var(--text-lg);
+  line-height: var(--leading-lg);
+  font-variant-numeric: tabular-nums;
 }
 
-.proctoring {
+.detailSection {
   display: grid;
-  gap: var(--space-3);
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: var(--space-4);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--line);
+}
+
+.detailSection .sectionLabel {
+  padding-top: 3px;
+}
+
+.detailBody {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.soft {
+  color: var(--ink-soft);
 }
 
 .ruleList {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2) var(--space-6);
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -185,17 +178,13 @@
 
 .ruleList li {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  align-items: flex-start;
+  gap: var(--space-3);
 }
 
 .ruleList svg {
   flex: none;
-  color: var(--ink-soft);
-}
-
-.note {
-  max-width: 560px;
+  margin-top: 3px;
   color: var(--ink-soft);
 }
 
@@ -208,4 +197,20 @@
 
 .blocked {
   color: var(--ink-soft);
+}
+
+@media (max-width: 760px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .rowAction {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .detailSection {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
 }

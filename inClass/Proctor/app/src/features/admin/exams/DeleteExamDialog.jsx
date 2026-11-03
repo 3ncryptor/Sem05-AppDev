@@ -38,7 +38,7 @@ export function DeleteExamDialog({ exam, onClose, onDeleted }) {
       footer={
         <>
           <Button onClick={onClose}>Cancel</Button>
-          <Button variant="danger" onClick={confirm} loading={remove.loading} disabled={typed.trim() !== exam.title}>
+          <Button variant="dangerSolid" onClick={confirm} loading={remove.loading} disabled={typed.trim() !== exam.title}>
             Delete draft
           </Button>
         </>

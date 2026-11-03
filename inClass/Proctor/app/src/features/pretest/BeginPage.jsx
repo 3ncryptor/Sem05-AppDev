@@ -1,5 +1,5 @@
 // C6 Step 4 · Begin (BUILD_PLAN §22.2): start the attempt, save the identity photo, enter the exam.
-import { Camera, Clock, Maximize } from 'lucide-react'
+import { Camera, ChevronLeft, Clock, Maximize } from 'lucide-react'
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router'
 import { Button } from '../../components/Button.jsx'
@@ -36,9 +36,11 @@ export function BeginPage() {
 
   if (error && STOP_CODES.has(error.code)) {
     return (
-      <article className={styles.card}>
-        <h1 className={styles.title}>You can’t start this exam</h1>
-        <p>{errorMessage(error)}</p>
+      <article className={styles.step}>
+        <header className={styles.heading}>
+          <h1 className={styles.title}>You can’t start this exam</h1>
+          <p className={styles.lead}>{errorMessage(error)}</p>
+        </header>
         <div className={styles.footer}>
           <span />
           <Link to="/student/exams">Back to exams</Link>
@@ -48,10 +50,12 @@ export function BeginPage() {
   }
 
   return (
-    <article className={styles.card} aria-labelledby="begin-title">
-      <h1 id="begin-title" className={styles.title}>
-        Ready when you are
-      </h1>
+    <article className={styles.step} aria-labelledby="begin-title">
+      <header className={styles.heading}>
+        <h1 id="begin-title" className={styles.title}>
+          Ready when you are
+        </h1>
+      </header>
       <ul className={styles.ruleList}>
         <li className={styles.ruleLine}>
           <Clock size={16} aria-hidden="true" /> <span>{exam.durationMinutes} minutes start when you press Begin.</span>
@@ -77,8 +81,8 @@ export function BeginPage() {
         </p>
       )}
       <div className={styles.footer}>
-        <Button onClick={() => navigate('../photo')} disabled={busy}>
-          ‹ Back
+        <Button variant="ghost" size="lg" icon={ChevronLeft} onClick={() => navigate('../photo')} disabled={busy}>
+          Back
         </Button>
         <Button variant="primary" size="lg" onClick={onBegin} loading={busy}>
           Begin

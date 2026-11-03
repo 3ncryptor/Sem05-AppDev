@@ -1,3 +1,5 @@
+/* Buttons (DESIGN.md): primary = ink fill, secondary = surface + strong line, ghost = text only,
+   danger = secondary shape in critical text. `.dangerSolid` is reserved for a confirmed destructive action. */
 .button {
   display: inline-flex;
   align-items: center;
@@ -9,10 +11,12 @@
   border-radius: var(--radius-control);
   font-size: var(--text-md);
   font-weight: 500;
+  line-height: var(--leading-md);
   white-space: nowrap;
   transition:
     background-color var(--duration-fast) var(--ease-out),
     border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
     transform var(--duration-fast) var(--ease-out);
 }
 
@@ -21,13 +25,13 @@
 }
 
 .button:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 .lg {
   height: var(--control-height-lg);
   padding: 0 var(--space-4);
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
 }
 
 .block {
@@ -35,19 +39,18 @@
 }
 
 .primary {
-  background: var(--focus);
-  color: var(--on-focus);
+  background: var(--ink);
+  color: var(--on-ink);
 }
 
 .primary:hover:not(:disabled) {
-  background: var(--focus-hover);
+  background: var(--ink-hover);
 }
 
 .secondary {
   background: var(--surface);
   border-color: var(--line-strong);
   color: var(--ink);
-  box-shadow: var(--shadow-card);
 }
 
 .secondary:hover:not(:disabled) {
@@ -60,17 +63,30 @@
 }
 
 .ghost:hover:not(:disabled) {
-  background: var(--hover);
+  background: var(--surface-sunk);
   color: var(--ink);
 }
 
 .danger {
-  background: var(--critical);
-  color: #fff;
+  background: var(--surface);
+  border-color: var(--line-strong);
+  color: var(--critical);
 }
 
 .danger:hover:not(:disabled) {
+  background: var(--critical-tint);
+  border-color: var(--critical);
+}
+
+.dangerSolid {
+  background: var(--critical);
+  border-color: var(--critical);
+  color: var(--on-critical);
+}
+
+.dangerSolid:hover:not(:disabled) {
   background: var(--critical-hover);
+  border-color: var(--critical-hover);
 }
 
 .spinner {

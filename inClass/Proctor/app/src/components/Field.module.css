@@ -5,6 +5,7 @@
 
 .label {
   font-size: var(--text-sm);
+  line-height: var(--leading-sm);
   font-weight: 500;
   color: var(--ink);
 }
@@ -30,7 +31,7 @@
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-control);
   color: var(--ink);
-  font-size: var(--text-md);
+  font-size: var(--text-base);
   transition:
     border-color var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out);
@@ -44,21 +45,29 @@
 .control:focus-visible,
 .control:focus {
   outline: none;
-  border-color: var(--focus);
-  box-shadow: 0 0 0 3px var(--focus-tint);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-tint);
+}
+
+.control:hover:not(:focus, :disabled, [aria-invalid='true']) {
+  border-color: var(--ink-faint);
 }
 
 .control[aria-invalid='true'] {
   border-color: var(--critical);
 }
 
+.control[aria-invalid='true']:focus {
+  box-shadow: 0 0 0 3px var(--critical-tint);
+}
+
 .control:disabled {
-  opacity: 0.6;
+  background: var(--surface-sunk);
+  color: var(--ink-faint);
 }
 
 .large {
   height: var(--control-height-lg);
-  font-size: var(--text-lg);
 }
 
 .mono {
@@ -70,7 +79,7 @@
   min-height: 88px;
   padding: var(--space-2) var(--space-3);
   resize: vertical;
-  line-height: 1.5;
+  line-height: var(--leading-base);
 }
 
 .select {

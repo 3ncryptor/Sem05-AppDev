@@ -35,7 +35,7 @@ const DONE_COLUMNS = [
 
 const START = Object.freeze({ step: 'choose', fileName: '', rows: [], check: null, created: [], error: null })
 
-const STEP_LABELS = { choose: '① Choose file', check: '② Check', done: '③ Done' }
+const STEP_LABELS = { choose: 'Step 1 of 3 · Choose a file', check: 'Step 2 of 3 · Check the rows', done: 'Step 3 of 3 · Done' }
 
 function CheckStep({ fileName, check, onChooseAgain }) {
   const { counts } = check
@@ -43,12 +43,14 @@ function CheckStep({ fileName, check, onChooseAgain }) {
     <>
       <div className={styles.importHead}>
         <span>
-          {fileName} · {plural(check.rows.length, 'row')}
+          <span className={styles.fileName}>{fileName}</span> · {plural(check.rows.length, 'row')}
         </span>
         <Button variant="ghost" icon={FileUp} onClick={onChooseAgain}>Choose another</Button>
       </div>
       <p className={styles.counts}>
-        ✓ {counts.ready} ready · ⚠ {counts.exists} already exist (skipped) · ✕ {plural(counts.problems, 'problem')}
+        <span className={styles.countOk}>✓ {counts.ready} ready</span>
+        <span className={styles.countWarn}>⚠ {counts.exists} already exist (skipped)</span>
+        <span className={styles.countBad}>✕ {plural(counts.problems, 'problem')}</span>
       </p>
       <div className={styles.scroll}>
         <Table caption="Rows in the file" columns={CHECK_COLUMNS} rows={check.rows} rowKey={(r) => String(r.row)} />
@@ -134,12 +136,10 @@ export function ImportDialog({ open, onClose, onImported }) {
       <div className={styles.form}>
         {state.error && <Banner tone="critical" role="alert">{state.error}</Banner>}
         {state.step === 'choose' && (
-          <>
+          <div className={styles.dropzone}>
             <p>Pick a .csv file whose first row is <code className={styles.mono}>rollNo,name</code>. Passwords are generated.</p>
-            <div>
-              <Button variant="primary" icon={FileUp} onClick={choose} loading={choosing}>Choose file…</Button>
-            </div>
-          </>
+            <Button variant="primary" icon={FileUp} onClick={choose} loading={choosing}>Choose file…</Button>
+          </div>
         )}
         {state.step === 'check' && <CheckStep fileName={state.fileName} check={state.check} onChooseAgain={choose} />}
         {state.step === 'done' && <DoneStep created={state.created} onCopy={copyAll} />}

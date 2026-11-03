@@ -10,12 +10,22 @@ export const MY_STATUS = Object.freeze({
   closed: { symbol: '✓', label: 'Closed', tone: 'neutral' },
 })
 
-/** Filter chips: All · Open · Upcoming · Done. */
+const isOpen = (e) => e.myStatus === 'open' || e.myStatus === 'in_progress'
+const isDone = (e) => e.myStatus === 'submitted' || e.myStatus === 'closed'
+
+/** Filter segments: All · Open · Upcoming · Done. */
 export const FILTERS = [
   { id: 'all', label: 'All', match: () => true },
-  { id: 'open', label: 'Open', match: (e) => e.myStatus === 'open' || e.myStatus === 'in_progress' },
+  { id: 'open', label: 'Open', match: isOpen },
   { id: 'upcoming', label: 'Upcoming', match: (e) => e.myStatus === 'upcoming' },
-  { id: 'done', label: 'Done', match: (e) => e.myStatus === 'submitted' || e.myStatus === 'closed' },
+  { id: 'done', label: 'Done', match: isDone },
+]
+
+/** The page groups whatever the filter leaves into these sections, in this order. */
+export const SECTIONS = [
+  { id: 'open', label: 'Open now', match: isOpen },
+  { id: 'upcoming', label: 'Upcoming', match: (e) => e.myStatus === 'upcoming' },
+  { id: 'finished', label: 'Finished', match: isDone },
 ]
 
 /** Second and third lines of the card. */

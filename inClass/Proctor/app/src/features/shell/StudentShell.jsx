@@ -18,7 +18,9 @@ export function StudentShell() {
       <div className={styles.main}>
         <div className={`drag-region ${styles.titlebar}`} />
         <main className={styles.content}>
-          <Outlet />
+          <div className={`${styles.page} ${styles.student}`}>
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

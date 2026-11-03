@@ -1,11 +1,11 @@
 import { CircleAlert, CircleCheck, Info, TriangleAlert } from 'lucide-react'
 import styles from './Banner.module.css'
 
-const ICONS = { neutral: Info, focus: Info, ok: CircleCheck, attention: TriangleAlert, critical: CircleAlert }
+const ICONS = { neutral: Info, info: Info, focus: Info, ok: CircleCheck, attention: TriangleAlert, critical: CircleAlert }
 
 /**
  * Full-width message with an optional action (SCREENS §0.3).
- * @param {{ tone?: 'neutral' | 'focus' | 'ok' | 'attention' | 'critical', icon?: import('react').ElementType,
+ * @param {{ tone?: 'neutral' | 'info' | 'focus' | 'ok' | 'attention' | 'critical', icon?: import('react').ElementType,
  *           action?: import('react').ReactNode, role?: string, children: import('react').ReactNode }} props
  */
 export function Banner({ tone = 'neutral', icon, action, role, children }) {
