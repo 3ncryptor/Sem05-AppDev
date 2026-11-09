@@ -63,5 +63,10 @@ module.exports = defineConfig([
     },
   },
   { files: ['src/utils/logger.js'], rules: { 'no-console': 'off' } },
-  { files: ['**/*.test.js'], languageOptions: { globals: JEST_GLOBALS } },
+  {
+    files: ['**/*.test.js'],
+    languageOptions: { globals: JEST_GLOBALS },
+    // tests spy on console to check what gets logged
+    rules: { 'no-console': 'off' },
+  },
 ]);
