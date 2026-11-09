@@ -43,3 +43,9 @@ export const LOGIN_SUCCESS_HOLD_MS = 650;
 
 /** How long the "back online" banner stays before it hides. */
 export const RESTORED_BANNER_MS = 2000;
+
+/** The backend rejects files over 10 MB (decoded size). */
+export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+/** Decoded images kept in memory; each is a large base64 string, so keep it small. */
+export const MAX_IMAGE_CACHE = 40;

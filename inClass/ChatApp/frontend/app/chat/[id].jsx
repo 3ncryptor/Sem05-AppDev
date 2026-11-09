@@ -1,15 +1,18 @@
 /**
  * Chat room (buildPlan.md 5.3): header slab, inverted message list with
  * older pages, optimistic sending with ticks, "N new" pill, long-press menu.
- * Polls every 3 s while open. Images arrive in F8.
+ * Photos: attach, upload with progress stage, tap to open the viewer.
+ * Polls every 3 s while open.
  */
 import MessageCircle from 'lucide-react-native/icons/message-circle';
 import WifiOff from 'lucide-react-native/icons/wifi-off';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AttachButton } from '../../src/components/chat/AttachButton';
 import { ChatHeader } from '../../src/components/chat/ChatHeader';
+import { ImageBubble } from '../../src/components/chat/ImageBubble';
 import { Composer } from '../../src/components/chat/Composer';
 import { MessageList } from '../../src/components/chat/MessageList';
 import { MessageMenu } from '../../src/components/chat/MessageMenu';
@@ -24,6 +27,12 @@ import { chatsStore, loadConversations } from '../../src/store/chatsStore';
 import { directoryStore, loadUsers } from '../../src/store/directoryStore';
 import { sessionStore } from '../../src/store/sessionStore';
 import { conversationTitle, memberNames } from '../../src/utils/conversationTitle';
+import { formatClock } from '../../src/utils/format';
+import { log } from '../../src/utils/logger';
+
+function showPhotoError(message) {
+  Alert.alert('Photo not sent', message);
+}
 
 export default function ChatRoom() {
   const { id } = useLocalSearchParams();
@@ -57,6 +66,30 @@ export default function ChatRoom() {
     setSentCount((count) => count + 1);
   }
 
+  async function sendPhoto(photo) {
+    setSentCount((count) => count + 1);
+    const result = await chat.sendImage(photo);
+    if (result.error) showPhotoError(result.error);
+  }
+
+  function openImage(message) {
+    log.nav(`chat -> image/${message.fileId}`);
+    router.push({
+      pathname: '/image/[id]',
+      params: {
+        id: message.fileId,
+        sender: usersById[message.senderId]?.name ?? '',
+        time: formatClock(message.createdAt),
+        caption: message.content ?? '',
+      },
+    });
+  }
+
+  function renderAttachment(message) {
+    const hasImage = message.type === 'IMAGE' && (message.fileId || message.localUri);
+    return hasImage ? <ImageBubble message={message} onOpen={openImage} /> : undefined;
+  }
+
   function renderBody() {
     if (chat.status === 'loading') return <ChatsSkeleton />;
     if (chat.status === 'error') {
@@ -86,6 +119,7 @@ export default function ChatRoom() {
         onSeen={chat.markSeen}
         onLongPress={setMenuMessage}
         onRetry={chat.retry}
+        renderAttachment={renderAttachment}
         scrollToBottomSignal={sentCount}
       />
     );
@@ -105,7 +139,10 @@ export default function ChatRoom() {
       />
       <View style={styles.body}>{renderBody()}</View>
       <View style={{ paddingBottom: insets.bottom + space.sm, paddingTop: space.xs }}>
-        <Composer onSend={send} />
+        <Composer
+          onSend={send}
+          leading={<AttachButton onPick={sendPhoto} onError={showPhotoError} />}
+        />
       </View>
       <MessageMenu
         message={menuMessage}

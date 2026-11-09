@@ -104,7 +104,8 @@ export function MessageBubble({
               styles.bubble,
               fill,
               tail,
-              { opacity: message.localState === 'sending' ? SENDING_OPACITY : 1 },
+              attachment ? styles.withAttachment : null,
+              { opacity: message.localState === 'sending' && !attachment ? SENDING_OPACITY : 1 },
             ]}
           >
             {attachment ??
@@ -115,7 +116,9 @@ export function MessageBubble({
                 </View>
               ) : null)}
             {message.content ? (
-              <Text style={[type.body, { color: textColor }]}>{message.content}</Text>
+              <Text style={[type.body, attachment && styles.caption, { color: textColor }]}>
+                {message.content}
+              </Text>
             ) : null}
           </Pressable>
         </Animated.View>
@@ -147,6 +150,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.bubble,
     gap: space.xs,
   },
+  withAttachment: { padding: 6 },
+  caption: { paddingHorizontal: space.xs, paddingBottom: 4 },
   attachmentHint: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: space.sm },
   metaMine: { marginLeft: 0, marginRight: space.xs },

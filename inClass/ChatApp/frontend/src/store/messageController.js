@@ -5,10 +5,12 @@
  *   poll()         newest page again, merged by id (new messages, new receipts)
  *   loadOlder()    the page before the oldest one shown (cursor)
  *   send(text)     optimistic: shows at once, confirmed or marked failed
- *   retry(id)      resend a failed message
+ *   sendImage(p)   upload (POST /file) then send with file_id; same optimistic flow
+ *   retry(id)      resend a failed message (an uploaded image is not uploaded twice)
  * Its state lives in a createStore store, read with useStore.
  */
 import { friendlyMessage } from '../api/ApiError';
+import { uploadFile } from '../api/files';
 import { listMessages, sendMessage } from '../api/messages';
 import {
   addLocal,
@@ -17,9 +19,11 @@ import {
   mergeMessages,
   setLocalState,
 } from '../hooks/messageList';
+import { isTooLarge, toDataUri } from '../utils/fileData';
 import { log } from '../utils/logger';
 import { createRequestId } from '../utils/requestId';
 import { createStore } from './createStore';
+import { primeImage } from './imageCache';
 
 const initialState = {
   messages: [], // newest first
@@ -101,9 +105,34 @@ export function createMessageController({ conversationId, myId }) {
     }
   }
 
-  async function deliver(tempId, content) {
+  function patchLocal(tempId, patch) {
+    store.set((state) => ({
+      messages: state.messages.map((message) =>
+        message.id === tempId ? { ...message, ...patch } : message,
+      ),
+    }));
+  }
+
+  /** Uploads a local image once and remembers the file id for retries. */
+  async function ensureUploaded(local) {
+    if (local.fileId || !local.upload) return local.fileId;
+    patchLocal(local.id, { uploadStage: 'uploading' });
+    const file = await uploadFile(local.upload);
+    primeImage(file.id, toDataUri(local.upload.mimeType, local.upload.data));
+    patchLocal(local.id, { fileId: file.id, uploadStage: 'sending' });
+    log.state(`${tag}: uploaded ${file.name} (${file.size} bytes)`);
+    return file.id;
+  }
+
+  async function deliver(tempId) {
+    const local = store.get().messages.find((message) => message.id === tempId);
     try {
-      const saved = await sendMessage({ conversationId, content });
+      const fileId = await ensureUploaded(local);
+      const saved = await sendMessage({
+        conversationId,
+        content: local.content || undefined,
+        fileId,
+      });
       store.set((state) => ({ messages: confirmLocal(state.messages, tempId, saved) }));
       return true;
     } catch (error) {
@@ -113,17 +142,10 @@ export function createMessageController({ conversationId, myId }) {
     }
   }
 
-  /**
-   * @param {string} text
-   * @returns {Promise<boolean>} whether the server accepted it
-   */
-  function send(text) {
-    const content = text.trim();
-    if (!content) return Promise.resolve(false);
-    const tempId = localId(createRequestId());
+  function addLocalMessage(fields) {
     const local = {
-      id: tempId,
-      content,
+      id: localId(createRequestId()),
+      content: '',
       type: 'TEXT',
       senderId: myId,
       conversationId,
@@ -131,9 +153,35 @@ export function createMessageController({ conversationId, myId }) {
       status: {},
       localState: 'sending',
       isFresh: true,
+      ...fields,
     };
     store.set((state) => ({ messages: addLocal(state.messages, local) }));
-    return deliver(tempId, content);
+    return local.id;
+  }
+
+  /**
+   * @param {string} text
+   * @returns {Promise<boolean>} whether the server accepted it
+   */
+  function send(text) {
+    const content = text.trim();
+    if (!content) return Promise.resolve(false);
+    return deliver(addLocalMessage({ content }));
+  }
+
+  /**
+   * @param {{ uri: string, data: string, mimeType: string, fileName: string }} photo
+   * @returns {Promise<{ ok: boolean, error?: string }>}
+   */
+  async function sendImage({ uri, data, mimeType, fileName }) {
+    if (isTooLarge(data)) return { ok: false, error: 'That photo is larger than 10 MB.' };
+    const tempId = addLocalMessage({
+      type: 'IMAGE',
+      localUri: uri,
+      upload: { fileName, mimeType, data },
+      uploadStage: 'uploading',
+    });
+    return { ok: await deliver(tempId) };
   }
 
   /** @param {string} tempId a failed local message */
@@ -141,12 +189,12 @@ export function createMessageController({ conversationId, myId }) {
     const message = store.get().messages.find((item) => item.id === tempId);
     if (!message || message.localState !== 'failed') return Promise.resolve(false);
     store.set((state) => ({ messages: setLocalState(state.messages, tempId, 'sending') }));
-    return deliver(tempId, message.content);
+    return deliver(tempId);
   }
 
   function markSeen() {
     if (store.get().unseen) store.set({ unseen: 0 });
   }
 
-  return { store, loadInitial, poll, loadOlder, send, retry, markSeen };
+  return { store, loadInitial, poll, loadOlder, send, sendImage, retry, markSeen };
 }
