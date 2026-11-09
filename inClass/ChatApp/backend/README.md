@@ -46,6 +46,16 @@ npm run start:dev:bot
 
 ---
 
+## Demo Data
+
+```bash
+docker exec chatapp_api npm run seed
+```
+
+Creates users `aarav`, `diya`, `kabir`, `meera` and `rohan` (password `demo123`), three DMs, a "Study Group" with an image message, and a few messages each. Running it again adds nothing new. `rohan` has no chats, for testing a fresh account.
+
+---
+
 ## Local Additions (not on the class server)
 
 These keep every route and response shape the same, so apps written against the class server work unchanged:
