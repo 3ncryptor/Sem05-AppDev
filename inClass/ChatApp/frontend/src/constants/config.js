@@ -40,3 +40,6 @@ export const LOG_POLLS_TO_CONSOLE = false;
 
 /** How long the login button shows its check mark before the app moves on. */
 export const LOGIN_SUCCESS_HOLD_MS = 650;
+
+/** How long the "back online" banner stays before it hides. */
+export const RESTORED_BANNER_MS = 2000;

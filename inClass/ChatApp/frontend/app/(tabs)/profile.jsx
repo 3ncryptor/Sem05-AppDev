@@ -1,22 +1,22 @@
 /**
- * Temporary home (F5 only): proves the session works end to end. Shows who
- * is signed in and where, with log out and the playground. F6 replaces it
- * with the tab layout (chats, people, profile).
+ * Profile tab, minimal for now: who is signed in and where, log out and the
+ * playground. F10 adds the avatar style picker, appearance and developer
+ * toggles.
  */
 import LogOut from 'lucide-react-native/icons/log-out';
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
-import { Avatar } from '../src/components/avatar/Avatar';
-import { PrimaryButton } from '../src/components/ui/PrimaryButton';
-import { RingButton } from '../src/components/ui/RingButton';
-import { Slab } from '../src/components/ui/Slab';
-import { Wordmark } from '../src/components/ui/Wordmark';
-import { space, type } from '../src/constants/theme';
-import { useSession } from '../src/hooks/useSession';
-import { useTheme } from '../src/hooks/useTheme';
-import { haptics } from '../src/utils/haptics';
+import { Avatar } from '../../src/components/avatar/Avatar';
+import { PrimaryButton } from '../../src/components/ui/PrimaryButton';
+import { RingButton } from '../../src/components/ui/RingButton';
+import { Slab } from '../../src/components/ui/Slab';
+import { Wordmark } from '../../src/components/ui/Wordmark';
+import { space, type } from '../../src/constants/theme';
+import { useSession } from '../../src/hooks/useSession';
+import { useTheme } from '../../src/hooks/useTheme';
+import { haptics } from '../../src/utils/haptics';
 
-export default function Home() {
+export default function Profile() {
   const { colors } = useTheme();
   const session = useSession();
 

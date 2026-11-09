@@ -60,7 +60,9 @@ export default function RootLayout() {
             <Stack.Screen name="login" options={{ animation: 'fade' }} />
           </Stack.Protected>
           <Stack.Protected guard={isSignedIn}>
-            <Stack.Screen name="home" options={{ animation: 'fade' }} />
+            <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+            <Stack.Screen name="chat/[id]" />
+            <Stack.Screen name="new-group" options={{ presentation: 'modal' }} />
           </Stack.Protected>
           <Stack.Screen name="playground" />
         </Stack>

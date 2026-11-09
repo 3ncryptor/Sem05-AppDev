@@ -1,5 +1,5 @@
 /**
- * Start route: sends the user to home when signed in, otherwise to login.
+ * Start route: sends the user to chats when signed in, otherwise to login.
  * The root layout keeps the splash screen up until the saved session has
  * been read, so this never flashes the wrong screen.
  */
@@ -9,5 +9,5 @@ import { useStore } from '../src/hooks/useStore';
 
 export default function Index() {
   const status = useStore(sessionStore, (state) => state.status);
-  return <Redirect href={status === 'signedIn' ? '/home' : '/login'} />;
+  return <Redirect href={status === 'signedIn' ? '/chats' : '/login'} />;
 }
