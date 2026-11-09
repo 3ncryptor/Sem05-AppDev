@@ -6,16 +6,19 @@
 import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SvgXml } from 'react-native-svg';
-import { avatarSvg, avatarTint, DEFAULT_AVATAR_STYLE } from './avatarSvg';
+import { useStore } from '../../hooks/useStore';
+import { settingsStore } from '../../store/settingsStore';
+import { avatarSvg, avatarTint } from './avatarSvg';
 
 /**
  * @param {object} props
  * @param {string} props.name username, the seed for the face
  * @param {number} [props.size=40]
- * @param {string} [props.styleId] DiceBear style id (Profile setting, later from the settings store)
+ * @param {string} [props.styleId] DiceBear style id; defaults to the style chosen in Profile
  * @param {string} [props.ringColor] draws a 2 px ring, used when avatars overlap
  */
-function AvatarBase({ name, size = 40, styleId = DEFAULT_AVATAR_STYLE, ringColor }) {
+function AvatarBase({ name, size = 40, styleId, ringColor }) {
+  const chosenStyle = useStore(settingsStore, (state) => state.avatarStyle);
   const ring = ringColor ? { borderWidth: 2, borderColor: ringColor } : null;
 
   return (
@@ -28,7 +31,7 @@ function AvatarBase({ name, size = 40, styleId = DEFAULT_AVATAR_STYLE, ringColor
       accessibilityRole="image"
       accessibilityLabel={name ? `${name}'s avatar` : 'avatar'}
     >
-      <SvgXml xml={avatarSvg(name, styleId)} width="100%" height="100%" />
+      <SvgXml xml={avatarSvg(name, styleId ?? chosenStyle)} width="100%" height="100%" />
     </View>
   );
 }

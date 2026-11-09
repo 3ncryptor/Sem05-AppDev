@@ -20,6 +20,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useStore } from '../src/hooks/useStore';
 import { useTheme } from '../src/hooks/useTheme';
 import { restoreSession, sessionStore } from '../src/store/sessionStore';
+import { restoreSettings } from '../src/store/settingsStore';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,6 +36,7 @@ export default function RootLayout() {
   const isReady = (fontsLoaded || Boolean(fontError)) && status !== 'restoring';
 
   useEffect(() => {
+    restoreSettings();
     restoreSession();
   }, []);
 

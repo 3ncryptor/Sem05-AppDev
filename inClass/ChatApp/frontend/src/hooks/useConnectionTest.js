@@ -10,7 +10,8 @@ import { log } from '../utils/logger';
 
 /** @typedef {'idle' | 'checking' | 'ok' | 'fail'} ConnectionState */
 
-// Counter shared at module level: the login screen is the only user of this hook.
+// Counter shared at module level. Login and Profile use this hook but are never
+// mounted together (one needs signed out, the other signed in).
 let latestCheck = 0;
 
 export function useConnectionTest() {
