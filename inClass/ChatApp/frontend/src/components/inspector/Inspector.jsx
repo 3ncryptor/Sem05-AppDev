@@ -1,6 +1,6 @@
 /**
  * Inspector: the in-app debug console (buildPlan.md 6). A dark sheet with
- * logs, network and tools tabs, mounted once in the root layout so it opens
+ * logs, network, flow (Live Wire) and tools tabs, mounted once in the root layout so it opens
  * over any screen, signed in or not. Server logs are checked when it opens
  * and polled only while it stays open.
  */
@@ -15,6 +15,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { RingButton } from '../ui/RingButton';
 import { SegmentedPill } from '../ui/SegmentedPill';
 import { Sheet } from '../ui/Sheet';
+import { FlowPanel } from './FlowPanel';
 import { LogsPanel } from './LogsPanel';
 import { NetworkPanel } from './NetworkPanel';
 import { ToolsPanel } from './ToolsPanel';
@@ -22,11 +23,13 @@ import { ToolsPanel } from './ToolsPanel';
 const TAB_OPTIONS = [
   { value: 'logs', label: 'logs' },
   { value: 'network', label: 'network' },
+  { value: 'flow', label: 'flow' },
   { value: 'tools', label: 'tools' },
 ];
 
 function TabBody({ tab, server }) {
   if (tab === 'network') return <NetworkPanel serverEntries={server.entries} />;
+  if (tab === 'flow') return <FlowPanel server={server} />;
   if (tab === 'tools') return <ToolsPanel server={server} onRetryServer={checkServerLogs} />;
   return <LogsPanel server={server} onRetryServer={checkServerLogs} />;
 }

@@ -15,7 +15,8 @@ export const DEFAULT_LOG_FILTERS = {
   search: '',
 };
 
-const BOT_PATTERN = /\bbot\b|factbot/i;
+/** Matches the backend's BotService context and FactBot lines. */
+const BOT_PATTERN = /bot/i;
 
 /**
  * @param {object[]} appEntries oldest first
@@ -38,7 +39,7 @@ function matches(entry, filters) {
   if (!filters.levels.includes(entry.level)) return false;
   if (filters.categories.length && !filters.categories.includes(entry.category)) return false;
   if (filters.hidePolls && entry.isPoll) return false;
-  if (filters.hideBot && (entry.category === 'BOT' || BOT_PATTERN.test(entry.message)))
+  if (filters.hideBot && (BOT_PATTERN.test(entry.category) || BOT_PATTERN.test(entry.message)))
     return false;
   const search = filters.search.trim().toLowerCase();
   if (!search) return true;

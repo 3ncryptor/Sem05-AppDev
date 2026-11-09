@@ -7,7 +7,7 @@ import { log } from '../utils/logger';
 import { createStore } from '../store/createStore';
 import { logStore } from './logStore';
 
-export const INSPECTOR_TABS = ['logs', 'network', 'tools'];
+export const INSPECTOR_TABS = ['logs', 'network', 'flow', 'tools'];
 
 export const inspectorStore = createStore({ isOpen: false, tab: 'logs', seenLogId: 0 });
 

@@ -76,3 +76,16 @@ export const MAX_PREVIEW_CHARS = 1500;
 
 /** How long a "copied" check mark stays before the button resets. */
 export const COPIED_HOLD_MS = 1500;
+
+/** Live Wire: one leg of a dot's trip (phone to db, or back) at normal speed. */
+export const FLOW_LEG_MS = 700;
+
+/** Live Wire: slow-mo multiplies every duration by this. */
+export const FLOW_SLOW_MO = 4;
+
+/** Live Wire: how long after starting a dot stays (times the speed factor), and the most shown at once. */
+export const FLOW_DOT_WINDOW_MS = 2600;
+export const FLOW_MAX_DOTS = 14;
+
+/** Live Wire: how long a server ripple (bot, receipts, cleanup) stays. */
+export const FLOW_RIPPLE_MS = 1800;

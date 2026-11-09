@@ -505,8 +505,8 @@ frontend/
   src/
     api/          client.js · users.js · conversations.js · messages.js · files.js · debugLogs.js
     store/        createStore.js · sessionStore.js · settingsStore.js · persist.js
-    debug/        logStore.js · networkStore.js · serverLogStore.js · inspectorStore.js ·
-                  toolsStore.js · filterLogs.js · serverLogsState.js · shakeDetector.js · flowEvents.js
+    debug/        logStore.js · networkStore.js · serverLogStore.js · inspectorStore.js · flowEvents.js ·
+                  toolsStore.js · filterLogs.js · serverLogsState.js · shakeDetector.js · debugReport.js
     hooks/        useStore.js · useSession.js · usePolling.js · useConversations.js ·
                   useUsers.js · useMessages.js · useSendMessage.js · useServerLogs.js · useShake.js
     components/   every component file is .jsx
@@ -518,7 +518,8 @@ frontend/
       chats/      GroupCard · GroupCarousel · DmRow
       people/     FaceTile · FaceGrid
       inspector/  InspectorLayer (orb + shake + sheet, mounted once in _layout) · Inspector ·
-                  LogRow · LogFilters · NetworkRow · LiveWire · ExplainSteps · ToolsPanel · DebugOrb
+                  LogRow · LogFilters · NetworkRow · LiveWire · FlowDot · FlowNode · FlowRipple ·
+                  ExplainSteps · FlowPanel · ToolsPanel · DebugOrb
     utils/        logger.js · format.js · conversationTitle.js · serverUrl.js · requestId.js · hash.js
     constants/    theme.js (design.md tokens) · motion.js (durations, springs) · config.js
 ```
