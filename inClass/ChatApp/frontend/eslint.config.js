@@ -3,6 +3,8 @@
  *
  * - useContext / useReducer are banned: shared state goes through the
  *   store modules in src/store (see buildPlan.md, D4).
+ * - lucide icons are imported one per file (lucide-react-native/icons/<name>):
+ *   Metro does not tree-shake, so the barrel would bundle all ~1,600 icons.
  * - console is banned outside src/utils/logger.js, so every log line
  *   also reaches the in-app Inspector.
  */
@@ -32,12 +34,26 @@ module.exports = defineConfig([
       'no-restricted-imports': [
         'error',
         {
-          paths: [{ name: 'react', importNames: ['useContext', 'useReducer'], message: BANNED_HOOK_MESSAGE }],
+          paths: [
+            {
+              name: 'react',
+              importNames: ['useContext', 'useReducer'],
+              message: BANNED_HOOK_MESSAGE,
+            },
+            {
+              name: 'lucide-react-native',
+              message:
+                "Import one icon per file: import House from 'lucide-react-native/icons/house' (the barrel bundles every icon).",
+            },
+          ],
         },
       ],
       'no-restricted-syntax': [
         'error',
-        { selector: 'CallExpression[callee.name=/^use(Context|Reducer)$/]', message: BANNED_HOOK_MESSAGE },
+        {
+          selector: 'CallExpression[callee.name=/^use(Context|Reducer)$/]',
+          message: BANNED_HOOK_MESSAGE,
+        },
         {
           selector: "MemberExpression[object.name='React'][property.name=/^use(Context|Reducer)$/]",
           message: BANNED_HOOK_MESSAGE,

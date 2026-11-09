@@ -84,9 +84,24 @@ export const type = {
 /** Soft shadows (design.md 5.3). Level 0 = flat surface. */
 export function shadow(level, color) {
   const levels = {
-    1: { shadowOffset: { width: 0, height: 2 }, shadowRadius: 8, shadowOpacity: 0.06, elevation: 1 },
-    2: { shadowOffset: { width: 0, height: 8 }, shadowRadius: 24, shadowOpacity: 0.1, elevation: 4 },
-    3: { shadowOffset: { width: 0, height: 16 }, shadowRadius: 40, shadowOpacity: 0.25, elevation: 12 },
+    1: {
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 8,
+      shadowOpacity: 0.06,
+      elevation: 1,
+    },
+    2: {
+      shadowOffset: { width: 0, height: 8 },
+      shadowRadius: 24,
+      shadowOpacity: 0.1,
+      elevation: 4,
+    },
+    3: {
+      shadowOffset: { width: 0, height: 16 },
+      shadowRadius: 40,
+      shadowOpacity: 0.25,
+      elevation: 12,
+    },
   };
   return levels[level] ? { shadowColor: color, ...levels[level] } : {};
 }

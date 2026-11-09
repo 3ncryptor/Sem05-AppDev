@@ -1,9 +1,11 @@
 /**
- * Start screen. For F1 it previews the wordmark and theme so the scaffold can
- * be checked on a phone in light and dark mode; F5 replaces it with a redirect
+ * Start screen. For F1-F2 it previews the wordmark and theme so the scaffold can
+ * be checked on a phone in light and  dark mode and links to the component playground; F5 replaces it with a redirect
  * to login or chats.
  */
+import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
+import { PrimaryButton } from '../src/components/ui/PrimaryButton';
 import { Wordmark } from '../src/components/ui/Wordmark';
 import { space, type } from '../src/constants/theme';
 import { useTheme } from '../src/hooks/useTheme';
@@ -21,11 +23,21 @@ export default function Index() {
           switch your phone&apos;s appearance to check both themes
         </Text>
       </View>
+      <View style={styles.action}>
+        <PrimaryButton label="Open playground" onPress={() => router.push('/playground')} />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.sm },
-  slab: { marginTop: space.xxl, padding: space.lg, borderRadius: 32, alignItems: 'center', gap: space.xxs },
+  slab: {
+    marginTop: space.xxl,
+    padding: space.lg,
+    borderRadius: 32,
+    alignItems: 'center',
+    gap: space.xxs,
+  },
+  action: { marginTop: space.lg, alignSelf: 'stretch', paddingHorizontal: space.xl },
 });
