@@ -56,6 +56,22 @@ Creates users `aarav`, `diya`, `kabir`, `meera` and `rohan` (password `demo123`)
 
 ---
 
+## Watching the Console
+
+```bash
+docker logs -f chatapp_api
+```
+
+Every request prints one line: method, URL, status, time and user, plus a short body summary (long text and base64 are shown as `<N chars>`; passwords are never printed). Failed requests add `reason="…"`; server errors also print a stack trace. Sign-ups, sent messages, read receipts, FactBot ticks and upload cleanup log their own lines.
+
+```
+[HTTP] POST /message 201 42ms user=aarav {conversation_id="6af2…", content="logging demo"}
+[HTTP] POST /message 400 8ms user=aarav {…} reason="file_id must reference a file uploaded by the sender"
+[Auth] New user "viva_newbie" signed up (first request with this username)
+```
+
+---
+
 ## Local Additions (not on the class server)
 
 These keep every route and response shape the same, so apps written against the class server work unchanged:

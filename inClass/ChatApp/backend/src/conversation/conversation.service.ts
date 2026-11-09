@@ -45,7 +45,8 @@ export class ConversationService {
   /** Receipts are a side effect; a failure is logged and never fails the request. */
   private async markDelivered(userId: string) {
     try {
-      await markReceipts(this.prisma, userId, 'delivered');
+      const count = await markReceipts(this.prisma, userId, 'delivered');
+      if (count > 0) this.logger.log(`${count} message(s) delivered to user ${userId}`);
     } catch (err) {
       this.logger.warn(`Could not mark messages delivered for ${userId}: ${err?.message ?? err}`);
     }

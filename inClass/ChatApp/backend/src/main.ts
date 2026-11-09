@@ -1,15 +1,23 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
+import { requestLogger } from './common/request-logger.middleware';
+import { LoggingExceptionFilter } from './common/logging-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bodyParser: false });
 
+  // Log every request to the console (registered first so it also sees body-parser errors)
+  app.use(requestLogger);
+
   // Files are capped at 10 MB decoded; base64 adds ~33%, so the JSON body may reach ~14 MB
   app.use(json({ limit: '15mb' }));
   app.use(urlencoded({ extended: true, limit: '15mb' }));
+
+  // Record why requests fail (shown on the request's log line); stack traces for 5xx
+  app.useGlobalFilters(new LoggingExceptionFilter(app.get(HttpAdapterHost).httpAdapter));
 
   // Global validation pipe — transforms payloads to DTO instances
   app.useGlobalPipes(

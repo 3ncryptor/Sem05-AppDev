@@ -141,7 +141,8 @@ export class MessageService {
   /** Receipts are a side effect; a failure is logged and never fails the request. */
   private async markRead(conversationId: string, readerId: string) {
     try {
-      await markReceipts(this.prisma, readerId, 'read', conversationId);
+      const count = await markReceipts(this.prisma, readerId, 'read', conversationId);
+      if (count > 0) this.logger.log(`${count} message(s) read by user ${readerId} in ${conversationId}`);
     } catch (err) {
       this.logger.warn(`Could not mark messages read for ${readerId}: ${err?.message ?? err}`);
     }
