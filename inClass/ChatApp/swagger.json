@@ -1,0 +1,823 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/user/profile": {
+      "get": {
+        "description": "Returns the profile of the target user if user_id query parameter is provided, otherwise returns the authenticated caller profile. Conversation details are omitted for privacy.",
+        "operationId": "UserController_getProfile",
+        "parameters": [
+          {
+            "name": "user_id",
+            "required": false,
+            "in": "query",
+            "description": "MongoDB ObjectId of the target user (defaults to authenticated caller)",
+            "schema": {
+              "example": "64b8f9e2c4a3b12d4e5f6789",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "basic-auth": []
+          }
+        ],
+        "summary": "Get user profile",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/user": {
+      "get": {
+        "description": "Returns every registered user on the platform (id, name, bio). Useful for discovering users to start conversations with.",
+        "operationId": "UserController_getAllUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Array of all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          }
+        },
+        "security": [
+          {
+            "basic-auth": []
+          }
+        ],
+        "summary": "List all users",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/conversation": {
+      "get": {
+        "description": "Returns all conversations the authenticated user participates in, sorted by createdAt descending (newest first). User is identified from the `Authorization: Basic <username>:<password>` header.",
+        "operationId": "ConversationController_getConversations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Array of conversations returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConversationResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          }
+        },
+        "security": [
+          {
+            "basic-auth": []
+          }
+        ],
+        "summary": "List my conversations",
+        "tags": [
+          "conversations"
+        ]
+      },
+      "post": {
+        "description": "Creates a new DM or Group conversation. The caller is automatically added to participants. For DMs, if a conversation between the two users already exists, it is returned instead of creating a duplicate.",
+        "operationId": "ConversationController_createConversation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConversationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Conversation created or found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or invalid participants"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "description": "Recipient user not found"
+          }
+        },
+        "security": [
+          {
+            "basic-auth": []
+          }
+        ],
+        "summary": "Create or find a conversation",
+        "tags": [
+          "conversations"
+        ]
+      }
+    },
+    "/message": {
+      "get": {
+        "description": "Fetches messages for a conversation using cursor-based pagination. First call: omit from_message_cursor. Subsequent calls: pass the returned nextCursor to load older messages.",
+        "operationId": "MessageController_getMessages",
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "required": true,
+            "in": "query",
+            "description": "MongoDB ObjectId of the target conversation",
+            "schema": {
+              "example": "64b8f9e2c4a3b12d4e5f0001",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from_message_cursor",
+            "required": false,
+            "in": "query",
+            "description": "ObjectId of the last fetched message. Omit for the first page.",
+            "schema": {
+              "example": "64b8f9e2c4a3b12d4e5f1234",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated messages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedMessagesResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "description": "Cursor message not found"
+          }
+        },
+        "security": [
+          {
+            "basic-auth": []
+          }
+        ],
+        "summary": "Get paginated messages",
+        "tags": [
+          "messages"
+        ]
+      },
+      "post": {
+        "description": "Creates a new message in the specified conversation. The sender is identified from the `Authorization: Basic <username>:<password>` header — no sender_id needed in the body. Delivery/read status is automatically initialized for all participants.",
+        "operationId": "MessageController_createMessage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "404": {
+            "description": "Conversation not found"
+          }
+        },
+        "security": [
+          {
+            "basic-auth": []
+          }
+        ],
+        "summary": "Send a message",
+        "tags": [
+          "messages"
+        ]
+      }
+    },
+    "/file": {
+      "post": {
+        "description": "Uploads a file sent as base64 in a JSON body (max 10 MB). PNG, JPEG, GIF, WebP, BMP and HEIC/HEIF images are recognised from their bytes and stored with kind IMAGE; anything else is stored as FILE. To send it in a chat, pass the returned `id` as `file_id` to `POST /message`.",
+        "operationId": "FileController_upload",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid base64, empty file, or data that is not the declared image type"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "413": {
+            "description": "File larger than 10 MB"
+          }
+        },
+        "security": [
+          {
+            "basic-auth": []
+          }
+        ],
+        "summary": "Upload an image or file (base64)",
+        "tags": [
+          "files"
+        ]
+      }
+    },
+    "/file/{id}": {
+      "get": {
+        "description": "Returns the file metadata and its contents as base64. Allowed for the uploader and for participants of conversations where the file was sent.",
+        "operationId": "FileController_getFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "MongoDB ObjectId of the file",
+            "schema": {
+              "example": "64b8f9e2c4a3b12d4e5f9001",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File with base64 data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileWithDataResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "403": {
+            "description": "No access to this file"
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "security": [
+          {
+            "basic-auth": []
+          }
+        ],
+        "summary": "Get a file as base64",
+        "tags": [
+          "files"
+        ]
+      }
+    },
+    "/file/{id}/download": {
+      "get": {
+        "description": "Returns the original bytes with their Content-Type. Images are shown inline, other files are downloaded. Same access rules as GET /file/{id}.",
+        "operationId": "FileController_download",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "MongoDB ObjectId of the file",
+            "schema": {
+              "example": "64b8f9e2c4a3b12d4e5f9001",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file contents"
+          },
+          "401": {
+            "description": "Missing or invalid Authorization header"
+          },
+          "403": {
+            "description": "No access to this file"
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "security": [
+          {
+            "basic-auth": []
+          }
+        ],
+        "summary": "Download a file (raw bytes)",
+        "tags": [
+          "files"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Chat App API",
+    "description": "NestJS Chat Backend — Users, Conversations, and Messages with cursor-based pagination.\n\n**Authentication**: All endpoints require an `Authorization` header in the format:\n\n`Authorization: Basic <username>:<password>`\n\nThe `username` acts as the unique user identifier. The `password` is used for authentication. If no user exists with that username, one is created automatically.",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "users",
+      "description": "User profile operations"
+    },
+    {
+      "name": "conversations",
+      "description": "Conversation management"
+    },
+    {
+      "name": "messages",
+      "description": "Message CRUD and pagination"
+    },
+    {
+      "name": "files",
+      "description": "Image and file upload (base64) and download"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "basic-auth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Format: Basic <username>:<password>"
+      }
+    },
+    "schemas": {
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique MongoDB ObjectId of the user",
+            "example": "64b8f9e2c4a3b12d4e5f6789"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the user (from Basic auth username)",
+            "example": "Ritesh Sharma"
+          },
+          "bio": {
+            "type": "string",
+            "description": "Short bio or status message",
+            "example": "Building cool stuff 🚀"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ConversationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique MongoDB ObjectId of the conversation",
+            "example": "64b8f9e2c4a3b12d4e5f0001"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the conversation. Null for DM conversations.",
+            "example": "Study Group"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of conversation: DM (direct message) or GROUP",
+            "example": "DM",
+            "enum": [
+              "DM",
+              "GROUP"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "ISO timestamp when the conversation was created",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "MongoDB ObjectId of the user who created this conversation",
+            "example": "64b8f9e2c4a3b12d4e5f6789"
+          },
+          "participants_ids": {
+            "description": "List of participant user ObjectIds (including creator)",
+            "example": [
+              "64b8f9e2c4a3b12d4e5f6789",
+              "64b8f9e2c4a3b12d4e5f6790"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "createdAt",
+          "createdBy",
+          "participants_ids"
+        ]
+      },
+      "CreateConversationDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Conversation type: DM or GROUP. Defaults to DM for single participant, GROUP for multiple.",
+            "enum": [
+              "DM",
+              "GROUP"
+            ],
+            "example": "DM"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the conversation. Optional for DM, recommended for GROUP.",
+            "example": "Project Alpha"
+          },
+          "participants_ids": {
+            "description": "Array of participant user ObjectIds (caller is added automatically).",
+            "example": [
+              "64b8f9e2c4a3b12d4e5f6790"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "FileResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique MongoDB ObjectId of the file",
+            "example": "64b8f9e2c4a3b12d4e5f9001"
+          },
+          "name": {
+            "type": "string",
+            "description": "Original file name",
+            "example": "holiday.jpg"
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "MIME type",
+            "example": "image/jpeg"
+          },
+          "size": {
+            "type": "number",
+            "description": "Size in bytes (of the decoded file, not the base64 text)",
+            "example": 48213
+          },
+          "kind": {
+            "type": "string",
+            "description": "IMAGE for recognised image formats, FILE for everything else",
+            "enum": [
+              "IMAGE",
+              "FILE"
+            ],
+            "example": "IMAGE"
+          },
+          "uploadedBy": {
+            "type": "string",
+            "description": "MongoDB ObjectId of the user who uploaded the file",
+            "example": "64b8f9e2c4a3b12d4e5f6789"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "ISO timestamp of the upload",
+            "example": "2024-01-15T10:34:00.000Z"
+          },
+          "downloadUrl": {
+            "type": "string",
+            "description": "Path that returns the raw bytes (send the same Authorization header)",
+            "example": "/file/64b8f9e2c4a3b12d4e5f9001/download"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "mimeType",
+          "size",
+          "kind",
+          "uploadedBy",
+          "createdAt",
+          "downloadUrl"
+        ]
+      },
+      "MessageResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique MongoDB ObjectId of the message",
+            "example": "64b8f9e2c4a3b12d4e5f1234"
+          },
+          "content": {
+            "type": "string",
+            "description": "Text content of the message (empty string for an attachment sent without a caption)",
+            "example": "Hey, are we meeting tomorrow?"
+          },
+          "type": {
+            "type": "string",
+            "description": "TEXT, or IMAGE / FILE when the message has an attachment",
+            "enum": [
+              "TEXT",
+              "IMAGE",
+              "FILE"
+            ],
+            "example": "TEXT"
+          },
+          "fileId": {
+            "type": "string",
+            "description": "ObjectId of the attached file, or null",
+            "example": null,
+            "nullable": true
+          },
+          "file": {
+            "description": "Metadata of the attached file (without its contents), or null. Fetch the contents with GET /file/{id}.",
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FileResponseDto"
+              }
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "ISO timestamp when the message was created",
+            "example": "2024-01-15T10:35:00.000Z"
+          },
+          "senderId": {
+            "type": "string",
+            "description": "MongoDB ObjectId of the message sender (from auth header)",
+            "example": "64b8f9e2c4a3b12d4e5f6789"
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "MongoDB ObjectId of the conversation this message belongs to",
+            "example": "64b8f9e2c4a3b12d4e5f0001"
+          },
+          "status": {
+            "type": "object",
+            "description": "Delivery/read status keyed by participant user IDs. Sender starts as delivered+read=true; all others default to false.",
+            "example": {
+              "64b8f9e2c4a3b12d4e5f6789": {
+                "delivered": true,
+                "read": true
+              },
+              "64b8f9e2c4a3b12d4e5f6790": {
+                "delivered": false,
+                "read": false
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "content",
+          "type",
+          "createdAt",
+          "senderId",
+          "conversationId",
+          "status"
+        ]
+      },
+      "PaginatedMessagesResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "Messages for this page (oldest to newest within the page)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageResponseDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "description": "Pass this as from_message_cursor on the next request to load older messages. Null = no more pages.",
+            "example": "64b8f9e2c4a3b12d4e5f1111"
+          },
+          "count": {
+            "type": "number",
+            "description": "Items returned in this page",
+            "example": 20
+          }
+        },
+        "required": [
+          "data",
+          "count"
+        ]
+      },
+      "CreateMessageDto": {
+        "type": "object",
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "description": "MongoDB ObjectId of the conversation this message belongs to",
+            "example": "64b8f9e2c4a3b12d4e5f0001"
+          },
+          "content": {
+            "type": "string",
+            "description": "Text content of the message. Required for text messages; optional (a caption) when file_id is given.",
+            "example": "Hey, are we meeting tomorrow?",
+            "minLength": 1
+          },
+          "file_id": {
+            "type": "string",
+            "description": "ObjectId of an image or file uploaded with POST /file. It must have been uploaded by the sender.",
+            "example": "64b8f9e2c4a3b12d4e5f9001"
+          }
+        },
+        "required": [
+          "conversation_id"
+        ]
+      },
+      "UploadFileDto": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string",
+            "description": "Original file name, shown to other users and used for downloads",
+            "example": "holiday.jpg",
+            "maxLength": 255
+          },
+          "mime_type": {
+            "type": "string",
+            "description": "MIME type of the file. Optional when `data` is a data URL (the type is read from it) or when the file is a PNG/JPEG/GIF/WebP/BMP/HEIC image (the type is detected from its bytes).",
+            "example": "image/jpeg"
+          },
+          "data": {
+            "type": "string",
+            "description": "File contents encoded as base64. Plain base64 (\"iVBORw0KGgo...\") or a data URL (\"data:image/png;base64,iVBORw0KGgo...\") are both accepted.",
+            "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+          }
+        },
+        "required": [
+          "file_name",
+          "data"
+        ]
+      },
+      "FileWithDataResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique MongoDB ObjectId of the file",
+            "example": "64b8f9e2c4a3b12d4e5f9001"
+          },
+          "name": {
+            "type": "string",
+            "description": "Original file name",
+            "example": "holiday.jpg"
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "MIME type",
+            "example": "image/jpeg"
+          },
+          "size": {
+            "type": "number",
+            "description": "Size in bytes (of the decoded file, not the base64 text)",
+            "example": 48213
+          },
+          "kind": {
+            "type": "string",
+            "description": "IMAGE for recognised image formats, FILE for everything else",
+            "enum": [
+              "IMAGE",
+              "FILE"
+            ],
+            "example": "IMAGE"
+          },
+          "uploadedBy": {
+            "type": "string",
+            "description": "MongoDB ObjectId of the user who uploaded the file",
+            "example": "64b8f9e2c4a3b12d4e5f6789"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "ISO timestamp of the upload",
+            "example": "2024-01-15T10:34:00.000Z"
+          },
+          "downloadUrl": {
+            "type": "string",
+            "description": "Path that returns the raw bytes (send the same Authorization header)",
+            "example": "/file/64b8f9e2c4a3b12d4e5f9001/download"
+          },
+          "data": {
+            "type": "string",
+            "description": "File contents as plain base64. To show an image, use `data:${mimeType};base64,${data}` as its URI.",
+            "example": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "mimeType",
+          "size",
+          "kind",
+          "uploadedBy",
+          "createdAt",
+          "downloadUrl",
+          "data"
+        ]
+      }
+    }
+  }
+}
+
