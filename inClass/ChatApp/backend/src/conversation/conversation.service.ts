@@ -1,20 +1,27 @@
 import {
   Injectable,
   BadRequestException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { markReceipts } from '../common/receipts.util';
 import { CreateConversationDto } from './dto/conversation.dto';
 
 @Injectable()
 export class ConversationService {
+  private readonly logger = new Logger('Receipts');
+
   constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Returns all conversations the user is a participant in,
    * sorted by createdAt descending (newest first).
+   * Fetching the list counts as the user's app receiving their messages,
+   * so their undelivered messages are marked delivered.
    */
   async getUserConversations(userId: string) {
+    await this.markDelivered(userId);
     return this.prisma.conversation.findMany({
       where: {
         participants_ids: {
@@ -33,6 +40,15 @@ export class ConversationService {
         participants_ids: true,
       },
     });
+  }
+
+  /** Receipts are a side effect; a failure is logged and never fails the request. */
+  private async markDelivered(userId: string) {
+    try {
+      await markReceipts(this.prisma, userId, 'delivered');
+    } catch (err) {
+      this.logger.warn(`Could not mark messages delivered for ${userId}: ${err?.message ?? err}`);
+    }
   }
 
   /**

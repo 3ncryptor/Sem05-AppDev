@@ -46,6 +46,14 @@ npm run start:dev:bot
 
 ---
 
+## Local Additions (not on the class server)
+
+These keep every route and response shape the same, so apps written against the class server work unchanged:
+
+- **Read receipts**: `GET /conversation` marks the caller's messages `delivered`; `GET /message` marks that conversation's messages `read` for the caller. Only users already in a message's `status` are updated.
+
+---
+
 ## Authentication
 
 Every request needs:

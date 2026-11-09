@@ -48,10 +48,11 @@ export class MessageController {
   })
   @ApiResponse({ status: 401, description: 'Missing or invalid Authorization header' })
   @ApiResponse({ status: 404, description: 'Cursor message not found' })
-  getMessages(@Query() query: GetMessagesDto) {
+  getMessages(@Query() query: GetMessagesDto, @CurrentUser() user: any) {
     return this.messageService.getMessages(
       query.conversation_id,
       query.from_message_cursor,
+      user.id,
     );
   }
 

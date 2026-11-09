@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateMessageDto, MessageResponseDto, MessageType } from './dto/message.dto';
 import { colorizeName } from '../common/color.util';
 import { FILE_META_SELECT, FileMeta, toFileResponse } from '../file/file.mapper';
+import { markReceipts } from '../common/receipts.util';
 
 const PAGE_SIZE = 20;
 
@@ -59,8 +60,12 @@ export class MessageService {
    * - No cursor  → 20 most-recent messages.
    * - With cursor → 20 messages older than the cursor message.
    * Returned oldest-first within the page (natural chat order).
+   * Opening a conversation counts as reading it, so the reader's unread
+   * messages in it are marked read before the page is loaded.
    */
-  async getMessages(conversationId: string, fromMessageCursor?: string) {
+  async getMessages(conversationId: string, fromMessageCursor: string | undefined, readerId: string) {
+    await this.markRead(conversationId, readerId);
+
     if (fromMessageCursor) {
       const cursorMessage = await this.prisma.message.findUnique({
         where: { id: fromMessageCursor },
@@ -131,6 +136,15 @@ export class MessageService {
 
     await this.logMessage(conversation, senderId, message.content, file);
     return toMessageResponse(message, file);
+  }
+
+  /** Receipts are a side effect; a failure is logged and never fails the request. */
+  private async markRead(conversationId: string, readerId: string) {
+    try {
+      await markReceipts(this.prisma, readerId, 'read', conversationId);
+    } catch (err) {
+      this.logger.warn(`Could not mark messages read for ${readerId}: ${err?.message ?? err}`);
+    }
   }
 
   private async loadOwnFile(fileId: string, senderId: string): Promise<FileMeta> {
