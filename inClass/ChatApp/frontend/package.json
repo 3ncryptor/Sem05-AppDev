@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
+    "@dicebear/core": "9.4.2",
+    "@dicebear/lorelei": "9.4.2",
+    "@dicebear/notionists": "9.4.2",
+    "@dicebear/open-peeps": "9.4.2",
     "@expo-google-fonts/inter": "^0.4.2",
     "expo": "~58.0.23",
     "expo-blur": "~58.0.5",
@@ -53,6 +57,11 @@
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}",
       "!src/**/*.test.js"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@dicebear))",
+      "/node_modules/react-native-reanimated/plugin/",
+      "/node_modules/@react-native/babel-preset/"
     ]
   }
 }

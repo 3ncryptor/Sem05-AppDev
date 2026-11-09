@@ -15,6 +15,9 @@ import Users from 'lucide-react-native/icons/users';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Avatar } from '../src/components/avatar/Avatar';
+import { AVATAR_STYLES } from '../src/components/avatar/avatarSvg';
+import { AvatarStack } from '../src/components/avatar/AvatarStack';
 import { Chip } from '../src/components/ui/Chip';
 import { FloatingBar } from '../src/components/ui/FloatingBar';
 import { PillInput } from '../src/components/ui/PillInput';
@@ -31,6 +34,7 @@ const SERVER_OPTIONS = [
   { value: 'local', label: 'my laptop' },
   { value: 'class', label: 'class server' },
 ];
+const DEMO_PEOPLE = ['aarav', 'diya', 'kabir', 'meera', 'rohan'];
 const SUCCESS_RESET_MS = 1200;
 const FAKE_LOADING_MS = 900;
 
@@ -81,6 +85,19 @@ export default function Playground() {
       >
         {label('wordmark')}
         <Wordmark size={40} />
+
+        {label('avatars')}
+        {AVATAR_STYLES.map((style) => (
+          <View key={style.id} style={styles.row}>
+            {DEMO_PEOPLE.map((name) => (
+              <Avatar key={name} name={name} size={48} styleId={style.id} />
+            ))}
+          </View>
+        ))}
+        <AvatarStack names={DEMO_PEOPLE} />
+        <Slab style={styles.frostedDemo}>
+          <AvatarStack names={DEMO_PEOPLE} on="slab" />
+        </Slab>
 
         {label('ring buttons')}
         <View style={styles.row}>

@@ -126,16 +126,18 @@ Every request carries two extra headers. They are harmless on the class server:
 
 ## 4. Avatars
 
-- **DiceBear** (`@dicebear/core` + `@dicebear/collection`, MIT code) renders SVG on the device
-  via `react-native-svg`. No network calls. Pin matching major versions of core and collection
-  at install time.
+- **DiceBear** 9.4.2 (`@dicebear/core` + only the three style packages `@dicebear/lorelei`,
+  `@dicebear/notionists`, `@dicebear/open-peeps`; MIT code) renders SVG on the device via
+  `react-native-svg`. No network calls. All four are pinned to the same exact version. The full
+  `@dicebear/collection` is avoided because Metro does not tree-shake and would bundle ~30 styles.
 - **Seed = username**, so `aarav` has the same face on every phone, on both servers, with no
   storage needed (the backend has no avatar field).
 - **Styles:** `lorelei` (default), `notionists`, `open-peeps`, chosen in Profile. The choice
   changes how *you* see everyone and is stored on the device.
 - **Background tint:** a soft pastel picked from the name hash, drawn from tints of the
   gradient palette, so faces sit inside the design.
-- **Licences:** check each style's art licence when installing. Credit any CC BY styles in the README.
+- **Licences:** checked at install: all three art styles are **CC0 1.0** (lorelei by Lisa
+  Wischofsky, notionists by Zoish, open-peeps by Pablo Stanley), so no credit is required.
 - **Caching:** the SVG string is generated once per `(style, name)` and kept in a module-level
   `Map`, so lists scroll smoothly.
 
@@ -562,7 +564,7 @@ Base64 bodies are shortened to `<N chars>`. Passwords and the `Authorization` he
 | `expo-haptics` | haptic feedback |
 | `expo-image` | image fade-in, placeholders |
 | `react-native-svg` | avatars, Live Wire, illustrations |
-| `@dicebear/core`, `@dicebear/collection` | face avatars (pure JS) |
+| `@dicebear/core`, `@dicebear/lorelei`, `@dicebear/notionists`, `@dicebear/open-peeps` (9.4.2, exact) | face avatars (pure JS) |
 | `expo-font`, `@expo-google-fonts/inter` | Inter |
 | `lucide-react-native` | SVG line icons (draws with `react-native-svg`; no icon fonts, no emojis) |
 | `expo-secure-store` | session and settings |
