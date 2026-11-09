@@ -1,13 +1,16 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { requestLogger } from './common/request-logger.middleware';
 import { LoggingExceptionFilter } from './common/logging-exception.filter';
+import { BufferedLogger } from './common/buffered-logger';
+import { requestContextMiddleware } from './common/request-context';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  // Console logger that also keeps recent lines for GET /debug/logs
+  const app = await NestFactory.create(AppModule, { bodyParser: false, logger: new BufferedLogger() });
 
   // Log every request to the console (registered first so it also sees body-parser errors)
   app.use(requestLogger);
@@ -15,6 +18,9 @@ async function bootstrap() {
   // Files are capped at 10 MB decoded; base64 adds ~33%, so the JSON body may reach ~14 MB
   app.use(json({ limit: '15mb' }));
   app.use(urlencoded({ extended: true, limit: '15mb' }));
+
+  // Tag every log line written while handling a request with its X-Request-Id
+  app.use(requestContextMiddleware);
 
   // Record why requests fail (shown on the request's log line); stack traces for 5xx
   app.useGlobalFilters(new LoggingExceptionFilter(app.get(HttpAdapterHost).httpAdapter));
@@ -59,7 +65,9 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  console.log(`Application running on http://localhost:${port}`);
-  console.log(`Swagger UI available at http://localhost:${port}/docs`);
+  const logger = new Logger('Bootstrap');
+  logger.log(`Application running on http://localhost:${port}`);
+  logger.log(`Swagger UI available at http://localhost:${port}/docs`);
+  logger.log(`Inspector server logs: ${process.env.DEBUG_LOGS === 'true' ? 'on (GET /debug/logs)' : 'off'}`);
 }
 bootstrap();

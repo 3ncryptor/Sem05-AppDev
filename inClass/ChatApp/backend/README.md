@@ -77,6 +77,10 @@ Every request prints one line: method, URL, status, time and user, plus a short 
 These keep every route and response shape the same, so apps written against the class server work unchanged:
 
 - **Read receipts**: `GET /conversation` marks the caller's messages `delivered`; `GET /message` marks that conversation's messages `read` for the caller. Only users already in a message's `status` are updated.
+- **Server logs for the app's Inspector**: `GET /debug/logs?after=<seq>&limit=<n>` returns the last 500 log lines as
+  `{ entries: [{ seq, time, level, context, message, requestId, isPoll }], latestSeq, oldestSeq }`. Hidden from Swagger.
+  On when `DEBUG_LOGS=true` (the Docker default), otherwise 404. Requests carrying `X-Request-Id` / `X-Client-Poll`
+  headers get those tags on every log line they cause, so the app can match its requests to server lines.
 - **Orphaned upload cleanup**: files uploaded with `POST /file` but never sent in a message are deleted after `FILE_ORPHAN_TTL_HOURS` (default 24). Checked on startup and hourly.
 
 ---
@@ -104,7 +108,7 @@ Creates 5 bot users on startup. Every 10s, **every real user** receives a random
 ## Logging
 
 - **Interactive Message Logs**: Real messages log sender, receiver, and conversation with deterministic user colors.
-- **Bot Logs**: FactBots log a single `[BOT] 🤖 Bot is Chatting...` entry per cycle.
+- **Bot Logs**: FactBots log a single `[BOT] Bot is chatting...` entry per cycle.
 - **MongoDB Logs**: Controlled by `MONGO_SILENT_LOGS` in `.env` (defaults to `true` to keep Docker output clean). Set to `false` for raw Mongo engine logs.
 
 ---
