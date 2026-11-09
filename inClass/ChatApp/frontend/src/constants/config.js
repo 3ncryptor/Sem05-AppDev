@@ -37,3 +37,6 @@ export const LOG_STRING_LIMIT = 120;
  * Failed polls are always printed.
  */
 export const LOG_POLLS_TO_CONSOLE = false;
+
+/** How long the login button shows its check mark before the app moves on. */
+export const LOGIN_SUCCESS_HOLD_MS = 650;

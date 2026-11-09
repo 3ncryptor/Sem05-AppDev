@@ -1,7 +1,8 @@
 /**
- * Root layout: loads the Inter fonts, keeps the splash screen up until they
- * are ready, matches the system background to the theme (no white flash in
- * dark mode) and renders the screen stack.
+ * Root layout: loads the Inter fonts and the saved session, keeps the splash
+ * screen up until both are ready, matches the system background to the theme
+ * (no white flash in dark mode) and guards the routes:
+ * signed out -> only login; signed in -> the app. The playground is open to both.
  */
 import {
   Inter_400Regular,
@@ -16,7 +17,9 @@ import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useStore } from '../src/hooks/useStore';
 import { useTheme } from '../src/hooks/useTheme';
+import { restoreSession, sessionStore } from '../src/store/sessionStore';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,7 +30,13 @@ export default function RootLayout() {
     Inter_500Medium,
     Inter_600SemiBold,
   });
-  const isReady = fontsLoaded || Boolean(fontError);
+  const status = useStore(sessionStore, (state) => state.status);
+  const isSignedIn = status === 'signedIn';
+  const isReady = (fontsLoaded || Boolean(fontError)) && status !== 'restoring';
+
+  useEffect(() => {
+    restoreSession();
+  }, []);
 
   useEffect(() => {
     SystemUI.setBackgroundColorAsync(colors.surface);
@@ -45,7 +54,16 @@ export default function RootLayout() {
         <StatusBar style={isDark ? 'light' : 'dark'} />
         <Stack
           screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface } }}
-        />
+        >
+          <Stack.Screen name="index" />
+          <Stack.Protected guard={!isSignedIn}>
+            <Stack.Screen name="login" options={{ animation: 'fade' }} />
+          </Stack.Protected>
+          <Stack.Protected guard={isSignedIn}>
+            <Stack.Screen name="home" options={{ animation: 'fade' }} />
+          </Stack.Protected>
+          <Stack.Screen name="playground" />
+        </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
