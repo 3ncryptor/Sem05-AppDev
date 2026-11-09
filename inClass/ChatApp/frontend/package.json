@@ -51,7 +51,7 @@
   "jest": {
     "preset": "jest-expo",
     "collectCoverageFrom": [
-      "src/**/*.js",
+      "src/**/*.{js,jsx}",
       "!src/**/*.test.js"
     ]
   }

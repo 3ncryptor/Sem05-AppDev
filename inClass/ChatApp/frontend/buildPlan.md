@@ -484,29 +484,34 @@ Opens as a bottom sheet (dark slab, radius 44 at the top) from the **orb**, a **
 
 ## 7. Folder structure
 
+File extensions (as taught in class): anything that renders JSX (routes in `app/` and every
+component) is **`.jsx`**. Plain logic with no JSX (api, store, debug, hooks, utils, constants)
+and the Jest tests are **`.js`**. Imports leave the extension off, so Metro finds either.
+
 ```
 frontend/
-  app/                         routes only
-    _layout.js                 fonts, theme, Stack + Stack.Protected, orb overlay, shake listener
-    index.js                   <Redirect>
-    login.js
-    (tabs)/_layout.js          custom FloatingTabBar
-    (tabs)/chats.js · people.js · profile.js
-    chat/[id].js
-    new-group.js               modal
-    image/[id].js              modal
-    inspector.js               modal sheet (logs | network | flow | tools)
-    playground.js              dev-only gallery of every component (viva + design QA)
+  app/                         routes only (.jsx: they render JSX)
+    _layout.jsx                fonts, theme, Stack + Stack.Protected, orb overlay, shake listener
+    index.jsx                  <Redirect>
+    login.jsx
+    (tabs)/_layout.jsx         custom FloatingTabBar
+    (tabs)/chats.jsx · people.jsx · profile.jsx
+    chat/[id].jsx
+    new-group.jsx              modal
+    image/[id].jsx             modal
+    inspector.jsx              modal sheet (logs | network | flow | tools)
+    playground.jsx             dev-only gallery of every component (viva + design QA)
   src/
     api/          client.js · users.js · conversations.js · messages.js · files.js · debugLogs.js
     store/        createStore.js · sessionStore.js · settingsStore.js · persist.js
     debug/        logStore.js · networkStore.js · flowEvents.js · serverLogs.js
     hooks/        useStore.js · useSession.js · usePolling.js · useConversations.js ·
                   useUsers.js · useMessages.js · useSendMessage.js · useServerLogs.js · useShake.js
-    components/
-      ui/         RingButton · Slab · FloatingBar · PillInput · GradientFill · Chip · Badge ·
-                  PressableScale · SegmentedPill · Sheet · ConnectionBanner · EmptyState · Skeleton
-      avatar/     Avatar · AvatarStack · avatarSvg.js (DiceBear + cache)
+    components/   every component file is .jsx
+      ui/         RingButton · Slab · FloatingBar · PillInput · PrimaryButton · GradientFill · Chip ·
+                  Badge · PressableScale · SegmentedPill · Sheet · Icon · Wordmark ·
+                  ConnectionBanner · EmptyState · Skeleton
+      avatar/     Avatar · AvatarStack (.jsx) · avatarSvg.js (DiceBear + cache)
       chat/       MessageBubble · ImageBubble · Ticks · Composer · MessageList · NewMessagesPill
       chats/      GroupCard · GroupCarousel · DmRow
       people/     FaceTile · FaceGrid
