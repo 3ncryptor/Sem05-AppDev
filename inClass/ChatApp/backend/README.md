@@ -51,6 +51,7 @@ npm run start:dev:bot
 These keep every route and response shape the same, so apps written against the class server work unchanged:
 
 - **Read receipts**: `GET /conversation` marks the caller's messages `delivered`; `GET /message` marks that conversation's messages `read` for the caller. Only users already in a message's `status` are updated.
+- **Orphaned upload cleanup**: files uploaded with `POST /file` but never sent in a message are deleted after `FILE_ORPHAN_TTL_HOURS` (default 24). Checked on startup and hourly.
 
 ---
 
