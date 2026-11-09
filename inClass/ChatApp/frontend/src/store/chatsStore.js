@@ -4,11 +4,12 @@
  * loadConversations() is called on first load, pull-to-refresh and every
  * poll; it only replaces the list when something actually changed.
  */
-import { listConversations } from '../api/conversations';
+import { createConversation, listConversations } from '../api/conversations';
 import { friendlyMessage } from '../api/ApiError';
 import { RESTORED_BANNER_MS } from '../constants/config';
 import { nextConnectionState } from '../utils/connectionState';
 import { listSignature } from '../utils/conversationTitle';
+import { findDirectChat } from '../utils/people';
 import { log } from '../utils/logger';
 import { createStore } from './createStore';
 import { hasUnknownUsers, loadUsers } from './directoryStore';
@@ -71,6 +72,34 @@ export async function loadConversations({ isPoll = false } = {}) {
 export function addConversation(conversation) {
   const conversations = [conversation, ...chatsStore.get().conversations];
   chatsStore.set({ conversations, signature: listSignature(conversations) });
+}
+
+/**
+ * The DM with someone: the existing one, or a new one.
+ * @param {string} myId
+ * @param {string} otherId
+ * @returns {Promise<string>} conversation id
+ */
+export async function openDirectChat(myId, otherId) {
+  if (chatsStore.get().status !== 'ready') await loadConversations();
+  const existing = findDirectChat(chatsStore.get().conversations, myId, otherId);
+  if (existing) return existing.id;
+  const created = await createConversation({ type: 'DM', participantIds: [otherId] });
+  addConversation(created);
+  log.state(`chats: new DM ${created.id}`);
+  return created.id;
+}
+
+/**
+ * @param {string} name
+ * @param {string[]} participantIds people other than me (the server adds me)
+ * @returns {Promise<string>} conversation id
+ */
+export async function createGroup(name, participantIds) {
+  const created = await createConversation({ type: 'GROUP', name: name.trim(), participantIds });
+  addConversation(created);
+  log.state(`chats: new group "${created.name}" with ${participantIds.length} people`);
+  return created.id;
 }
 
 sessionStore.subscribe((session) => {
