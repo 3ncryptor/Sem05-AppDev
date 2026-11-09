@@ -3,14 +3,16 @@
  * - adds the raw Basic auth header, X-Request-Id, and X-Client-Poll for polls
  * - times out after REQUEST_TIMEOUT_MS
  * - is recorded in networkStore and logged (body made safe, never the password)
+ * - fails at once with a network error while Inspector > tools > simulate offline is on
  * - resolves with parsed JSON, or throws an ApiError
  *
  * Screens never call fetch; they use the endpoint modules next to this file.
  */
-import { LOG_POLLS_TO_CONSOLE, REQUEST_TIMEOUT_MS } from '../constants/config';
+import { LOG_POLLS_TO_CONSOLE, MAX_PREVIEW_CHARS, REQUEST_TIMEOUT_MS } from '../constants/config';
 import { finishRequest, startRequest } from '../debug/networkStore';
+import { toolsStore } from '../debug/toolsStore';
 import { sessionStore } from '../store/sessionStore';
-import { previewBody } from '../utils/logBody';
+import { clipText, previewBody } from '../utils/logBody';
 import { log } from '../utils/logger';
 import { createRequestId } from '../utils/requestId';
 import { joinUrl } from '../utils/serverUrl';
@@ -51,13 +53,14 @@ function buildHeaders({ id, connection, auth, isPoll, hasBody }) {
   return headers;
 }
 
+/** @returns {Promise<{ data: unknown, bytes: number }>} bytes is the body length in characters */
 async function readJson(response) {
   const text = await response.text();
-  if (!text) return null;
+  if (!text) return { data: null, bytes: 0 };
   try {
-    return JSON.parse(text);
+    return { data: JSON.parse(text), bytes: text.length };
   } catch {
-    return text;
+    return { data: text, bytes: text.length };
   }
 }
 
@@ -90,8 +93,9 @@ export async function request(path, options = {}) {
     throw new ApiError({ kind: 'network', message: 'No server selected.', requestId: id });
   }
 
-  startRequest({ id, method, path, isPoll });
-  log.api(`-> ${label} #${id} ${previewBody(body)}`.trimEnd(), { ...tags, toConsole });
+  const requestPreview = previewBody(body);
+  startRequest({ id, method, path, isPoll, requestPreview });
+  log.api(`-> ${label} #${id} ${requestPreview}`.trimEnd(), { ...tags, toConsole });
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -105,6 +109,11 @@ export async function request(path, options = {}) {
       level: 'error',
     });
     return error;
+  }
+
+  if (toolsStore.get().simulateOffline) {
+    clearTimeout(timer);
+    throw fail(new ApiError({ kind: 'network', message: 'Simulated offline', requestId: id }));
   }
 
   let response;
@@ -123,14 +132,15 @@ export async function request(path, options = {}) {
     clearTimeout(timer);
   }
 
-  const data = await readJson(response);
+  const { data, bytes } = await readJson(response);
   if (!response.ok) {
     const message = messageFromBody(data, response.status);
     throw fail(new ApiError({ kind: 'http', status: response.status, message, requestId: id }));
   }
 
   const durationMs = Date.now() - startedAt;
-  finishRequest(id, { state: 'ok', status: response.status, durationMs });
+  const responsePreview = clipText(previewBody(data), MAX_PREVIEW_CHARS);
+  finishRequest(id, { state: 'ok', status: response.status, durationMs, bytes, responsePreview });
   log.api(`<- ${response.status} ${label} #${id} ${durationMs}ms`, { ...tags, toConsole });
   return data;
 }

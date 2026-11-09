@@ -41,3 +41,16 @@ export function formatDateTime(value) {
   const months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}, ${formatClock(date)}`;
 }
+
+/**
+ * 24-hour time with seconds for log rows, e.g. "09:04:31".
+ * @param {string | number | Date} value
+ * @returns {string} '' for an invalid date
+ */
+export function formatLogTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return [date.getHours(), date.getMinutes(), date.getSeconds()]
+    .map((part) => String(part).padStart(2, '0'))
+    .join(':');
+}

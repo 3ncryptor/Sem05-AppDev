@@ -49,3 +49,30 @@ export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 /** Decoded images kept in memory; each is a large base64 string, so keep it small. */
 export const MAX_IMAGE_CACHE = 40;
+
+/** Server log lines fetched when the Inspector first connects (older ones are skipped). */
+export const SERVER_LOG_BACKLOG = 100;
+
+/** Most server log lines asked for in one poll. */
+export const SERVER_LOG_PAGE = 200;
+
+/** Server log lines the Inspector keeps. */
+export const MAX_SERVER_LOG_ENTRIES = 500;
+
+/** Lines included in the copied debug report. */
+export const DEBUG_REPORT_LINES = 100;
+
+/** Shake to open: how hard (in g, beyond gravity), how many jolts, within what window. */
+export const SHAKE = { threshold: 1.4, hits: 3, windowMs: 900, cooldownMs: 1500, sampleMs: 80 };
+
+/** Poll interval choices offered in Inspector > tools. */
+export const POLL_CHOICES = {
+  conversations: [2000, 5000, 10000],
+  messages: [1000, 3000, 6000],
+};
+
+/** Longest response preview kept per request in the Network tab. */
+export const MAX_PREVIEW_CHARS = 1500;
+
+/** How long a "copied" check mark stays before the button resets. */
+export const COPIED_HOLD_MS = 1500;

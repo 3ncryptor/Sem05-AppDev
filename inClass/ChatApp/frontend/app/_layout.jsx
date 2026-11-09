@@ -3,6 +3,7 @@
  * screen up until both are ready, matches the system background to the theme
  * (no white flash in dark mode) and guards the routes:
  * signed out -> only login; signed in -> the app. The playground is open to both.
+ * The Inspector layer (orb, shake, sheet) sits above every screen.
  */
 import {
   Inter_400Regular,
@@ -17,6 +18,7 @@ import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { InspectorLayer } from '../src/components/inspector/InspectorLayer';
 import { useStore } from '../src/hooks/useStore';
 import { useTheme } from '../src/hooks/useTheme';
 import { restoreSession, sessionStore } from '../src/store/sessionStore';
@@ -72,6 +74,7 @@ export default function RootLayout() {
           </Stack.Protected>
           <Stack.Screen name="playground" />
         </Stack>
+        <InspectorLayer />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

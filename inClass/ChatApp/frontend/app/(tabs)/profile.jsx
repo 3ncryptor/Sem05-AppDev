@@ -18,6 +18,7 @@ import { PrimaryButton } from '../../src/components/ui/PrimaryButton';
 import { PressableScale } from '../../src/components/ui/PressableScale';
 import { SegmentedPill } from '../../src/components/ui/SegmentedPill';
 import { space, type } from '../../src/constants/theme';
+import { openInspector } from '../../src/debug/inspectorStore';
 import { useConnectionTest } from '../../src/hooks/useConnectionTest';
 import { useSession } from '../../src/hooks/useSession';
 import { useStore } from '../../src/hooks/useStore';
@@ -113,6 +114,17 @@ export default function Profile() {
               onChange: (shakeToOpen) => updateSettings({ shakeToOpen }),
             }}
           />
+          <PressableScale
+            onPress={() => openInspector('profile')}
+            scaleTo={0.98}
+            accessibilityLabel="Open the inspector"
+          >
+            <SettingRow
+              label="inspector"
+              detail="logs, network requests and demo tools"
+              right={<Icon as={ChevronRight} color={colors.textTertiary} size={18} />}
+            />
+          </PressableScale>
           <PressableScale
             onPress={() => router.push('/playground')}
             scaleTo={0.98}

@@ -1,10 +1,10 @@
 /**
  * useMessages: one controller per open chat (created once with a useState
  * initializer), its state through useStore, the first load in useEffect and
- * a poll every POLL_MS.messages via usePolling.
+ * a poll every few seconds (Inspector > tools sets the interval).
  */
 import { useEffect, useState } from 'react';
-import { POLL_MS } from '../constants/config';
+import { toolsStore } from '../debug/toolsStore';
 import { createMessageController } from '../store/messageController';
 import { usePolling } from './usePolling';
 import { useStore } from './useStore';
@@ -21,7 +21,8 @@ export function useMessages(conversationId, myId) {
     controller.loadInitial();
   }, [controller]);
 
-  usePolling(controller.poll, POLL_MS.messages, state.status !== 'loading');
+  const pollMs = useStore(toolsStore, (tools) => tools.pollMs.messages);
+  usePolling(controller.poll, pollMs, state.status !== 'loading');
 
   return { ...state, ...controller };
 }

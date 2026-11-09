@@ -43,3 +43,12 @@ export function previewBody(body) {
     return '<unprintable>';
   }
 }
+
+/**
+ * Cuts a long preview and says how much was left out.
+ * @param {string} text
+ * @param {number} max
+ */
+export function clipText(text, max) {
+  return text.length > max ? `${text.slice(0, max)}... (+${text.length - max} chars)` : text;
+}

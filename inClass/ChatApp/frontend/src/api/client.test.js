@@ -114,3 +114,30 @@ describe('request', () => {
     expect(logStore.get().entries.length).toBeGreaterThan(0);
   });
 });
+
+describe('request extras for the Inspector', () => {
+  const { setTools, DEFAULT_TOOLS } = jest.requireActual('../debug/toolsStore');
+
+  afterEach(() => setTools(DEFAULT_TOOLS));
+
+  it('fails without calling fetch while simulate offline is on', async () => {
+    setTools({ simulateOffline: true });
+    await expect(request('/user', { connection })).rejects.toMatchObject({ kind: 'network' });
+    expect(global.fetch).not.toHaveBeenCalled();
+    expect(networkStore.get().requests[0]).toMatchObject({ state: 'error' });
+  });
+
+  it('stores safe request and response previews and the size', async () => {
+    global.fetch.mockResolvedValue(jsonResponse(201, { id: 'm1' }));
+    await request('/message', {
+      method: 'POST',
+      body: { content: 'hi', password: 'x' },
+      connection,
+    });
+    const row = networkStore.get().requests[0];
+    expect(row.requestPreview).toContain('<hidden>');
+    expect(row.requestPreview).not.toContain('"x"');
+    expect(row.responsePreview).toBe('{"id":"m1"}');
+    expect(row.bytes).toBe(11);
+  });
+});

@@ -1,10 +1,10 @@
 /**
  * useConversations: the Chats screen's data. Loads conversations and users,
- * polls conversations every POLL_MS.conversations, and offers refresh() for
+ * polls conversations every few seconds (Inspector > tools sets the interval), and offers refresh() for
  * pull-to-refresh. Returns display-ready groups and DMs.
  */
 import { useEffect, useState } from 'react';
-import { POLL_MS } from '../constants/config';
+import { toolsStore } from '../debug/toolsStore';
 import { chatsStore, loadConversations } from '../store/chatsStore';
 import { directoryStore, loadUsers } from '../store/directoryStore';
 import { sessionStore } from '../store/sessionStore';
@@ -25,7 +25,8 @@ export function useConversations() {
     loadUsers();
   }, []);
 
-  usePolling(pollConversations, POLL_MS.conversations);
+  const pollMs = useStore(toolsStore, (tools) => tools.pollMs.conversations);
+  usePolling(pollConversations, pollMs);
 
   async function refresh() {
     setIsRefreshing(true);

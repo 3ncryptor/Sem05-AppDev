@@ -37,3 +37,11 @@ describe('formatDateTime', () => {
     expect(formatDateTime('bad')).toBe('');
   });
 });
+
+describe('formatLogTime', () => {
+  it('pads 24-hour time with seconds', () => {
+    const { formatLogTime } = jest.requireActual('./format');
+    expect(formatLogTime(new Date(2026, 0, 1, 21, 5, 7))).toBe('21:05:07');
+    expect(formatLogTime('nope')).toBe('');
+  });
+});

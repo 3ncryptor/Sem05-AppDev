@@ -3,6 +3,7 @@
  * Colours are sampled from the reference mockup; the dark theme swaps the
  * light surface and dark slab materials while keeping the same accent.
  */
+import { Platform } from 'react-native';
 
 /** Light theme: pale sage surfaces with near-black slabs. */
 const light = {
@@ -68,6 +69,8 @@ export const fonts = {
   regular: 'Inter_400Regular',
   medium: 'Inter_500Medium',
   semibold: 'Inter_600SemiBold',
+  /** System monospace for the Inspector's log rows (no extra font download). */
+  mono: Platform.select({ ios: 'Menlo', default: 'monospace' }),
 };
 
 /** Type scale from design.md section 4 (size / lineHeight / weight). */
