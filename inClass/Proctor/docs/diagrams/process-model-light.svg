@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 1010" width="1200" height="1010" role="img" aria-labelledby="title-athena-process desc-athena-process">
+<title id="title-athena-process">Athena process model</title>
+<desc id="desc-athena-process">The React renderer runs sandboxed and reaches the network only through the preload allow-list and the Electron main process, which owns the token, the answer queue, the heartbeat, screenshot capture and the upload queue. Main calls the Express 5 backend over HTTP; the backend runs a fixed middleware order, keeps its rules in lib/ and stores data in JSON files and a screenshots folder.</desc>
+<style>
+.bg{fill:#FFFFFF;stroke:#D8DEE4}
+.box{stroke-width:1.4}
+.box.dashed,.edge.dashed,.group.dashed{stroke-dasharray:6 5}
+.group{fill:none;stroke-width:1.2}
+.glabel{font:600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#1F2328}
+.gsub{font:400 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#57606A}
+.title{font:600 13.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif}
+.line{font:400 11.5px ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;fill:#57606A}
+.heading{font:700 17px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#1F2328}
+.caption{font:400 12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#57606A}
+.edge{fill:none;stroke:#8C959F;stroke-width:1.5}
+.elabel{font:400 11px ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;fill:#1F2328}
+.elabel-bg{fill:#FFFFFF;opacity:.92}
+.arrow{fill:#8C959F}
+.legend{font:400 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#57606A}
+.dot{stroke:#FFFFFF;stroke-width:1.5}
+.box.client{fill:#EEF4FB;stroke:#3F6FA6}.group.client{stroke:#3F6FA6}.title.client{fill:#1F3A5C}.dot.client{fill:#3F6FA6}.swatch.client{fill:#EEF4FB;stroke:#3F6FA6}.box.network{fill:#F3F4F6;stroke:#6E7781}.group.network{stroke:#6E7781}.title.network{fill:#24292F}.dot.network{fill:#6E7781}.swatch.network{fill:#F3F4F6;stroke:#6E7781}.box.server{fill:#EDF6EF;stroke:#3E7D4F}.group.server{stroke:#3E7D4F}.title.server{fill:#1C4429}.dot.server{fill:#3E7D4F}.swatch.server{fill:#EDF6EF;stroke:#3E7D4F}.box.data{fill:#FBF3E6;stroke:#A0661A}.group.data{stroke:#A0661A}.title.data{fill:#5C3A0C}.dot.data{fill:#A0661A}.swatch.data{fill:#FBF3E6;stroke:#A0661A}.box.jobs{fill:#F4F0FA;stroke:#6B55A3}.group.jobs{stroke:#6B55A3}.title.jobs{fill:#3B2D63}.dot.jobs{fill:#6B55A3}.swatch.jobs{fill:#F4F0FA;stroke:#6B55A3}.box.native{fill:#FBEFEF;stroke:#A64B4B}.group.native{stroke:#A64B4B}.title.native{fill:#5E2222}.dot.native{fill:#A64B4B}.swatch.native{fill:#FBEFEF;stroke:#A64B4B}
+@media (prefers-reduced-motion: reduce){.dot{display:none}}
+</style>
+<defs>
+<marker id="arrow-athena-process" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+<marker id="arrow-athena-process-start" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+</defs>
+<rect class="bg" x="0.5" y="0.5" width="1199" height="1009" rx="16"/>
+<text class="heading" x="28" y="40">Athena: process model and the path of an answer</text><text class="caption" x="28" y="62">The page has no network access. Every request leaves through the main process, which also keeps answers and screenshots safe on disk first.</text>
+<g><rect class="group client" x="28" y="80" width="672" height="870" rx="14"/>
+<text class="glabel" x="42" y="101">Student or examiner Mac: Athena, Electron 44</text></g>
+<g><rect class="group native" x="48" y="352" width="632" height="476" rx="14"/>
+<text class="glabel" x="280" y="373">Main process (app/electron)</text><text class="gsub" x="280" y="390">all network and disk I/O</text></g>
+<g><rect class="group server" x="740" y="80" width="432" height="870" rx="14"/>
+<text class="glabel" x="754" y="101">Backend host: Express 5 on Node.js 22</text><text class="gsub" x="754" y="118">backend/server.js, in the order it runs</text></g>
+<path id="ap-invoke" class="edge" d="M214 212 L214 245" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-events-up" class="edge" d="M560 245 L560 213" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-to-queue" class="edge" d="M214 340 L214 407" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-to-api" class="edge" d="M520 340 L520 407" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-events-main" class="edge" d="M620 407 L620 341" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-queue-api" class="edge" d="M364 454 L379 454" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-beat-api" class="edge" d="M364 558 L379 558" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-capture-evidence" class="edge" d="M214 708 L214 719" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-exam-capture" class="edge" d="M380 662 L365 662" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-evidence-api" class="edge" d="M364 766 L372 766 L372 590 L379 590" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-disk" class="edge" d="M64 454 L56 454 L56 845" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-disk-evidence" class="edge" d="M64 766 L56 766"/>
+<path id="ap-http" class="edge" d="M664 440 L712 440 L712 156 L759 156" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-reply" class="edge" d="M759 172 L724 172 L724 470 L665 470" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-1-2" class="edge" d="M956 186 L956 197" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-2-3" class="edge" d="M956 258 L956 269" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-3-4" class="edge" d="M956 330 L956 341" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-4-5" class="edge dashed" d="M956 436 L956 447" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-4-lib" class="edge" d="M1152 389 L1162 389 L1162 607 L1153 607" marker-end="url(#arrow-athena-process)"/>
+<path id="ap-lib-data" class="edge" d="M956 686 L956 703" marker-end="url(#arrow-athena-process)"/>
+<g><rect class="box client" x="48" y="118" width="632" height="94" rx="9"/>
+<text class="title client" x="60" y="140">Renderer: React 19 UI (app/src)</text><text class="line" x="60" y="160">loaded from app://athena (packaged) or Vite :5173 (dev)</text><text class="line" x="60" y="176">contextIsolation, sandbox, no nodeIntegration:</text><text class="line" x="60" y="192">no Node.js and no network of its own</text></g>
+<g><rect class="box client" x="48" y="246" width="632" height="94" rx="9"/>
+<text class="title client" x="60" y="268">Preload: window.athena (preload.cjs)</text><text class="line" x="60" y="288">contextBridge: a fixed set of functions, one IPC channel each</text><text class="line" x="60" y="304">events only from EXAM_EVENTS, theme:changed, net:status</text><text class="line" x="60" y="320">main checks every caller is Athena (validate.js, handle)</text></g>
+<g><rect class="box native" x="64" y="408" width="300" height="92" rx="9"/>
+<text class="title native" x="76" y="430">queue.js: answers</text><text class="line" x="76" y="450">queue.json written first;</text><text class="line" x="76" y="466">newest revision per question</text><text class="line" x="76" y="482">retry after 1,2,4,8,16,30 s</text></g>
+<g><rect class="box native" x="64" y="512" width="300" height="92" rx="9"/>
+<text class="title native" x="76" y="534">heartbeat.js</text><text class="line" x="76" y="554">every 10 s; countdown uses</text><text class="line" x="76" y="570">median of 5 clock offsets</text><text class="line" x="76" y="586">server may answer 'forced'</text></g>
+<g><rect class="box native" x="64" y="616" width="300" height="92" rx="9"/>
+<text class="title native" x="76" y="638">capture.js</text><text class="line" x="76" y="658">first shot at 3 s, then</text><text class="line" x="76" y="674">random 45 to 60 s; window</text><text class="line" x="76" y="690">only, 1280 px JPEG q70</text></g>
+<g><rect class="box native" x="64" y="720" width="300" height="92" rx="9"/>
+<text class="title native" x="76" y="742">evidence.js: uploads</text><text class="line" x="76" y="762">JPEG + manifest on disk</text><text class="line" x="76" y="778">first; oldest sent first;</text><text class="line" x="76" y="794">retry after 5,10,20,30 s</text></g>
+<g><rect class="box native" x="380" y="408" width="284" height="196" rx="9"/>
+<text class="title native" x="392" y="430">api.js: the one HTTP client</text><text class="line" x="392" y="450">net.fetch, 10 s timeout</text><text class="line" x="392" y="466">route table: 51 names;</text><text class="line" x="392" y="482">8 internal, main only</text><text class="line" x="392" y="498">adds the Bearer token</text><text class="line" x="392" y="514">from session.js (kept</text><text class="line" x="392" y="530">encrypted by safeStorage)</text></g>
+<g><rect class="box native" x="380" y="616" width="284" height="196" rx="9"/>
+<text class="title native" x="392" y="638">exam.js: the exam lock</text><text class="line" x="392" y="658">exam:enter starts the lock,</text><text class="line" x="392" y="674">heartbeat and capture</text><text class="line" x="392" y="690">lock = kiosk mode when</text><text class="line" x="392" y="706">packaged, fullscreen in</text><text class="line" x="392" y="722">development</text><text class="line" x="392" y="738">exitExam stops all three</text></g>
+<g><rect class="box data" x="48" y="846" width="632" height="78" rx="9"/>
+<text class="title data" x="60" y="868">userData folder (this Mac)</text><text class="line" x="60" y="888">queue.json, session.bin (encrypted),</text><text class="line" x="60" y="904">pending-uploads/&lt;attempt&gt;/&lt;kind&gt;/ + manifest.json</text></g>
+<g><rect class="box server" x="760" y="126" width="392" height="60" rx="9"/>
+<text class="title server" x="772" y="148">1  requestId, logger, securityHeaders</text><text class="line" x="772" y="168">backend/lib/http.js</text></g>
+<g><rect class="box server" x="760" y="198" width="392" height="60" rx="9"/>
+<text class="title server" x="772" y="220">2  express.json, limit 256 KB</text><text class="line" x="772" y="240">screenshots: express.raw image/jpeg</text></g>
+<g><rect class="box server" x="760" y="270" width="392" height="60" rx="9"/>
+<text class="title server" x="772" y="292">3  GET /api/health (no auth)</text><text class="line" x="772" y="312">start.sh waits for it</text></g>
+<g><rect class="box server" x="760" y="342" width="392" height="94" rx="9"/>
+<text class="title server" x="772" y="364">4  routers</text><text class="line" x="772" y="384">/api/auth     login, logout, me</text><text class="line" x="772" y="400">/api/admin/*  requireAuth + admin</text><text class="line" x="772" y="416">/api/*        requireAuth + student</text></g>
+<g><rect class="box server dashed" x="760" y="448" width="392" height="60" rx="9"/>
+<text class="title server" x="772" y="470">5  notFound, errorHandler</text><text class="line" x="772" y="490">every reply: { ok, data, error }</text></g>
+<g><rect class="box server" x="760" y="528" width="392" height="158" rx="9"/>
+<text class="title server" x="772" y="550">lib/: the rules</text><text class="line" x="772" y="570">auth.js    scrypt passwords;</text><text class="line" x="772" y="586">           tokens stored as SHA-256</text><text class="line" x="772" y="602">store.js   4 JSON files, atomic write</text><text class="line" x="772" y="618">locks.js   withLock per attempt</text><text class="line" x="772" y="634">finalize   overdue closed on read</text><text class="line" x="772" y="650">scoring/   7 types, one module each</text></g>
+<g><rect class="box data" x="760" y="704" width="392" height="94" rx="9"/>
+<text class="title data" x="772" y="726">backend/data/</text><text class="line" x="772" y="746">users, sessions, exams, attempts .json</text><text class="line" x="772" y="762">written to .tmp, then renamed</text><text class="line" x="772" y="778">records/&lt;user&gt;/&lt;attempt&gt;/</text></g>
+<g><rect class="box data" x="760" y="816" width="392" height="78" rx="9"/>
+<text class="title data" x="772" y="838">backend/screenshots/</text><text class="line" x="772" y="858">&lt;Candidate&gt;/&lt;Test&gt;/webcam/</text><text class="line" x="772" y="874">&lt;Candidate&gt;/&lt;Test&gt;/screen/</text></g>
+<rect class="elabel-bg" x="148.7" y="216" width="130.60000000000002" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="214" y="229">ipcRenderer.invoke</text>
+
+<rect class="elabel-bg" x="94.8" y="344" width="90.4" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="140" y="357">answers.save</text>
+<rect class="elabel-bg" x="402.75" y="344" width="110.5" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="458" y="357">other api calls</text>
+
+
+
+
+
+
+
+
+<rect class="elabel-bg" x="693.6" y="300" width="36.8" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="712" y="313">HTTP</text>
+
+
+
+
+
+
+
+<text class="line" x="552" y="236" text-anchor="end">events: exam:capture-now, net:status</text>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="0s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0400;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-invoke" xlink:href="#ap-invoke"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="0s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0400;0.0401;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="0.4s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0500;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-to-queue" xlink:href="#ap-to-queue"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="0.4s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0500;0.0501;1"/>
+</circle>
+<circle class="dot data" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="0.9s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0900;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-disk" xlink:href="#ap-disk"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="0.9s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0900;0.0901;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="1s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0200;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-queue-api" xlink:href="#ap-queue-api"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="1s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0200;0.0201;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="1.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-http" xlink:href="#ap-http"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="1.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1000;0.1001;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="2.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0150;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-1-2" xlink:href="#ap-1-2"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="2.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0150;0.0151;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="2.35s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0150;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-2-3" xlink:href="#ap-2-3"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="2.35s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0150;0.0151;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="2.5s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0150;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-3-4" xlink:href="#ap-3-4"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="2.5s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0150;0.0151;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="2.65s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0600;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-4-lib" xlink:href="#ap-4-lib"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="2.65s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0600;0.0601;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="3.25s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-lib-data" xlink:href="#ap-lib-data"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="3.25s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0250;0.0251;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="3.6s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-reply" xlink:href="#ap-reply"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="3.6s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1000;0.1001;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="5s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0200;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-beat-api" xlink:href="#ap-beat-api"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="5s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0200;0.0201;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="5.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-http" xlink:href="#ap-http"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="5.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1000;0.1001;1"/>
+</circle>
+<circle class="dot native" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="6.4s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0200;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-exam-capture" xlink:href="#ap-exam-capture"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="6.4s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0200;0.0201;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="6.6s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0200;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-capture-evidence" xlink:href="#ap-capture-evidence"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="6.6s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0200;0.0201;1"/>
+</circle>
+<circle class="dot native" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="6.6s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0500;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-events-main" xlink:href="#ap-events-main"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="6.6s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0500;0.0501;1"/>
+</circle>
+<circle class="dot native" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="7.1s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0300;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-events-up" xlink:href="#ap-events-up"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="7.1s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0300;0.0301;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="6.9s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0600;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-evidence-api" xlink:href="#ap-evidence-api"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="6.9s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0600;0.0601;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="7.5s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ap-http" xlink:href="#ap-http"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="7.5s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1000;0.1001;1"/>
+</circle>
+<rect class="swatch client" x="28" y="970" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="48" y="981.5">renderer and preload</text><rect class="swatch native" x="190" y="970" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="210" y="981.5">Electron main process</text><rect class="swatch server" x="358.6" y="970" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="378.6" y="981.5">Express backend</text><rect class="swatch data" x="487.6" y="970" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="507.6" y="981.5">files on disk</text><line x1="603.4" y1="977" x2="629.4" y2="977" stroke="#8C959F" stroke-width="1.5" stroke-dasharray="6 5"/><text class="legend" x="635.4" y="981.5">only for unknown routes or errors</text><circle cx="877.1999999999999" cy="977" r="5" fill="#8C959F"/><text class="legend" x="889.1999999999999" y="981.5">answer, heartbeat or screenshot in flight</text>
+</svg>

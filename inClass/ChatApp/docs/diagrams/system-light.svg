@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 650" width="1200" height="650" role="img" aria-labelledby="title-chat-system desc-chat-system">
+<title id="title-chat-system">huddle. system and deployment</title>
+<desc id="desc-chat-system">The huddle. app runs in Expo Go on a phone and talks over Wi-Fi to a NestJS API in a Docker container on the Mac, which stores data in a MongoDB container through Prisma. Metro serves the app bundle. A class server can replace the local API.</desc>
+<style>
+.bg{fill:#FFFFFF;stroke:#D8DEE4}
+.box{stroke-width:1.4}
+.box.dashed,.edge.dashed,.group.dashed{stroke-dasharray:6 5}
+.group{fill:none;stroke-width:1.2}
+.glabel{font:600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#1F2328}
+.gsub{font:400 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#57606A}
+.title{font:600 13.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif}
+.line{font:400 11.5px ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;fill:#57606A}
+.heading{font:700 17px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#1F2328}
+.caption{font:400 12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#57606A}
+.edge{fill:none;stroke:#8C959F;stroke-width:1.5}
+.elabel{font:400 11px ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;fill:#1F2328}
+.elabel-bg{fill:#FFFFFF;opacity:.92}
+.arrow{fill:#8C959F}
+.legend{font:400 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#57606A}
+.dot{stroke:#FFFFFF;stroke-width:1.5}
+.box.client{fill:#EEF4FB;stroke:#3F6FA6}.group.client{stroke:#3F6FA6}.title.client{fill:#1F3A5C}.dot.client{fill:#3F6FA6}.swatch.client{fill:#EEF4FB;stroke:#3F6FA6}.box.network{fill:#F3F4F6;stroke:#6E7781}.group.network{stroke:#6E7781}.title.network{fill:#24292F}.dot.network{fill:#6E7781}.swatch.network{fill:#F3F4F6;stroke:#6E7781}.box.server{fill:#EDF6EF;stroke:#3E7D4F}.group.server{stroke:#3E7D4F}.title.server{fill:#1C4429}.dot.server{fill:#3E7D4F}.swatch.server{fill:#EDF6EF;stroke:#3E7D4F}.box.data{fill:#FBF3E6;stroke:#A0661A}.group.data{stroke:#A0661A}.title.data{fill:#5C3A0C}.dot.data{fill:#A0661A}.swatch.data{fill:#FBF3E6;stroke:#A0661A}.box.jobs{fill:#F4F0FA;stroke:#6B55A3}.group.jobs{stroke:#6B55A3}.title.jobs{fill:#3B2D63}.dot.jobs{fill:#6B55A3}.swatch.jobs{fill:#F4F0FA;stroke:#6B55A3}.box.native{fill:#FBEFEF;stroke:#A64B4B}.group.native{stroke:#A64B4B}.title.native{fill:#5E2222}.dot.native{fill:#A64B4B}.swatch.native{fill:#FBEFEF;stroke:#A64B4B}
+@media (prefers-reduced-motion: reduce){.dot{display:none}}
+</style>
+<defs>
+<marker id="arrow-chat-system" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+<marker id="arrow-chat-system-start" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+</defs>
+<rect class="bg" x="0.5" y="0.5" width="1199" height="649" rx="16"/>
+<text class="heading" x="28" y="40">huddle.: system and deployment</text><text class="caption" x="28" y="62">Request dots run at the real polling intervals: open chat every 3 s, chat list every 5 s, inbox checker one chat at a time. The hourly cleanup is sped up.</text>
+<g><rect class="group client" x="28" y="88" width="330" height="500" rx="14"/>
+<text class="glabel" x="42" y="109">Phone (Android or iOS)</text><text class="gsub" x="42" y="126">Expo Go, Expo SDK 58, React Native 0.88</text></g>
+<g><rect class="group network" x="610" y="88" width="562" height="500" rx="14"/>
+<text class="glabel" x="624" y="109">Your Mac</text><text class="gsub" x="624" y="126">npx expo start  +  npm run docker:up</text></g>
+<g><rect class="group server" x="630" y="232" width="522" height="340" rx="14"/>
+<text class="glabel" x="644" y="253">Docker Compose project &quot;chatapp&quot;</text><text class="gsub" x="644" y="270">one private network; the API reaches MongoDB as host &quot;mongo&quot;</text></g>
+<path id="cs-bundle" class="edge" d="M630 179 L340 179" marker-end="url(#arrow-chat-system)"/>
+<path id="cs-ui-store" class="edge" d="M193 214 L193 233" marker-end="url(#arrow-chat-system)"/>
+<path id="cs-store-client" class="edge" d="M193 328 L193 347" marker-end="url(#arrow-chat-system)"/>
+<path id="cs-client-inspector" class="edge" d="M268 426 L268 445" marker-end="url(#arrow-chat-system)"/>
+<path id="cs-request" class="edge" d="M338 368 L649 368" marker-end="url(#arrow-chat-system)"/>
+<path id="cs-reply" class="edge" d="M650 396 L339 396" marker-end="url(#arrow-chat-system)"/>
+<path id="cs-class" class="edge dashed" d="M485 414 L485 479" marker-start="url(#arrow-chat-system-start)" marker-end="url(#arrow-chat-system)"/>
+<path id="cs-db" class="edge" d="M890 350 L939 350" marker-start="url(#arrow-chat-system-start)" marker-end="url(#arrow-chat-system)"/>
+<path id="cs-volumes" class="edge" d="M1036 430 L1036 455"/>
+<path id="cs-job-db" class="edge" d="M890 487 L915 487 L915 400 L939 400" marker-end="url(#arrow-chat-system)"/>
+<g><rect class="box client" x="48" y="136" width="290" height="78" rx="9"/>
+<text class="title client" x="60" y="158">Screens (Expo Router)</text><text class="line" x="60" y="178">app/(tabs)/chats, people, profile</text><text class="line" x="60" y="194">app/chat/[id], login, new-group</text></g>
+<g><rect class="box client" x="48" y="234" width="290" height="94" rx="9"/>
+<text class="title client" x="60" y="256">Stores and polling</text><text class="line" x="60" y="276">createStore + useStore (no Context)</text><text class="line" x="60" y="292">createPoller, paused in background</text><text class="line" x="60" y="308">inbox checker: one chat at a time</text></g>
+<g><rect class="box client" x="48" y="348" width="290" height="78" rx="9"/>
+<text class="title client" x="60" y="370">API client  src/api/client.js</text><text class="line" x="60" y="390">Basic auth, X-Request-Id, 10 s timeout</text><text class="line" x="60" y="406">records each request for Inspector</text></g>
+<g><rect class="box client" x="48" y="446" width="140" height="94" rx="9"/>
+<text class="title client" x="60" y="468">SecureStore</text><text class="line" x="60" y="488">session,</text><text class="line" x="60" y="504">settings,</text><text class="line" x="60" y="520">unread counts</text></g>
+<g><rect class="box client" x="198" y="446" width="140" height="94" rx="9"/>
+<text class="title client" x="210" y="468">Inspector</text><text class="line" x="210" y="488">overview, flow,</text><text class="line" x="210" y="504">network, logs,</text><text class="line" x="210" y="520">tools</text></g>
+<g><rect class="box network" x="400" y="330" width="170" height="84" rx="9"/>
+<text class="title network" x="412" y="352">Wi-Fi (same LAN)</text><text class="line" x="412" y="372">HTTP/1.1 + JSON</text><text class="line" x="412" y="388">no push channel:</text><text class="line" x="412" y="404">the app polls</text></g>
+<g><rect class="box network dashed" x="380" y="480" width="210" height="94" rx="9"/>
+<text class="title network" x="392" y="502">Class server (instructor)</text><text class="line" x="392" y="522">same routes (swagger.json)</text><text class="line" x="392" y="538">no /debug/logs, no receipts</text><text class="line" x="392" y="554">picked on the login screen</text></g>
+<g><rect class="box network" x="630" y="140" width="270" height="78" rx="9"/>
+<text class="title network" x="642" y="162">Metro bundler  :8081</text><text class="line" x="642" y="182">serves the JS bundle; the app</text><text class="line" x="642" y="198">derives the API address from it</text></g>
+<g><rect class="box server" x="650" y="286" width="240" height="128" rx="9"/>
+<text class="title server" x="662" y="308">chatapp_api  :3000</text><text class="line" x="662" y="328">NestJS 11 on Node 20</text><text class="line" x="662" y="344">global AuthGuard</text><text class="line" x="662" y="360">global ValidationPipe</text><text class="line" x="662" y="376">Swagger UI at /docs</text><text class="line" x="662" y="392">GET /debug/logs (DEBUG_LOGS)</text></g>
+<g><rect class="box jobs" x="650" y="432" width="240" height="110" rx="9"/>
+<text class="title jobs" x="662" y="454">Background work in the API</text><text class="line" x="662" y="474">FileCleanup: at start, then</text><text class="line" x="662" y="490">hourly; deletes uploads not</text><text class="line" x="662" y="506">sent in 24 h</text><text class="line" x="662" y="522">FactBots: every 10 s (BOT_MODE)</text></g>
+<g><rect class="box data" x="940" y="286" width="192" height="144" rx="9"/>
+<text class="title data" x="952" y="308">chatapp_mongo  :27017</text><text class="line" x="952" y="328">MongoDB 7.0</text><text class="line" x="952" y="344">replica set rs0</text><text class="line" x="952" y="360">keyfile between members</text><text class="line" x="952" y="376">collections: users,</text><text class="line" x="952" y="392">conversations,</text><text class="line" x="952" y="408">messages, files</text></g>
+<g><rect class="box data" x="940" y="456" width="192" height="76" rx="9"/>
+<text class="title data" x="952" y="478">Docker volumes</text><text class="line" x="952" y="498">mongo_data  /data/db</text><text class="line" x="952" y="514">mongo_key   /data/key</text></g>
+<rect class="elabel-bg" x="429.75" y="157" width="110.5" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="485" y="170">JS bundle (dev)</text>
+
+
+
+
+
+<rect class="elabel-bg" x="491.3" y="438" width="23.4" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="503" y="451">or</text>
+<rect class="elabel-bg" x="889.9" y="326" width="50.2" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="915" y="339">Prisma</text>
+
+
+<text class="line" x="485" y="284" text-anchor="middle">upper line: request,</text><text class="line" x="485" y="299" text-anchor="middle">Authorization: Basic</text><text class="line" x="485" y="314" text-anchor="middle">lower line: JSON reply</text>
+<circle class="dot network" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="6s" begin="0s" repeatCount="1" fill="freeze" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.3000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#cs-bundle" xlink:href="#cs-bundle"/></animateMotion>
+<animate attributeName="opacity" dur="6s" begin="0s" repeatCount="1" fill="freeze" values="1;1;0;0" keyTimes="0;0.3000;0.3001;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="3s" begin="0.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.3333;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#cs-request" xlink:href="#cs-request"/></animateMotion>
+<animate attributeName="opacity" dur="3s" begin="0.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.3333;0.3334;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="3s" begin="1.5s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.3333;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#cs-reply" xlink:href="#cs-reply"/></animateMotion>
+<animate attributeName="opacity" dur="3s" begin="1.5s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.3333;0.3334;1"/>
+</circle>
+<circle class="dot server" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="3s" begin="1.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#cs-db" xlink:href="#cs-db"/></animateMotion>
+<animate attributeName="opacity" dur="3s" begin="1.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1000;0.1001;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="5s" begin="0.9s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.2000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#cs-request" xlink:href="#cs-request"/></animateMotion>
+<animate attributeName="opacity" dur="5s" begin="0.9s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.2000;0.2001;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="5s" begin="2.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.2000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#cs-reply" xlink:href="#cs-reply"/></animateMotion>
+<animate attributeName="opacity" dur="5s" begin="2.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.2000;0.2001;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="2.6s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#cs-request" xlink:href="#cs-request"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="2.6s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1000;0.1001;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="3.9s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#cs-reply" xlink:href="#cs-reply"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="3.9s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1000;0.1001;1"/>
+</circle>
+<circle class="dot jobs" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="15s" begin="4s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0933;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#cs-job-db" xlink:href="#cs-job-db"/></animateMotion>
+<animate attributeName="opacity" dur="15s" begin="4s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0933;0.0934;1"/>
+</circle>
+<rect class="swatch client" x="28" y="610" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="48" y="621.5">phone app</text><rect class="swatch network" x="117.4" y="610" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="137.4" y="621.5">network and tooling</text><rect class="swatch server" x="272.79999999999995" y="610" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="292.79999999999995" y="621.5">API container</text><rect class="swatch data" x="388.59999999999997" y="610" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="408.59999999999997" y="621.5">database</text><rect class="swatch jobs" x="471.4" y="610" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="491.4" y="621.5">background work</text><line x1="600.4" y1="617" x2="626.4" y2="617" stroke="#8C959F" stroke-width="1.5" stroke-dasharray="6 5"/><text class="legend" x="632.4" y="621.5">alternative path</text><circle cx="762" cy="617" r="5" fill="#8C959F"/><text class="legend" x="774" y="621.5">data in flight</text>
+</svg>

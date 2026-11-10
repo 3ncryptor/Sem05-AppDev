@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 600" width="1200" height="600" role="img" aria-labelledby="title-overview desc-overview">
+<title id="title-overview">Three projects, three architectures</title>
+<desc id="desc-overview">Left: the CLI Music Player, a terminal process that drives a native audio process over stdin and stdout. Middle: Athena, a sandboxed Electron renderer that reaches an Express server only through the main process. Right: huddle., a phone app that polls a NestJS API in Docker, which stores data in MongoDB through Prisma.</desc>
+<style>
+.bg{fill:#0D1117;stroke:#30363D}
+.box{stroke-width:1.4}
+.box.dashed,.edge.dashed,.group.dashed{stroke-dasharray:6 5}
+.group{fill:none;stroke-width:1.2}
+.glabel{font:600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#E6EDF3}
+.gsub{font:400 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#9198A1}
+.title{font:600 13.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif}
+.line{font:400 11.5px ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;fill:#9198A1}
+.heading{font:700 17px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#E6EDF3}
+.caption{font:400 12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#9198A1}
+.edge{fill:none;stroke:#6E7681;stroke-width:1.5}
+.elabel{font:400 11px ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;fill:#E6EDF3}
+.elabel-bg{fill:#0D1117;opacity:.92}
+.arrow{fill:#6E7681}
+.legend{font:400 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#9198A1}
+.dot{stroke:#0D1117;stroke-width:1.5}
+.box.client{fill:#14233A;stroke:#6EA0DA}.group.client{stroke:#6EA0DA}.title.client{fill:#CFE0F5}.dot.client{fill:#6EA0DA}.swatch.client{fill:#14233A;stroke:#6EA0DA}.box.network{fill:#1C2128;stroke:#8B949E}.group.network{stroke:#8B949E}.title.network{fill:#D7DDE3}.dot.network{fill:#8B949E}.swatch.network{fill:#1C2128;stroke:#8B949E}.box.server{fill:#13261A;stroke:#6FBF85}.group.server{stroke:#6FBF85}.title.server{fill:#C9EBD3}.dot.server{fill:#6FBF85}.swatch.server{fill:#13261A;stroke:#6FBF85}.box.data{fill:#2B2012;stroke:#D9A24D}.group.data{stroke:#D9A24D}.title.data{fill:#F2DDB8}.dot.data{fill:#D9A24D}.swatch.data{fill:#2B2012;stroke:#D9A24D}.box.jobs{fill:#221B33;stroke:#A895DD}.group.jobs{stroke:#A895DD}.title.jobs{fill:#E0D8F5}.dot.jobs{fill:#A895DD}.swatch.jobs{fill:#221B33;stroke:#A895DD}.box.native{fill:#2E1717;stroke:#E08A8A}.group.native{stroke:#E08A8A}.title.native{fill:#F5D3D3}.dot.native{fill:#E08A8A}.swatch.native{fill:#2E1717;stroke:#E08A8A}
+@media (prefers-reduced-motion: reduce){.dot{display:none}}
+</style>
+<defs>
+<marker id="arrow-overview" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+<marker id="arrow-overview-start" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+</defs>
+<rect class="bg" x="0.5" y="0.5" width="1199" height="599" rx="16"/>
+<text class="heading" x="28" y="40">Sem05-AppDev: three projects, three architectures</text><text class="caption" x="28" y="62">A terminal program, a desktop app and a mobile app with a server. Each project README has the detailed figure.</text>
+<g><rect class="group client" x="28" y="88" width="368" height="448" rx="14"/>
+<text class="glabel" x="42" y="109">CLI Music Player  (inClass/CLI-Player)</text></g>
+<g><rect class="group native" x="416" y="88" width="368" height="448" rx="14"/>
+<text class="glabel" x="430" y="109">Athena  (inClass/Proctor)</text></g>
+<g><rect class="group server" x="804" y="88" width="368" height="448" rx="14"/>
+<text class="glabel" x="818" y="109">huddle.  (inClass/ChatApp)</text></g>
+<path id="ov-cli-1" class="edge" d="M172 204 L172 251" marker-end="url(#arrow-overview)"/>
+<path id="ov-cli-2" class="edge" d="M252 252 L252 205" marker-end="url(#arrow-overview)"/>
+<path id="ov-cli-3" class="edge dashed" d="M48 184 L38 184 L38 396 L47 396" marker-end="url(#arrow-overview)"/>
+<path id="ov-ath-1" class="edge" d="M600 204 L600 251" marker-start="url(#arrow-overview-start)" marker-end="url(#arrow-overview)"/>
+<path id="ov-ath-2" class="edge" d="M600 316 L600 363" marker-start="url(#arrow-overview-start)" marker-end="url(#arrow-overview)"/>
+<path id="ov-hud-1" class="edge" d="M988 204 L988 251" marker-start="url(#arrow-overview-start)" marker-end="url(#arrow-overview)"/>
+<path id="ov-hud-2" class="edge" d="M988 316 L988 363" marker-start="url(#arrow-overview-start)" marker-end="url(#arrow-overview)"/>
+<g><rect class="box client" x="48" y="140" width="328" height="64" rx="9"/>
+<text class="title client" x="60" y="162">Terminal process (Bun or Node.js)</text><text class="line" x="60" y="182">OpenTUI dashboard, player state</text></g>
+<g><rect class="box native" x="48" y="252" width="328" height="64" rx="9"/>
+<text class="title native" x="60" y="274">audio_player (Objective-C)</text><text class="line" x="60" y="294">AVAudioPlayer, speed and volume</text></g>
+<g><rect class="box native dashed" x="48" y="364" width="328" height="64" rx="9"/>
+<text class="title native" x="60" y="386">afplay (macOS)</text><text class="line" x="60" y="406">used if audio_player is missing</text></g>
+<g><rect class="box client" x="436" y="140" width="328" height="64" rx="9"/>
+<text class="title client" x="448" y="162">Renderer: React 19, sandboxed</text><text class="line" x="448" y="182">no Node.js, no network</text></g>
+<g><rect class="box native" x="436" y="252" width="328" height="64" rx="9"/>
+<text class="title native" x="448" y="274">Electron 44 main process</text><text class="line" x="448" y="294">token, answer queue, screenshots</text></g>
+<g><rect class="box server" x="436" y="364" width="328" height="64" rx="9"/>
+<text class="title server" x="448" y="386">Express 5 server</text><text class="line" x="448" y="406">JSON files, screenshots folder</text></g>
+<g><rect class="box client" x="824" y="140" width="328" height="64" rx="9"/>
+<text class="title client" x="836" y="162">Phone: Expo Go, React Native</text><text class="line" x="836" y="182">stores, polling, Inspector</text></g>
+<g><rect class="box server" x="824" y="252" width="328" height="64" rx="9"/>
+<text class="title server" x="836" y="274">NestJS 11 API (Docker)</text><text class="line" x="836" y="294">global AuthGuard, validation</text></g>
+<g><rect class="box data" x="824" y="364" width="328" height="64" rx="9"/>
+<text class="title data" x="836" y="386">MongoDB 7.0 (Docker)</text><text class="line" x="836" y="406">replica set rs0, via Prisma 6</text></g>
+<rect class="elabel-bg" x="118.25" y="216" width="43.5" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="140" y="229">stdin</text>
+<rect class="elabel-bg" x="262.9" y="216" width="50.2" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="288" y="229">stdout</text>
+
+<rect class="elabel-bg" x="608.1" y="216" width="103.8" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="660" y="229">IPC allow-list</text>
+<rect class="elabel-bg" x="610.8" y="328" width="90.4" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="656" y="341">HTTP, Bearer</text>
+<rect class="elabel-bg" x="999.35" y="216" width="137.3" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="1068" y="229">HTTP polling, Basic</text>
+<rect class="elabel-bg" x="996.9" y="328" width="50.2" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="1022" y="341">Prisma</text>
+<text class="caption" x="48" y="470">Native code in its own process,</text><text class="caption" x="48" y="488">driven by a line protocol over pipes.</text><text class="caption" x="436" y="470">Least privilege: only the main process</text><text class="caption" x="436" y="488">reaches the network and the file system.</text><text class="caption" x="824" y="470">Client and containerised server;</text><text class="caption" x="824" y="488">polling instead of push.</text>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="4s" begin="0s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1750;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ov-cli-1" xlink:href="#ov-cli-1"/></animateMotion>
+<animate attributeName="opacity" dur="4s" begin="0s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1750;0.1751;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="4s" begin="1.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1750;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ov-cli-2" xlink:href="#ov-cli-2"/></animateMotion>
+<animate attributeName="opacity" dur="4s" begin="1.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1750;0.1751;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="4s" begin="0.4s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1750;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ov-ath-1" xlink:href="#ov-ath-1"/></animateMotion>
+<animate attributeName="opacity" dur="4s" begin="0.4s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1750;0.1751;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="4s" begin="1.1s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1750;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ov-ath-2" xlink:href="#ov-ath-2"/></animateMotion>
+<animate attributeName="opacity" dur="4s" begin="1.1s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1750;0.1751;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="4s" begin="2.1s" repeatCount="indefinite" calcMode="spline" keyPoints="1;0;0" keyTimes="0;0.1750;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ov-ath-2" xlink:href="#ov-ath-2"/></animateMotion>
+<animate attributeName="opacity" dur="4s" begin="2.1s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1750;0.1751;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="4s" begin="2.8s" repeatCount="indefinite" calcMode="spline" keyPoints="1;0;0" keyTimes="0;0.1750;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ov-ath-1" xlink:href="#ov-ath-1"/></animateMotion>
+<animate attributeName="opacity" dur="4s" begin="2.8s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1750;0.1751;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="3s" begin="0.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.2333;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ov-hud-1" xlink:href="#ov-hud-1"/></animateMotion>
+<animate attributeName="opacity" dur="3s" begin="0.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.2333;0.2334;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="3s" begin="0.9s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1667;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ov-hud-2" xlink:href="#ov-hud-2"/></animateMotion>
+<animate attributeName="opacity" dur="3s" begin="0.9s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1667;0.1668;1"/>
+</circle>
+<circle class="dot data" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="3s" begin="1.6s" repeatCount="indefinite" calcMode="spline" keyPoints="1;0;0" keyTimes="0;0.1667;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ov-hud-2" xlink:href="#ov-hud-2"/></animateMotion>
+<animate attributeName="opacity" dur="3s" begin="1.6s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1667;0.1668;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="3s" begin="2.1s" repeatCount="indefinite" calcMode="spline" keyPoints="1;0;0" keyTimes="0;0.2333;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#ov-hud-1" xlink:href="#ov-hud-1"/></animateMotion>
+<animate attributeName="opacity" dur="3s" begin="2.1s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.2333;0.2334;1"/>
+</circle>
+<rect class="swatch client" x="28" y="560" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="48" y="571.5">user interface</text><rect class="swatch native" x="150.39999999999998" y="560" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="170.39999999999998" y="571.5">native or privileged process</text><rect class="swatch server" x="365.19999999999993" y="560" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="385.19999999999993" y="571.5">server</text><rect class="swatch data" x="434.79999999999995" y="560" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="454.79999999999995" y="571.5">storage</text><line x1="510.99999999999994" y1="567" x2="537" y2="567" stroke="#6E7681" stroke-width="1.5" stroke-dasharray="6 5"/><text class="legend" x="543" y="571.5">fallback</text><circle cx="619.8" cy="567" r="5" fill="#6E7681"/><text class="legend" x="631.8" y="571.5">data in flight</text>
+</svg>

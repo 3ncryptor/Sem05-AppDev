@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 880" width="1200" height="880" role="img" aria-labelledby="title-chat-request desc-chat-request">
+<title id="title-chat-request">One request through huddle., end to end</title>
+<desc id="desc-chat-request">Sending a message: the chat screen and message controller add an optimistic bubble, the API client sends POST /message, and the NestJS backend runs request logger, JSON parser, request context, AuthGuard, ValidationPipe, controller, service and Prisma before MongoDB stores the message. The reply confirms the bubble, and the log line reaches the Inspector through GET /debug/logs.</desc>
+<style>
+.bg{fill:#0D1117;stroke:#30363D}
+.box{stroke-width:1.4}
+.box.dashed,.edge.dashed,.group.dashed{stroke-dasharray:6 5}
+.group{fill:none;stroke-width:1.2}
+.glabel{font:600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#E6EDF3}
+.gsub{font:400 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#9198A1}
+.title{font:600 13.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif}
+.line{font:400 11.5px ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;fill:#9198A1}
+.heading{font:700 17px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#E6EDF3}
+.caption{font:400 12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#9198A1}
+.edge{fill:none;stroke:#6E7681;stroke-width:1.5}
+.elabel{font:400 11px ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;fill:#E6EDF3}
+.elabel-bg{fill:#0D1117;opacity:.92}
+.arrow{fill:#6E7681}
+.legend{font:400 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#9198A1}
+.dot{stroke:#0D1117;stroke-width:1.5}
+.box.client{fill:#14233A;stroke:#6EA0DA}.group.client{stroke:#6EA0DA}.title.client{fill:#CFE0F5}.dot.client{fill:#6EA0DA}.swatch.client{fill:#14233A;stroke:#6EA0DA}.box.network{fill:#1C2128;stroke:#8B949E}.group.network{stroke:#8B949E}.title.network{fill:#D7DDE3}.dot.network{fill:#8B949E}.swatch.network{fill:#1C2128;stroke:#8B949E}.box.server{fill:#13261A;stroke:#6FBF85}.group.server{stroke:#6FBF85}.title.server{fill:#C9EBD3}.dot.server{fill:#6FBF85}.swatch.server{fill:#13261A;stroke:#6FBF85}.box.data{fill:#2B2012;stroke:#D9A24D}.group.data{stroke:#D9A24D}.title.data{fill:#F2DDB8}.dot.data{fill:#D9A24D}.swatch.data{fill:#2B2012;stroke:#D9A24D}.box.jobs{fill:#221B33;stroke:#A895DD}.group.jobs{stroke:#A895DD}.title.jobs{fill:#E0D8F5}.dot.jobs{fill:#A895DD}.swatch.jobs{fill:#221B33;stroke:#A895DD}.box.native{fill:#2E1717;stroke:#E08A8A}.group.native{stroke:#E08A8A}.title.native{fill:#F5D3D3}.dot.native{fill:#E08A8A}.swatch.native{fill:#2E1717;stroke:#E08A8A}
+@media (prefers-reduced-motion: reduce){.dot{display:none}}
+</style>
+<defs>
+<marker id="arrow-chat-request" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+<marker id="arrow-chat-request-start" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+</defs>
+<rect class="bg" x="0.5" y="0.5" width="1199" height="879" rx="16"/>
+<text class="heading" x="28" y="40">huddle.: one request, end to end (sending a message)</text><text class="caption" x="28" y="62">Numbers 1 to 8 are the order the backend runs each step. Any error in steps 4 to 8 goes to the exception filter instead.</text>
+<g><rect class="group client" x="28" y="80" width="1144" height="144" rx="14"/>
+<text class="glabel" x="42" y="101">Phone: huddle. in Expo Go</text></g>
+<g><rect class="group server" x="28" y="318" width="1144" height="374" rx="14"/>
+<text class="glabel" x="42" y="339">NestJS API (container chatapp_api), steps in the order they run</text></g>
+<g><rect class="group data" x="28" y="708" width="1144" height="124" rx="14"/>
+<text class="glabel" x="248" y="729">MongoDB 7 (container chatapp_mongo): the collections this request touches</text></g>
+<path id="rq-screen" class="edge" d="M238 162 L257 162" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-send" class="edge" d="M498 146 L517 146" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-confirm" class="edge" d="M518 182 L499 182" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-record" class="edge" d="M758 162 L899 162" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-request" class="edge" d="M690 208 L690 361" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-reply" class="edge" d="M560 361 L560 209" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-1-2" class="edge" d="M720 408 L739 408" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-2-3" class="edge" d="M940 408 L959 408" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-3-4" class="edge" d="M1060 454 L1060 477" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-4-5" class="edge" d="M960 524 L941 524" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-5-6" class="edge" d="M740 524 L721 524" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-6-7" class="edge" d="M520 524 L501 524" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-7-8" class="edge" d="M300 524 L281 524" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-prisma" class="edge" d="M180 570 L180 743" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-guard-users" class="edge" d="M1110 570 L1110 743" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-log" class="edge" d="M520 408 L481 408" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-logs-feed" class="edge dashed" d="M460 361 L460 236 L1026 236 L1026 209" marker-end="url(#arrow-chat-request)"/>
+<path id="rq-errors" class="edge dashed" d="M400 586 L1060 586"/>
+<path id="rq-errors-filter" class="edge dashed" d="M800 586 L800 605" marker-end="url(#arrow-chat-request)"/>
+<g><rect class="box client" x="48" y="116" width="190" height="92" rx="9"/>
+<text class="title client" x="60" y="138">Chat screen</text><text class="line" x="60" y="158">app/chat/[id].jsx</text><text class="line" x="60" y="174">you tap send</text></g>
+<g><rect class="box client" x="258" y="116" width="240" height="92" rx="9"/>
+<text class="title client" x="270" y="138">messageController</text><text class="line" x="270" y="158">send(): 'sending' bubble</text><text class="line" x="270" y="174">shows at once (optimistic)</text><text class="line" x="270" y="190">then confirmed or failed</text></g>
+<g><rect class="box client" x="518" y="116" width="240" height="92" rx="9"/>
+<text class="title client" x="530" y="138">API client  client.js</text><text class="line" x="530" y="158">X-Request-Id: new id</text><text class="line" x="530" y="174">Authorization: Basic</text><text class="line" x="530" y="190">10 s timeout</text></g>
+<g><rect class="box client" x="900" y="116" width="252" height="92" rx="9"/>
+<text class="title client" x="912" y="138">Inspector stores</text><text class="line" x="912" y="158">networkStore: the request</text><text class="line" x="912" y="174">serverLogStore: its server</text><text class="line" x="912" y="190">lines, by request id</text></g>
+<g><rect class="box network" x="440" y="252" width="300" height="56" rx="9"/>
+<text class="title network" x="452" y="274">HTTP/1.1 over Wi-Fi</text><text class="line" x="452" y="294">POST /message  JSON body</text></g>
+<g><rect class="box server" x="80" y="362" width="400" height="92" rx="9"/>
+<text class="title server" x="92" y="384">BufferedLogger + LogBuffer</text><text class="line" x="92" y="404">every log line is kept with its</text><text class="line" x="92" y="420">request id (the last 500 lines)</text><text class="line" x="92" y="436">GET /debug/logs serves them</text></g>
+<g><rect class="box server" x="520" y="362" width="200" height="92" rx="9"/>
+<text class="title server" x="532" y="384">1  requestLogger</text><text class="line" x="532" y="404">starts a timer; logs</text><text class="line" x="532" y="420">one line when the</text><text class="line" x="532" y="436">reply has been sent</text></g>
+<g><rect class="box server" x="740" y="362" width="200" height="92" rx="9"/>
+<text class="title server" x="752" y="384">2  express.json()</text><text class="line" x="752" y="404">parses the JSON body</text><text class="line" x="752" y="420">limit 15 MB</text></g>
+<g><rect class="box server" x="960" y="362" width="200" height="92" rx="9"/>
+<text class="title server" x="972" y="384">3  requestContext</text><text class="line" x="972" y="404">AsyncLocalStorage</text><text class="line" x="972" y="420">keeps X-Request-Id</text><text class="line" x="972" y="436">for every log line</text></g>
+<g><rect class="box server" x="960" y="478" width="200" height="92" rx="9"/>
+<text class="title server" x="972" y="500">4  AuthGuard (global)</text><text class="line" x="972" y="520">Basic name:password</text><text class="line" x="972" y="536">new name: user created</text><text class="line" x="972" y="552">wrong password: 401</text></g>
+<g><rect class="box server" x="740" y="478" width="200" height="92" rx="9"/>
+<text class="title server" x="752" y="500">5  ValidationPipe</text><text class="line" x="752" y="520">CreateMessageDto</text><text class="line" x="752" y="536">unknown field: 400</text></g>
+<g><rect class="box server" x="520" y="478" width="200" height="92" rx="9"/>
+<text class="title server" x="532" y="500">6  MessageController</text><text class="line" x="532" y="520">POST /message</text><text class="line" x="532" y="536">sender is request.user</text></g>
+<g><rect class="box server" x="300" y="478" width="200" height="92" rx="9"/>
+<text class="title server" x="312" y="500">7  MessageService</text><text class="line" x="312" y="520">chat exists, else 404</text><text class="line" x="312" y="536">file is sender's own</text><text class="line" x="312" y="552">status map per member</text></g>
+<g><rect class="box server" x="80" y="478" width="200" height="92" rx="9"/>
+<text class="title server" x="92" y="500">8  PrismaService</text><text class="line" x="92" y="520">PrismaClient: typed</text><text class="line" x="92" y="536">queries to MongoDB</text></g>
+<g><rect class="box server dashed" x="600" y="606" width="400" height="72" rx="9"/>
+<text class="title server" x="612" y="628">LoggingExceptionFilter</text><text class="line" x="612" y="648">turns the error into a 4xx/5xx reply</text><text class="line" x="612" y="664">and puts its reason on the log line</text></g>
+<g><rect class="box data" x="48" y="744" width="262" height="72" rx="9"/>
+<text class="title data" x="60" y="766">messages</text><text class="line" x="60" y="786">create: content, senderId,</text><text class="line" x="60" y="802">status per member</text></g>
+<g><rect class="box data" x="330" y="744" width="262" height="72" rx="9"/>
+<text class="title data" x="342" y="766">conversations</text><text class="line" x="342" y="786">findUnique: does the</text><text class="line" x="342" y="802">chat exist?</text></g>
+<g><rect class="box data" x="612" y="744" width="262" height="72" rx="9"/>
+<text class="title data" x="624" y="766">files</text><text class="line" x="624" y="786">findUnique: only when</text><text class="line" x="624" y="802">a file_id was sent</text></g>
+<g><rect class="box data" x="894" y="744" width="258" height="72" rx="9"/>
+<text class="title data" x="906" y="766">users</text><text class="line" x="906" y="786">AuthGuard: find by name,</text><text class="line" x="906" y="802">or create a new user</text></g>
+
+
+
+<rect class="elabel-bg" x="789.5" y="140" width="77" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="828" y="153">records it</text>
+
+
+
+
+
+
+
+
+
+<rect class="elabel-bg" x="128.1" y="640" width="103.8" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="180" y="653">Prisma queries</text>
+<rect class="elabel-bg" x="1058.1" y="640" width="103.8" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="1110" y="653">find or create</text>
+
+
+
+
+<text class="line" x="770" y="256">Inspector open: GET</text><text class="line" x="770" y="271">/debug/logs every 2 s</text><text class="line" x="490" y="342">201 reply</text><text class="line" x="700" y="342">request</text><text class="line" x="410" y="600">errors from steps 4 to 8</text>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="0s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0400;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-screen" xlink:href="#rq-screen"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="0s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0400;0.0401;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="0.4s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0400;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-send" xlink:href="#rq-send"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="0.4s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0400;0.0401;1"/>
+</circle>
+<circle class="dot client" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="0.8s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0500;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-record" xlink:href="#rq-record"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="0.8s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0500;0.0501;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="0.8s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0900;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-request" xlink:href="#rq-request"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="0.8s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0900;0.0901;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="1.7s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-1-2" xlink:href="#rq-1-2"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="1.7s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0250;0.0251;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="1.95s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-2-3" xlink:href="#rq-2-3"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="1.95s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0250;0.0251;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="2.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0300;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-3-4" xlink:href="#rq-3-4"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="2.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0300;0.0301;1"/>
+</circle>
+<circle class="dot server" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="2.5s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0600;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-guard-users" xlink:href="#rq-guard-users"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="2.5s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0600;0.0601;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="3.1s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-4-5" xlink:href="#rq-4-5"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="3.1s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0250;0.0251;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="3.35s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-5-6" xlink:href="#rq-5-6"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="3.35s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0250;0.0251;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="3.6s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-6-7" xlink:href="#rq-6-7"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="3.6s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0250;0.0251;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="3.85s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-7-8" xlink:href="#rq-7-8"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="3.85s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0250;0.0251;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="4.1s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0700;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-prisma" xlink:href="#rq-prisma"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="4.1s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0700;0.0701;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="5s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0900;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-reply" xlink:href="#rq-reply"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="5s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0900;0.0901;1"/>
+</circle>
+<circle class="dot server" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="5.9s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0400;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-confirm" xlink:href="#rq-confirm"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="5.9s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0400;0.0401;1"/>
+</circle>
+<circle class="dot server" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="5s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0300;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-log" xlink:href="#rq-log"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="5s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0300;0.0301;1"/>
+</circle>
+<circle class="dot server" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="10s" begin="5.6s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1800;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#rq-logs-feed" xlink:href="#rq-logs-feed"/></animateMotion>
+<animate attributeName="opacity" dur="10s" begin="5.6s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1800;0.1801;1"/>
+</circle>
+<rect class="swatch client" x="28" y="840" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="48" y="851.5">phone app</text><rect class="swatch network" x="117.4" y="840" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="137.4" y="851.5">network</text><rect class="swatch server" x="193.6" y="840" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="213.6" y="851.5">NestJS API</text><rect class="swatch data" x="289.6" y="840" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="309.6" y="851.5">MongoDB</text><line x1="365.8" y1="847" x2="391.8" y2="847" stroke="#6E7681" stroke-width="1.5" stroke-dasharray="6 5"/><text class="legend" x="397.8" y="851.5">local backend only, or on error</text><circle cx="626.4" cy="847" r="5" fill="#6E7681"/><text class="legend" x="638.4" y="851.5">the request and its reply</text>
+</svg>
