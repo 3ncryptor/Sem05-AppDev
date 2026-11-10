@@ -1,6 +1,8 @@
 # CLI Music Player
 
-An interactive Terminal User Interface (TUI) audio player built with Node.js and `@opentui/core`. It provides real-time playback control, track queuing, volume/speed mixing, and audio spectrum visualization by managing native macOS audio processes via POSIX signals.
+An interactive Terminal User Interface (TUI) audio player built with Bun or Node.js and `@opentui/core` 0.5. It provides real-time playback control, track queuing, volume/speed mixing, and audio spectrum visualization by managing native macOS audio processes via POSIX signals.
+
+Part of [Sem05-AppDev](../../README.md). Built in class in August 2026; `WalkThrough.md` tells the story of how it was built, phase by phase.
 
 ---
 
@@ -37,7 +39,8 @@ graph TD
 
 * **UI Presentation Layer (`ui.js`)**: Encapsulates OpenTUI layout grids, border highlight states, widgets, and 4 precision 44-character visualizer renderers.
 * **Controller Layer (`index.js` & `songs/cliPlayer.js`)**: Routes user keypress events, manages playlists and queues, and bridges commands to the audio worker over standard IO streams.
-* **Hardware Audio Driver (`audio_player.m`)**: A native Objective-C daemon compiled via `clang` utilizing Apple's `AVFoundation` framework for dynamic, in-flight playback speed and volume adjustments with 0ms latency.
+* **Hardware Audio Driver (`audio_player.m`)**: A native Objective-C helper compiled via `clang` utilizing Apple's `AVFoundation` framework, so playback speed and volume change while a track is playing. It reads `PLAY`, `RATE`, `VOLUME` and `STOP` commands on stdin and reports `DURATION` and `ENDED` on stdout (`songs/cliPlayer.js`).
+* **Fallback**: If the compiled `audio_player` binary is missing, the player falls back to macOS `afplay` (`songs/cliPlayer.js`, `getWorker` and `playSong`). Playback, pause and the queue still work, but volume and speed changes only take effect when the next track starts. Track length is read with `afinfo` in both modes.
 
 ---
 
@@ -89,23 +92,28 @@ inClass/CLI-Player/
 ├── index.js              # Application entrypoint and keyboard input routing
 ├── ui.js                 # OpenTUI dashboard layout, widgets, and text builders
 ├── audio_player.m        # Native hardware audio driver (AVFoundation / CoreAudio)
+├── audio_player          # Compiled by setup.sh on first run (gitignored, not in the repo)
 ├── package.json          # Project metadata, scripts, and dependencies
 ├── package-lock.json     # Dependency lockfile
-├── BuildPlan.md          # Feature roadmap and implementation notes
+├── BuildPlan.md          # Original feature roadmap (written before the build)
+├── WalkThrough.md        # How the player was built, phase by phase
 ├── README.md             # Project documentation
 └── songs/
     ├── cliPlayer.js      # Audio controller and native IPC worker bridge
     ├── cliPlayer2.js     # Legacy synchronous playback reference
-    └── *.mp3             # Bundled sample audio files
+    └── *.mp3             # Four bundled sample tracks
 ```
+
+The player loads `.mp3`, `.wav`, `.m4a`, `.aiff` and `.mp4` files from `songs/`, or from the folder you pass as the first argument (`index.js`, `songs/cliPlayer.js`).
 
 ---
 
 ## Installation & Usage
 
 ### Prerequisites
-* **Host OS:** macOS (Required for native `afplay` and `afinfo` commands).
-* **JavaScript Runtime:** [Bun](https://bun.sh) (recommended for high-performance OpenTUI execution) or **Node.js** (v18.0.0+).
+* **Host OS:** macOS (the audio engine uses AVFoundation, and track lengths come from `afinfo`).
+* **Xcode Command Line Tools** (`xcode-select --install`): `setup.sh` compiles `audio_player.m` with `clang` on the first run. The binary is gitignored, so every fresh clone builds it. Without `clang` the player still runs on the `afplay` fallback described above.
+* **JavaScript Runtime:** [Bun](https://bun.sh) (recommended; `setup.sh` notes that OpenTUI's native bindings are built for Bun) or **Node.js**.
 
 ### Option A: Turnkey Launch (Recommended)
 Run the automated initialization and launch script (auto-detects Bun or Node.js, installs missing dependencies, and starts the player):
@@ -126,8 +134,11 @@ cd inClass/CLI-Player
 # 1. Install dependencies
 bun install
 
-# 2. Launch player
-bun start
+# 2. Compile the audio engine (once; setup.sh does this for you)
+clang -O2 -fobjc-arc -framework Foundation -framework AVFoundation audio_player.m -o audio_player
+
+# 3. Launch player (note: plain `bun start` runs the npm "start" script, which uses Node)
+bun run start:bun
 # or directly:
 bun run index.js
 ```
@@ -139,7 +150,7 @@ cd inClass/CLI-Player
 # 1. Install dependencies
 npm install
 
-# 2. Launch player
+# 2. Compile the audio engine once (the clang command in Option B), then launch
 npm start
 ```
 
