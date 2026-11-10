@@ -28,6 +28,41 @@ The projects don't share code or dependencies, so you can run any one of them wi
 
 Source: `inClass/CLI-Player/package.json` and `setup.sh`; `inClass/Proctor/app/package.json`, `backend/package.json` and `start.sh`; `inClass/ChatApp/frontend/package.json`, `backend/package.json` and `backend/docker-compose.yml`.
 
+## Architecture at a glance
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/overview-dark.svg">
+  <img alt="Three architectures side by side: the CLI Music Player's terminal process drives a native audio process over stdin and stdout, with afplay as fallback; Athena's sandboxed renderer reaches the Electron main process through an IPC allow-list, and main calls the Express server over HTTP with a Bearer token; huddle.'s phone app polls a NestJS API in Docker with Basic auth, and the API uses Prisma to reach MongoDB in Docker." src="docs/diagrams/overview-light.svg" width="100%">
+</picture>
+
+Source: the figure in each project README, where every box is cited to a file.
+
+The three projects move up in scale. The CLI player is one machine and two processes, joined by pipes and a small text protocol. Athena adds a privilege boundary: the page that shows the exam cannot touch the network, and a separate server holds the data. huddle. adds a real client and server split across two devices, with the server and its database in containers. The figure is animated: dots show data in flight. It follows GitHub's light or dark theme and stands still under reduced motion. Each project README has the detailed figures, a table of the system design concepts it uses, and step-by-step diagrams.
+
+### System design concepts, by project
+
+| Concept | CLI Music Player | Athena | huddle. |
+|---|---|---|---|
+| Client and server | | Electron app and Express server | Phone app and NestJS API |
+| Process isolation | Native audio in its own process | Sandboxed renderer, privileged main process | |
+| Inter-process communication | stdin and stdout pipes, text protocol | Allow-listed IPC through a preload script | |
+| HTTP API | | REST with a `{ ok, data, error }` envelope | REST described by `swagger.json` |
+| Authentication | | Bearer token, scrypt passwords, role checks | Basic auth checked on every request |
+| Reliable delivery | | Durable answer queue with retries, idempotent server writes | Optimistic sends with retry |
+| Keeping clients up to date | | Heartbeat every 10 s with server time | Polling every 3, 5 and 10 s |
+| Storage | | JSON files with atomic writes | MongoDB through the Prisma ORM |
+| Concurrency control | Background queue feeds the main queue | Per-attempt locks | One poll at a time per screen |
+| Containers | | | Docker Compose, two services |
+| Observability | | Request ids and one log line per request | Request ids from app to server logs, in-app Inspector |
+| Graceful degradation | `afplay` when the native binary is missing | Offline banner while answers wait on disk | Works on the class server without the local extras |
+| Design patterns | Event callbacks, render loop | Strategy pattern for scoring | Layered controller and service, dependency injection, publish and subscribe stores |
+
+Source: the concepts table in each project README ([`inClass/CLI-Player`](inClass/CLI-Player/README.md#architecture), [`inClass/Proctor`](inClass/Proctor/README.md#architecture), [`inClass/ChatApp`](inClass/ChatApp/README.md#architecture)).
+
+### How the figures are made
+
+The animated figures are SVG files generated from one small spec per figure by [`tools/diagrams/build.mjs`](tools/diagrams/build.mjs), a Node.js script with no dependencies. The script writes a light and a dark version of each figure, with the same colours and legend everywhere. The animation is written inside the SVG, so it plays on GitHub, where scripts are not allowed. To change a figure, edit its spec in `tools/diagrams/specs/` and run `node tools/diagrams/build.mjs`. The step-by-step diagrams are Mermaid, which GitHub draws from the text in the README.
+
 ## What you need
 
 All three projects were built and tested on macOS. The CLI player and Athena use Apple frameworks, so they only run on macOS. The chat app's server runs in Docker, so it should also run on Linux or Windows, but that has not been tried.
@@ -75,6 +110,8 @@ Sem05-AppDev/
     Proctor/               Athena desktop exam app (app/, backend/, docs/)
     ChatApp/               huddle. chat app (frontend/, backend/, swagger.json)
   projects/                graded course projects (none yet); its README is the template
+  docs/diagrams/           the overview figure above (light and dark SVG)
+  tools/diagrams/          the generator for every animated figure, and one spec per figure
 ```
 
 ## How the repository is kept

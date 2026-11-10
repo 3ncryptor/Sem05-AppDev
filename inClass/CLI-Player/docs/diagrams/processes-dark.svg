@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 820" width="1200" height="820" role="img" aria-labelledby="title-player-processes desc-player-processes">
+<title id="title-player-processes">CLI Music Player processes and pipes</title>
+<desc id="desc-player-processes">The terminal process (Bun or Node.js) reads keys through OpenTUI, keeps the player state and redraws every 100 ms. It sends one-line commands over stdin to a separate Objective-C process that plays audio with AVAudioPlayer and replies on stdout. If that binary is missing, macOS afplay is used instead and paused with signals.</desc>
+<style>
+.bg{fill:#0D1117;stroke:#30363D}
+.box{stroke-width:1.4}
+.box.dashed,.edge.dashed,.group.dashed{stroke-dasharray:6 5}
+.group{fill:none;stroke-width:1.2}
+.glabel{font:600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#E6EDF3}
+.gsub{font:400 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#9198A1}
+.title{font:600 13.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif}
+.line{font:400 11.5px ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;fill:#9198A1}
+.heading{font:700 17px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#E6EDF3}
+.caption{font:400 12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#9198A1}
+.edge{fill:none;stroke:#6E7681;stroke-width:1.5}
+.elabel{font:400 11px ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;fill:#E6EDF3}
+.elabel-bg{fill:#0D1117;opacity:.92}
+.arrow{fill:#6E7681}
+.legend{font:400 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;fill:#9198A1}
+.dot{stroke:#0D1117;stroke-width:1.5}
+.box.client{fill:#14233A;stroke:#6EA0DA}.group.client{stroke:#6EA0DA}.title.client{fill:#CFE0F5}.dot.client{fill:#6EA0DA}.swatch.client{fill:#14233A;stroke:#6EA0DA}.box.network{fill:#1C2128;stroke:#8B949E}.group.network{stroke:#8B949E}.title.network{fill:#D7DDE3}.dot.network{fill:#8B949E}.swatch.network{fill:#1C2128;stroke:#8B949E}.box.server{fill:#13261A;stroke:#6FBF85}.group.server{stroke:#6FBF85}.title.server{fill:#C9EBD3}.dot.server{fill:#6FBF85}.swatch.server{fill:#13261A;stroke:#6FBF85}.box.data{fill:#2B2012;stroke:#D9A24D}.group.data{stroke:#D9A24D}.title.data{fill:#F2DDB8}.dot.data{fill:#D9A24D}.swatch.data{fill:#2B2012;stroke:#D9A24D}.box.jobs{fill:#221B33;stroke:#A895DD}.group.jobs{stroke:#A895DD}.title.jobs{fill:#E0D8F5}.dot.jobs{fill:#A895DD}.swatch.jobs{fill:#221B33;stroke:#A895DD}.box.native{fill:#2E1717;stroke:#E08A8A}.group.native{stroke:#E08A8A}.title.native{fill:#F5D3D3}.dot.native{fill:#E08A8A}.swatch.native{fill:#2E1717;stroke:#E08A8A}
+@media (prefers-reduced-motion: reduce){.dot{display:none}}
+</style>
+<defs>
+<marker id="arrow-player-processes" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+<marker id="arrow-player-processes-start" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L10 5 L0 10 z"/></marker>
+</defs>
+<rect class="bg" x="0.5" y="0.5" width="1199" height="819" rx="16"/>
+<text class="heading" x="28" y="40">CLI Music Player: two processes, one line-based protocol</text><text class="caption" x="28" y="62">The dashboard really redraws every 100 ms; that loop is slowed down here so it can be seen.</text>
+<g><rect class="group client" x="28" y="80" width="612" height="540" rx="14"/>
+<text class="glabel" x="42" y="101">Terminal process: Bun or Node.js</text><text class="gsub" x="42" y="118">npm start, bun run start:bun, or ./setup.sh</text></g>
+<g><rect class="group native" x="700" y="80" width="472" height="540" rx="14"/>
+<text class="glabel" x="714" y="101">Audio process: audio_player (Objective-C)</text><text class="gsub" x="714" y="118">built by setup.sh with clang; not in git</text></g>
+<path id="pp-term" class="edge" d="M318 169 L337 169" marker-start="url(#arrow-player-processes-start)" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-key" class="edge" d="M183 208 L183 239" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-render" class="edge" d="M120 334 L120 365" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-draw" class="edge" d="M48 421 L38 421 L38 150 L47 150" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-call" class="edge" d="M479 334 L479 365" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-afinfo" class="edge" d="M479 492 L479 523" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-stdin" class="edge" d="M620 400 L660 400 L660 177 L719 177" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-read-handle" class="edge" d="M936 224 L936 239" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-handle-av" class="edge" d="M936 366 L936 381" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-av-delegate" class="edge" d="M936 444 L936 459" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-stdout" class="edge" d="M719 491 L680 491 L680 460 L621 460" marker-end="url(#arrow-player-processes)"/>
+<path id="pp-fallback" class="edge dashed" d="M600 492 L600 506 L660 506 L660 690 L719 690" marker-end="url(#arrow-player-processes)"/>
+<g><rect class="box client" x="48" y="130" width="270" height="78" rx="9"/>
+<text class="title client" x="60" y="152">OpenTUI renderer</text><text class="line" x="60" y="172">@opentui/core 0.5</text><text class="line" x="60" y="188">keyInput emits keypress</text></g>
+<g><rect class="box network" x="338" y="130" width="282" height="78" rx="9"/>
+<text class="title network" x="350" y="152">Keyboard and terminal</text><text class="line" x="350" y="172">keys in, drawn frames out</text><text class="line" x="350" y="188">(ANSI terminal)</text></g>
+<g><rect class="box client" x="48" y="240" width="572" height="94" rx="9"/>
+<text class="title client" x="60" y="262">index.js: key router and app state</text><text class="line" x="60" y="282">Space play/pause, r restart, n next, c queue, v visualizer</text><text class="line" x="60" y="298">Tab switches pane, q or Esc quits</text><text class="line" x="60" y="314">every 100 ms: dashboard.render(state)</text></g>
+<g><rect class="box client" x="48" y="366" width="270" height="110" rx="9"/>
+<text class="title client" x="60" y="388">ui.js: the dashboard</text><text class="line" x="60" y="408">playlist, mixer, queue,</text><text class="line" x="60" y="424">progress, 4 visualizers</text><text class="line" x="60" y="440">drawn from player state,</text><text class="line" x="60" y="456">not from audio samples</text></g>
+<g><rect class="box client" x="338" y="366" width="282" height="126" rx="9"/>
+<text class="title client" x="350" y="388">songs/cliPlayer.js</text><text class="line" x="350" y="408">isPlaying, isPaused, queue,</text><text class="line" x="350" y="424">volume 0-1, rate 0.5-2.0</text><text class="line" x="350" y="440">elapsed: a 1 s timer</text><text class="line" x="350" y="456">duration: afinfo</text><text class="line" x="350" y="472">reuses one audio_player</text></g>
+<g><rect class="box jobs" x="48" y="508" width="270" height="94" rx="9"/>
+<text class="title jobs" x="60" y="530">Cleanup on exit</text><text class="line" x="60" y="550">q, Esc, SIGINT, SIGTERM:</text><text class="line" x="60" y="566">STOP, QUIT, then SIGKILL;</text><text class="line" x="60" y="582">killall afplay</text></g>
+<g><rect class="box network" x="338" y="524" width="282" height="62" rx="9"/>
+<text class="title network" x="350" y="546">afinfo (macOS)</text><text class="line" x="350" y="566">per song: length in seconds</text></g>
+<g><rect class="box native" x="720" y="130" width="432" height="94" rx="9"/>
+<text class="title native" x="732" y="152">stdin reader (background queue)</text><text class="line" x="732" y="172">fgets reads one line at a time and</text><text class="line" x="732" y="188">hands each command to the main queue</text><text class="line" x="732" y="204">(dispatch_async)</text></g>
+<g><rect class="box native" x="720" y="240" width="432" height="126" rx="9"/>
+<text class="title native" x="732" y="262">handleCommand (main queue)</text><text class="line" x="732" y="282">PLAY &lt;path&gt;   RATE &lt;r&gt;   VOLUME &lt;v&gt;</text><text class="line" x="732" y="298">PAUSE   RESUME   STOP   QUIT</text><text class="line" x="732" y="314">one AVAudioPlayer, enableRate = YES</text><text class="line" x="732" y="330">after PLAY: prints DURATION &lt;s&gt;</text><text class="line" x="732" y="346">other replies are ignored by Node</text></g>
+<g><rect class="box native" x="720" y="382" width="432" height="62" rx="9"/>
+<text class="title native" x="732" y="404">AVAudioPlayer -&gt; CoreAudio</text><text class="line" x="732" y="424">speed and volume change mid-track</text></g>
+<g><rect class="box native" x="720" y="460" width="432" height="62" rx="9"/>
+<text class="title native" x="732" y="482">PlayerDelegate</text><text class="line" x="732" y="502">track finished: prints ENDED</text></g>
+<g><rect class="box network dashed" x="720" y="644" width="452" height="94" rx="9"/>
+<text class="title network" x="732" y="666">Fallback: afplay (macOS), one process per song</text><text class="line" x="732" y="686">afplay -v &lt;volume&gt; -r &lt;rate&gt; &lt;file&gt;</text><text class="line" x="732" y="702">pause SIGSTOP, resume SIGCONT, stop SIGKILL</text><text class="line" x="732" y="718">volume and speed apply from the next track</text></g>
+
+<rect class="elabel-bg" x="151.2" y="212" width="63.6" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="183" y="225">keypress</text>
+<rect class="elabel-bg" x="94.9" y="339" width="50.2" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="120" y="352">render</text>
+
+<rect class="elabel-bg" x="400.3" y="339" width="157.4" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="479" y="352">playSong, pauseSong...</text>
+
+<rect class="elabel-bg" x="638.25" y="280" width="43.5" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="660" y="293">stdin</text>
+
+
+
+<rect class="elabel-bg" x="654.9" y="470" width="50.2" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="680" y="483">stdout</text>
+<rect class="elabel-bg" x="624.85" y="600" width="70.30000000000001" height="20" rx="4"/><text class="elabel" text-anchor="middle" x="660" y="613">no binary</text>
+
+<circle class="dot network" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="8s" begin="0s" repeatCount="indefinite" calcMode="spline" keyPoints="1;0;0" keyTimes="0;0.0375;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-term" xlink:href="#pp-term"/></animateMotion>
+<animate attributeName="opacity" dur="8s" begin="0s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0375;0.0376;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="8s" begin="0.3s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0437;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-key" xlink:href="#pp-key"/></animateMotion>
+<animate attributeName="opacity" dur="8s" begin="0.3s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0437;0.0439;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="8s" begin="0.65s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0437;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-call" xlink:href="#pp-call"/></animateMotion>
+<animate attributeName="opacity" dur="8s" begin="0.65s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0437;0.0439;1"/>
+</circle>
+<circle class="dot client" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="8s" begin="1s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0375;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-afinfo" xlink:href="#pp-afinfo"/></animateMotion>
+<animate attributeName="opacity" dur="8s" begin="1s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0375;0.0376;1"/>
+</circle>
+<circle class="dot client" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="8s" begin="1s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.1250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-stdin" xlink:href="#pp-stdin"/></animateMotion>
+<animate attributeName="opacity" dur="8s" begin="1s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.1250;0.1251;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="8s" begin="2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-read-handle" xlink:href="#pp-read-handle"/></animateMotion>
+<animate attributeName="opacity" dur="8s" begin="2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0250;0.0251;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="8s" begin="2.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-handle-av" xlink:href="#pp-handle-av"/></animateMotion>
+<animate attributeName="opacity" dur="8s" begin="2.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0250;0.0251;1"/>
+</circle>
+<circle class="dot native" r="4.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="8s" begin="2.3s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0875;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-stdout" xlink:href="#pp-stdout"/></animateMotion>
+<animate attributeName="opacity" dur="8s" begin="2.3s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0875;0.0876;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="8s" begin="6s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0250;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-av-delegate" xlink:href="#pp-av-delegate"/></animateMotion>
+<animate attributeName="opacity" dur="8s" begin="6s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0250;0.0251;1"/>
+</circle>
+<circle class="dot native" r="5.5" cx="0" cy="0" opacity="0">
+<animateMotion dur="8s" begin="6.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.0875;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-stdout" xlink:href="#pp-stdout"/></animateMotion>
+<animate attributeName="opacity" dur="8s" begin="6.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.0875;0.0876;1"/>
+</circle>
+<circle class="dot client" r="4" cx="0" cy="0" opacity="0">
+<animateMotion dur="2s" begin="0.2s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.2000;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-render" xlink:href="#pp-render"/></animateMotion>
+<animate attributeName="opacity" dur="2s" begin="0.2s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.2000;0.2001;1"/>
+</circle>
+<circle class="dot client" r="4" cx="0" cy="0" opacity="0">
+<animateMotion dur="2s" begin="0.6s" repeatCount="indefinite" calcMode="spline" keyPoints="0;1;1" keyTimes="0;0.4500;1" keySplines="0.45 0 0.25 1;0 0 1 1"><mpath href="#pp-draw" xlink:href="#pp-draw"/></animateMotion>
+<animate attributeName="opacity" dur="2s" begin="0.6s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.4500;0.4501;1"/>
+</circle>
+<rect class="swatch network" x="28" y="780" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="48" y="791.5">terminal and macOS tools</text><rect class="swatch client" x="216.39999999999998" y="780" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="236.39999999999998" y="791.5">terminal process</text><rect class="swatch native" x="352" y="780" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="372" y="791.5">audio process</text><rect class="swatch jobs" x="467.8" y="780" width="14" height="14" rx="3" stroke-width="1.3"/><text class="legend" x="487.8" y="791.5">shutdown</text><line x1="550.6" y1="787" x2="576.6" y2="787" stroke="#6E7681" stroke-width="1.5" stroke-dasharray="6 5"/><text class="legend" x="582.6" y="791.5">fallback when audio_player is missing</text><circle cx="850.8" cy="787" r="5" fill="#6E7681"/><text class="legend" x="862.8" y="791.5">key, command or reply in flight</text>
+</svg>
