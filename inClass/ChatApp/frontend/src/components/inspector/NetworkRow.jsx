@@ -39,7 +39,7 @@ function NetworkRowView({ row, serverLines }) {
   const { colors } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const level = rowLevel(row);
-  const statusColor = level === 'error' ? colors.danger : colors.textOnSlab;
+  const statusColor = level === 'error' ? colors.dangerOnSlab : colors.textOnSlab;
   const status = row.state === 'pending' ? '...' : String(row.status ?? 'ERR');
   const timing = row.durationMs === undefined ? '' : `${row.durationMs}ms`;
   const size = row.bytes ? formatBytes(row.bytes) : '';
@@ -70,7 +70,7 @@ function NetworkRowView({ row, serverLines }) {
           <Detail label="id      " text={`#${row.id}`} color={colors.textOnSlabMuted} />
           <Detail label="request " text={row.requestPreview} color={colors.textOnSlab} />
           <Detail label="response" text={row.responsePreview} color={colors.textOnSlab} />
-          <Detail label="error   " text={row.error} color={colors.danger} />
+          <Detail label="error   " text={row.error} color={colors.dangerOnSlab} />
           {serverLines.map((line) => (
             <Detail key={line.id} label="server  " text={line.message} color={colors.textOnSlab} />
           ))}

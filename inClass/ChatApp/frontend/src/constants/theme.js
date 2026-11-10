@@ -2,6 +2,8 @@
  * Design tokens for the "soft slab" look (see design.md).
  * Colours are sampled from the reference mockup; the dark theme swaps the
  * light surface and dark slab materials while keeping the same accent.
+ * Text colours are checked for WCAG contrast in theme.test.js (F13 pass):
+ * body text >= 4.5:1, tertiary meta text >= 3.5:1.
  */
 import { Platform } from 'react-native';
 
@@ -16,13 +18,14 @@ const light = {
   onInk: '#FFFFFF',
   textPrimary: '#0A0D0C',
   textSecondary: '#5A605E',
-  textTertiary: '#9AA19F',
+  textTertiary: '#707775',
   textOnSlab: '#FFFFFF',
-  textOnSlabMuted: '#959394',
+  textOnSlabMuted: '#A3A1A2',
   ringOnSlab: 'rgba(255,255,255,0.10)',
   ringOnSurface: 'rgba(255,255,255,0.85)',
   success: '#58B566',
-  danger: '#C2564B',
+  danger: '#A8443A',
+  dangerOnSlab: '#EE9489',
   shadow: '#1F1F1F',
   scrim: 'rgba(10,13,12,0.40)',
 };
@@ -38,13 +41,14 @@ const dark = {
   onInk: '#0A0D0C',
   textPrimary: '#F3F5F4',
   textSecondary: '#A3A8A6',
-  textTertiary: '#6E7472',
+  textTertiary: '#858B89',
   textOnSlab: '#FFFFFF',
-  textOnSlabMuted: '#8C8A8B',
+  textOnSlabMuted: '#9C9A9B',
   ringOnSlab: 'rgba(255,255,255,0.08)',
   ringOnSurface: 'rgba(255,255,255,0.06)',
   success: '#5FC46F',
   danger: '#E07A6F',
+  dangerOnSlab: '#E07A6F',
   shadow: '#000000',
   scrim: 'rgba(0,0,0,0.55)',
 };

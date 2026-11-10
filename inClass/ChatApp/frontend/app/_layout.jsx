@@ -5,18 +5,18 @@
  * signed out -> only login; signed in -> the app. The playground is open to both.
  * The Inspector layer (orb, shake, sheet) sits above every screen.
  */
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  useFonts,
-} from '@expo-google-fonts/inter';
+// One import per weight: the package index bundles all 18 Inter files (Metro does not tree-shake).
+import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
+import { Inter_500Medium } from '@expo-google-fonts/inter/500Medium';
+import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { InspectorLayer } from '../src/components/inspector/InspectorLayer';
 import { useStore } from '../src/hooks/useStore';
@@ -55,6 +55,8 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.surface }}>
       <SafeAreaProvider>
+        {/* every animation follows the phone's "reduce motion" setting */}
+        <ReducedMotionConfig mode={ReduceMotion.System} />
         <StatusBar style={isDark ? 'light' : 'dark'} />
         <Stack
           screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface } }}

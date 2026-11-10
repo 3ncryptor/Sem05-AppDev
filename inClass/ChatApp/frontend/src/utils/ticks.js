@@ -38,3 +38,25 @@ export function receiptRows(message, usersById) {
       state: receipt?.read ? 'read' : receipt?.delivered ? 'delivered' : 'sent',
     }));
 }
+
+const SPOKEN_STATE = {
+  sending: 'sending',
+  failed: 'not sent',
+  sent: 'sent',
+  delivered: 'delivered',
+  read: 'read',
+};
+
+/**
+ * What a screen reader says for one bubble, e.g. "you: hi, 7:55 pm, read".
+ * @param {{ isMine: boolean, senderName: string, content?: string, type?: string,
+ *   time: string, ticks: TickState | null }} input
+ * @returns {string}
+ */
+export function bubbleLabel({ isMine, senderName, content, type, time, ticks }) {
+  const who = isMine ? 'you' : senderName;
+  const body = [type && type !== 'TEXT' ? 'photo' : '', content ?? ''].filter(Boolean).join(', ');
+  return [`${who}: ${body || 'message'}`, time, ticks ? SPOKEN_STATE[ticks] : '']
+    .filter(Boolean)
+    .join(', ');
+}

@@ -40,7 +40,7 @@ function Legend() {
       {item('#FFFFFF', 'read')}
       {item(colors.textOnSlabMuted, 'poll (no websockets, so we ask)')}
       {item(colors.success, 'ok')}
-      {item(colors.danger, 'error')}
+      {item(colors.dangerOnSlab, 'error')}
     </View>
   );
 }

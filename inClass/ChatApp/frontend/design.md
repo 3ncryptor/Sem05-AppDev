@@ -48,12 +48,14 @@ clean geometric sans. The result feels calm, premium and tactile.
 | `ink` | `#1F1F1F` | outgoing bubble, send button | Outgoing bubbles, primary buttons |
 | `textPrimary` | `#0A0D0C` | titles, bubble text | Main text on light |
 | `textSecondary` | `#5A605E` | "17 Members" subtitle | Metadata, labels on light |
-| `textTertiary` | `#9AA19F` | timestamps (estimated from the anti-aliased glyphs) | Timestamps, placeholders |
+| `textTertiary` | `#707775` | timestamps (sampled `#9AA19F`, darkened for 3.5:1 contrast) | Timestamps, placeholders |
 | `textOnSlab` | `#FFFFFF` | "peak seekers" | Text on slabs and ink |
-| `textOnSlabMuted` | `#959394` | "9 People" | Metadata on slabs |
+| `textOnSlabMuted` | `#A3A1A2` | "9 People" (sampled `#959394`, lightened for 4.5:1 on `slabRaised`) | Metadata on slabs |
 | `ringOnSlab` | `rgba(255,255,255,0.10)` | rim of dark ring buttons | 1 px ring of buttons on slabs |
 | `ringOnSurface` | `rgba(255,255,255,0.85)` | highlight of light ring buttons | Top-left highlight ring on light buttons |
 | `success` | `#58B566` | "Online" dot | Live and online indicators only |
+| `danger` | `#A8443A` | (not in the reference) | Error text and borders on light surfaces (4.5:1) |
+| `dangerOnSlab` | `#EE9489` | (not in the reference) | Error text on slabs (4.5:1) |
 | `badge` | `#DDAB7C` | notification badge | Count badges (or use the gradient) |
 
 ### 3.2 The accent gradient
@@ -84,7 +86,14 @@ The reference is light. A dark theme keeps the same logic with the materials swa
 | `ink` (outgoing) | `#1F1F1F` | `#F2F4F3` (outgoing becomes light, so it still stands out) |
 | `textPrimary` | `#0A0D0C` | `#F3F5F4` |
 | `textSecondary` | `#5A605E` | `#A3A8A6` |
+| `textTertiary` | `#707775` | `#858B89` |
+| `textOnSlabMuted` | `#A3A1A2` | `#9C9A9B` |
+| `danger` / `dangerOnSlab` | `#A8443A` / `#EE9489` | `#E07A6F` / `#E07A6F` |
 | Gradient | unchanged | unchanged |
+
+Contrast is checked by `theme.test.js`: body text 4.5:1 or more, tertiary text 3.5:1 or more.
+Known exception: white labels on the accent gradient measure about 2.2:1 to 2.5:1; they are
+kept for the look and always appear on short, bold labels, badges and icons.
 
 ### 3.4 Background behind the phones (presentation only)
 
@@ -389,8 +398,8 @@ Tokens as a plain object, which works in React Native, CSS-in-JS or any theme sy
 export const colors = {
   surface: '#E3E9E7', surfaceRaised: '#ECF0EF', card: '#F7FBFC',
   slab: '#222021', ink: '#1F1F1F',
-  textPrimary: '#0A0D0C', textSecondary: '#5A605E', textTertiary: '#9AA19F',
-  textOnSlab: '#FFFFFF', textOnSlabMuted: '#959394',
+  textPrimary: '#0A0D0C', textSecondary: '#5A605E', textTertiary: '#707775',
+  textOnSlab: '#FFFFFF', textOnSlabMuted: '#A3A1A2',
   ringOnSlab: 'rgba(255,255,255,0.10)', success: '#58B566',
 };
 export const gradient = { colors: ['#E6A065', '#DB9796', '#D092BB'], locations: [0, 0.55, 1],

@@ -52,3 +52,33 @@ describe('receiptRows', () => {
     ]);
   });
 });
+
+describe('bubbleLabel', () => {
+  const { bubbleLabel } = jest.requireActual('./ticks');
+
+  it('speaks who, what, when and the tick state', () => {
+    expect(
+      bubbleLabel({
+        isMine: true,
+        senderName: 'aarav',
+        content: 'hi',
+        type: 'TEXT',
+        time: '7:55 pm',
+        ticks: 'read',
+      }),
+    ).toBe('you: hi, 7:55 pm, read');
+    expect(
+      bubbleLabel({
+        isMine: false,
+        senderName: 'diya',
+        content: '',
+        type: 'IMAGE',
+        time: '8:00 am',
+        ticks: null,
+      }),
+    ).toBe('diya: photo, 8:00 am');
+    expect(bubbleLabel({ isMine: true, senderName: 'x', time: '', ticks: 'failed' })).toBe(
+      'you: message, not sent',
+    );
+  });
+});

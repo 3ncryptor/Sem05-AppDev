@@ -31,3 +31,33 @@ describe('shadow', () => {
     expect(opacities).toEqual([...opacities].sort((a, b) => a - b));
   });
 });
+
+describe('contrast (WCAG)', () => {
+  const { contrastRatio } = jest.requireActual('../utils/contrast');
+  const SURFACES = ['surface', 'surfaceRaised', 'card'];
+  const SLABS = ['slab', 'slabRaised'];
+  const RULES = [
+    { text: 'textPrimary', on: SURFACES, min: 4.5 },
+    { text: 'textSecondary', on: SURFACES, min: 4.5 },
+    { text: 'danger', on: SURFACES, min: 4.5 },
+    { text: 'textTertiary', on: SURFACES, min: 3.5 },
+    { text: 'textOnSlab', on: SLABS, min: 4.5 },
+    { text: 'textOnSlabMuted', on: SLABS, min: 4.5 },
+    { text: 'dangerOnSlab', on: SLABS, min: 4.5 },
+  ];
+
+  it('knows the extremes', () => {
+    expect(contrastRatio('#000000', '#FFFFFF')).toBeCloseTo(21, 0);
+    expect(contrastRatio('#777777', '#777777')).toBe(1);
+  });
+
+  it.each(['light', 'dark'])('keeps text readable in %s', (scheme) => {
+    const colors = themes[scheme];
+    RULES.forEach(({ text, on, min }) =>
+      on.forEach((background) => {
+        const ratio = contrastRatio(colors[text], colors[background]);
+        if (ratio < min) throw new Error(`${scheme} ${text} on ${background}: ${ratio.toFixed(2)}`);
+      }),
+    );
+  });
+});

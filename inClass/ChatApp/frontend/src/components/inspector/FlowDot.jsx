@@ -68,7 +68,7 @@ export function FlowDot({ row, track, speed, isSelected, onPick }) {
 
   const label = useAnimatedStyle(() => ({ opacity: progress.get() > 1 ? 1 : 0 }));
 
-  const replyColor = row.state === 'error' ? colors.danger : colors.success;
+  const replyColor = row.state === 'error' ? colors.dangerOnSlab : colors.success;
   const outColor =
     kind === 'send' ? gradient.colors[1] : kind === 'read' ? '#FFFFFF' : colors.textOnSlabMuted;
 

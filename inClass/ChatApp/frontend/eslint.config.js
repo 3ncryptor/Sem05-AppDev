@@ -41,6 +41,11 @@ module.exports = defineConfig([
               message: BANNED_HOOK_MESSAGE,
             },
             {
+              name: '@expo-google-fonts/inter',
+              message:
+                "Import one weight per file: import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular'.",
+            },
+            {
               name: 'lucide-react-native',
               message:
                 "Import one icon per file: import House from 'lucide-react-native/icons/house' (the barrel bundles every icon).",

@@ -13,7 +13,7 @@ import { useShake } from '../../hooks/useShake';
 import { useTheme } from '../../hooks/useTheme';
 import { formatClock } from '../../utils/format';
 import { haptics } from '../../utils/haptics';
-import { tickState } from '../../utils/ticks';
+import { bubbleLabel, tickState } from '../../utils/ticks';
 import { Avatar } from '../avatar/Avatar';
 import { Icon } from '../ui/Icon';
 import { Ticks } from './Ticks';
@@ -98,7 +98,15 @@ export function MessageBubble({
             onPress={handlePress}
             onLongPress={handleLongPress}
             delayLongPress={300}
-            accessibilityRole="text"
+            accessibilityRole={isFailed ? 'button' : 'text'}
+            accessibilityLabel={bubbleLabel({
+              isMine,
+              senderName,
+              content: message.content,
+              type: message.type,
+              time: formatClock(message.createdAt),
+              ticks,
+            })}
             accessibilityHint={isFailed ? 'Tap to retry' : 'Long press for options'}
             style={[
               styles.bubble,
