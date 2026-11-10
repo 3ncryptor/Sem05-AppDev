@@ -107,6 +107,8 @@ export async function request(path, options = {}) {
     log.api(`<- ${error.status || error.kind} ${label} #${id} ${durationMs}ms "${error.message}"`, {
       ...tags,
       level: 'error',
+      // a failed request is an expected outcome, not a code bug: no red error screen
+      consoleLevel: 'warn',
     });
     return error;
   }

@@ -22,12 +22,15 @@ const CONSOLE_BY_LEVEL = {
  * @param {string} [entry.requestId]
  * @param {boolean} [entry.isPoll]
  * @param {boolean} [entry.toConsole=true] false keeps it in the Inspector only
+ * @param {'info' | 'warn' | 'error'} [entry.consoleLevel] console channel when it should
+ *   differ from the level. Expected failures (server down, wrong password) use 'warn':
+ *   console.error opens React Native's red error screen, which is meant for code bugs.
  */
-export function writeLog({ toConsole = true, ...entry }) {
+export function writeLog({ toConsole = true, consoleLevel, ...entry }) {
   addLogEntry(entry);
   if (!toConsole) return;
   const tag = `[${entry.category}]`.padEnd(8);
-  CONSOLE_BY_LEVEL[entry.level](`${tag}${entry.message}`);
+  CONSOLE_BY_LEVEL[consoleLevel ?? entry.level](`${tag}${entry.message}`);
 }
 
 function make(category, defaultLevel = 'info') {

@@ -24,6 +24,7 @@ beforeEach(() => {
   clearRequests();
   jest.spyOn(console, 'log').mockImplementation(() => {});
   jest.spyOn(console, 'error').mockImplementation(() => {});
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
   global.fetch = jest.fn();
 });
 
@@ -139,5 +140,15 @@ describe('request extras for the Inspector', () => {
     expect(row.requestPreview).not.toContain('"x"');
     expect(row.responsePreview).toBe('{"id":"m1"}');
     expect(row.bytes).toBe(11);
+  });
+});
+
+describe('failed request logging', () => {
+  it('prints failures with console.warn (no red error screen) but stores them as errors', async () => {
+    global.fetch.mockRejectedValue(new Error('Network request failed'));
+    await expect(request('/user', { connection })).rejects.toMatchObject({ kind: 'network' });
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('network GET /user'));
+    expect(logStore.get().entries.at(-1).level).toBe('error');
   });
 });
