@@ -1,20 +1,27 @@
 import {
   Injectable,
   BadRequestException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { markReceipts } from '../common/receipts.util';
 import { CreateConversationDto } from './dto/conversation.dto';
 
 @Injectable()
 export class ConversationService {
+  private readonly logger = new Logger('Receipts');
+
   constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Returns all conversations the user is a participant in,
    * sorted by createdAt descending (newest first).
+   * Fetching the list counts as the user's app receiving their messages,
+   * so their undelivered messages are marked delivered.
    */
   async getUserConversations(userId: string) {
+    await this.markDelivered(userId);
     return this.prisma.conversation.findMany({
       where: {
         participants_ids: {
@@ -33,6 +40,16 @@ export class ConversationService {
         participants_ids: true,
       },
     });
+  }
+
+  /** Receipts are a side effect; a failure is logged and never fails the request. */
+  private async markDelivered(userId: string) {
+    try {
+      const count = await markReceipts(this.prisma, userId, 'delivered');
+      if (count > 0) this.logger.log(`${count} message(s) delivered to user ${userId}`);
+    } catch (err) {
+      this.logger.warn(`Could not mark messages delivered for ${userId}: ${err?.message ?? err}`);
+    }
   }
 
   /**
@@ -86,12 +103,8 @@ export class ConversationService {
     // Always include caller in participants_ids
     const allParticipantIds = [callerId, ...participantsArray];
 
-    // For DMs, override name to [DM] {username with whom created}
-    let conversationName = dto.name ?? null;
-    if (type === 'DM') {
-      const otherUser = foundUsers.find((u) => u.id === participantsArray[0]);
-      conversationName = `[DM] ${otherUser?.name ?? participantsArray[0]}`;
-    }
+    // DMs have no name; clients show the other participant's name instead
+    const conversationName = type === 'DM' ? null : (dto.name ?? null);
 
     const conversation = await this.prisma.conversation.create({
       data: {

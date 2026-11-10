@@ -45,10 +45,10 @@ export class ConversationResponseDto {
   id: string;
 
   @ApiPropertyOptional({
-    description: 'Name of the conversation ([DM] {username} for DMs, custom name for Groups)',
-    example: '[DM] Alice',
+    description: 'Name of the conversation. Null for DM conversations.',
+    example: 'Study Group',
   })
-  name?: string;
+  name?: string | null;
 
   @ApiProperty({
     description: 'Type of conversation: DM (direct message) or GROUP',

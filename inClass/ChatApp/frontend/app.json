@@ -1,49 +1,47 @@
 {
   "expo": {
-    "name": "ChatApp — Sem05 Messenger",
-    "slug": "chatapp-sem05",
+    "name": "huddle.",
+    "slug": "huddle",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "chatapp",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "edu.rishihood.nst.chatapp",
-      "infoPlist": {
-        "NSAppTransportSecurity": {
-          "NSAllowsArbitraryLoads": true
-        },
-        "NSPhotoLibraryUsageDescription": "Allow ChatApp to attach and send Base64 images in conversations."
-      }
+      "supportsTablet": true
     },
     "android": {
-      "package": "edu.rishihood.nst.chatapp",
-      "usesCleartextTraffic": true,
-      "permissions": [
-        "android.permission.READ_MEDIA_IMAGES"
-      ]
-    },
-    "androidNavigationBar": {
-      "barStyle": "dark-content",
-      "backgroundColor": "#FFFFFF"
+      "adaptiveIcon": {
+        "backgroundColor": "#E3E9E7",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
     },
     "web": {
-      "bundler": "metro",
-      "output": "single"
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router",
+      "expo-status-bar",
       [
-        "expo-image-picker",
+        "expo-splash-screen",
         {
-          "photosPermission": "Allow ChatApp to pick photos to send as Base64 images in chat."
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 120,
+          "backgroundColor": "#E3E9E7",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#141414"
+          }
         }
-      ]
+      ],
+      "expo-image",
+      "expo-font",
+      "expo-secure-store"
     ],
+    "scheme": "huddle",
     "experiments": {
       "typedRoutes": false
     }
   }
 }
-

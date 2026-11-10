@@ -2,6 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -19,6 +20,8 @@ import { PrismaService } from '../prisma/prisma.service';
  */
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger('Auth');
+
   constructor(private readonly prisma: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -62,6 +65,7 @@ export class AuthGuard implements CanActivate {
           conversationIds: [],
         },
       });
+      this.logger.log(`New user "${username}" signed up (first request with this username)`);
     } else {
       // If user already exists, verify password
       if (user.phone && user.phone !== password) {

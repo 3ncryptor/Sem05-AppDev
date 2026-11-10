@@ -1,3 +1,6 @@
+# Fixed project name so container/volume names don't depend on the folder name
+name: chatapp
+
 services:
   # ─── MongoDB 7.0 (single-node replica set for Prisma, internal keyfile) ───────
   mongo:
@@ -57,6 +60,7 @@ services:
       DATABASE_URL: 'mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/chatapp?authSource=admin&replicaSet=rs0&directConnection=true'
       PORT: '3000'
       BOT_MODE: '${BOT_MODE:-false}'
+      DEBUG_LOGS: '${DEBUG_LOGS:-true}'   # GET /debug/logs for the app's Inspector (local only)
     volumes:
       - .:/app
       - /app/node_modules

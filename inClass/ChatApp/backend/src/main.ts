@@ -1,22 +1,29 @@
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
+import { requestLogger } from './common/request-logger.middleware';
+import { LoggingExceptionFilter } from './common/logging-exception.filter';
+import { BufferedLogger } from './common/buffered-logger';
+import { requestContextMiddleware } from './common/request-context';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  // Console logger that also keeps recent lines for GET /debug/logs
+  const app = await NestFactory.create(AppModule, { bodyParser: false, logger: new BufferedLogger() });
 
-  // Enable CORS so Expo Web & mobile clients can call the API from any origin
-  app.enableCors({
-    origin: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  });
+  // Log every request to the console (registered first so it also sees body-parser errors)
+  app.use(requestLogger);
 
-  // Allow large JSON payloads (Base64 images)
-  app.use(json({ limit: '10mb' }));
-  app.use(urlencoded({ extended: true, limit: '10mb' }));
+  // Files are capped at 10 MB decoded; base64 adds ~33%, so the JSON body may reach ~14 MB
+  app.use(json({ limit: '15mb' }));
+  app.use(urlencoded({ extended: true, limit: '15mb' }));
+
+  // Tag every log line written while handling a request with its X-Request-Id
+  app.use(requestContextMiddleware);
+
+  // Record why requests fail (shown on the request's log line); stack traces for 5xx
+  app.useGlobalFilters(new LoggingExceptionFilter(app.get(HttpAdapterHost).httpAdapter));
 
   // Global validation pipe — transforms payloads to DTO instances
   app.useGlobalPipes(
@@ -50,14 +57,17 @@ async function bootstrap() {
     .addTag('users', 'User profile operations')
     .addTag('conversations', 'Conversation management')
     .addTag('messages', 'Message CRUD and pagination')
+    .addTag('files', 'Image and file upload (base64) and download')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
   const port = process.env.PORT ?? 3000;
-  await app.listen(port, '0.0.0.0');
-  console.log(`Application running on http://0.0.0.0:${port}`);
-  console.log(`Swagger UI available at http://localhost:${port}/docs`);
+  await app.listen(port);
+  const logger = new Logger('Bootstrap');
+  logger.log(`Application running on http://localhost:${port}`);
+  logger.log(`Swagger UI available at http://localhost:${port}/docs`);
+  logger.log(`Inspector server logs: ${process.env.DEBUG_LOGS === 'true' ? 'on (GET /debug/logs)' : 'off'}`);
 }
 bootstrap();

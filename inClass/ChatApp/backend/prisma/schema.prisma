@@ -37,8 +37,9 @@ model Conversation {
 
 model Message {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
-  content        String?
-  imageInfo      String?
+  content        String       @default("")
+  type           String       @default("TEXT") // "TEXT" | "IMAGE" | "FILE"
+  fileId         String?      @db.ObjectId
   createdAt      DateTime     @default(now())
   senderId       String       @db.ObjectId
   sender         User         @relation(fields: [senderId], references: [id])
@@ -46,5 +47,19 @@ model Message {
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   status         Json
 
+  @@index([fileId])
   @@map("messages")
+}
+
+model File {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  mimeType   String
+  size       Int
+  kind       String   // "IMAGE" | "FILE"
+  data       Bytes
+  uploadedBy String   @db.ObjectId
+  createdAt  DateTime @default(now())
+
+  @@map("files")
 }

@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { FACTS } from './facts.data';
 
 // ─── Single Fixed Bot User ──────────────────────────────────────────────────
-const BOT_USER = { name: 'FactBot', phone: 'BOT_001' };
+const BOT_USER = { name: 'FactBot', phone: 'BOT_001', bio: 'I am a FactBot' };
 
 @Injectable()
 export class BotService implements OnModuleInit, OnModuleDestroy {
@@ -46,10 +46,13 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
         data: {
           name: BOT_USER.name,
           phone: BOT_USER.phone,
-          bio: 'I am a FactBot 🤖',
+          bio: BOT_USER.bio,
           conversationIds: [],
         },
       });
+    } else if (user.bio !== BOT_USER.bio) {
+      // Older versions stored an emoji in the bio; keep it plain text
+      user = await this.prisma.user.update({ where: { id: user.id }, data: { bio: BOT_USER.bio } });
     }
     this.botUserId = user.id;
   }
@@ -71,7 +74,7 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
         return;
       }
 
-      this.logger.log('\x1b[35m[BOT]\x1b[0m \x1b[1m🤖 Bot is Chatting...\x1b[0m');
+      this.logger.log('\x1b[35m[BOT]\x1b[0m \x1b[1mBot is chatting...\x1b[0m');
 
       for (const realUser of realUsers) {
         // Reuse existing DM with bot or create a single one
@@ -117,13 +120,13 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
     });
 
     if (existing) {
-      const expectedName = `[DM] ${BOT_USER.name}`;
-      if (existing.name !== expectedName) {
+      // DMs are unnamed; clear names left over from older versions
+      if (existing.name !== null) {
         await this.prisma.conversation.update({
           where: { id: existing.id },
-          data: { name: expectedName },
+          data: { name: null },
         });
-        existing.name = expectedName;
+        existing.name = null;
       }
       return existing;
     }
@@ -131,7 +134,7 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
     // No existing DM — create one with FactBot
     const conversation = await this.prisma.conversation.create({
       data: {
-        name: `[DM] ${BOT_USER.name}`,
+        name: null,
         type: 'DM',
         createdBy: this.botUserId,
         participants_ids: [this.botUserId, realUserId],
