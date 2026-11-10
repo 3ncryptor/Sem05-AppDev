@@ -1,6 +1,6 @@
 # Athena backend
 
-Express 5 + JSON files. The contract is BUILD_PLAN.md Part 2 (§18 routes, §19 rules, §20 errors, §21 shapes).
+Express 5 + JSON files, Node.js 22 or newer (`package.json`, `engines`). The API as it is today is described route by route in [`../docs/API.md`](../docs/API.md). `../BUILD_PLAN.md` Part 2 was the original contract and still covers the error envelope and shapes, but it predates the removal of proctoring. [`../README.md`](../README.md) covers the whole app, and `../start.sh` starts this server together with the UI.
 
 ## Run
 

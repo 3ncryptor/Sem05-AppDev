@@ -2,14 +2,39 @@
 
 NestJS + Prisma + MongoDB + Swagger
 
+This is the course instructor's chat server, synced to the class API contract
+[`../swagger.json`](../swagger.json) (commit 05aeac6, 2026-11-10), with a few local additions
+listed under [Local Additions](#local-additions-not-on-the-class-server). The additions keep
+every route and response shape the same. The app that uses it is in [`../frontend`](../frontend),
+and [`../README.md`](../README.md) explains how the two fit together.
+
 ## Stack
 
 | | |
 |--|--|
 | Framework | NestJS v11 |
 | ORM | Prisma v6 |
-| Database | MongoDB 7.0 (Replica Set) |
+| Database | MongoDB 7.0 (single-node replica set, which Prisma needs) |
+| Runtime | Node.js 20 (Alpine) in Docker (`Dockerfile`) |
 | API Docs | Swagger UI → `http://localhost:3000/docs` |
+
+---
+
+## Environment
+
+Copy `.env.example` to `.env` before the first start. `.env` is gitignored; never commit it.
+
+| Variable | Default | What it does |
+|--|--|--|
+| `MONGO_USERNAME` / `MONGO_PASSWORD` | `chatadmin` / `chatpass123` | MongoDB root user created on the first start (local only; change them if the machine is shared) |
+| `DATABASE_URL` | `mongodb://…@localhost:27017/chatapp?…` | Used for local dev; Docker overrides it to reach the `mongo` container |
+| `PORT` | `3000` | API port |
+| `BOT_MODE` | `false` | `true` starts the FactBots (see below) |
+| `MONGO_SILENT_LOGS` | `true` | `false` shows MongoDB's own logs in the Docker output |
+| `FILE_ORPHAN_TTL_HOURS` | `24` | Uploads never sent in a message are deleted after this many hours |
+| `DEBUG_LOGS` | `true` | Serves recent server logs at `GET /debug/logs` for the app's Inspector |
+
+Source: `.env.example`, `docker-compose.yml`.
 
 ---
 
@@ -143,3 +168,8 @@ Creates 5 bot users on startup. Every 10s, **every real user** receives a random
 | `npm run start:dev:bot` | Local dev + FactBots |
 | `npm run prisma:generate` | Regenerate Prisma client |
 | `npm run prisma:push` | Push schema to DB |
+| `npm run seed` | Add the demo users and chats (in Docker: `docker exec chatapp_api npm run seed`) |
+
+`docker:up` uses the `docker compose` command; `docker:up:bot`, `docker:down` and `docker:logs`
+use the older `docker-compose`. If your Docker install only has the newer command, run
+`docker compose down` or `docker compose logs -f api` directly.

@@ -1,25 +1,34 @@
 # huddle.
 
 An Expo React Native chat app for the class ChatApp backend. It runs in **Expo Go**
-(SDK 58), is written in plain JavaScript and uses Expo Router.
+(SDK 58, React Native 0.88, React 19.3), is written in plain JavaScript and uses Expo Router.
 
+- [`../README.md`](../README.md): the whole project, how the app and the backend fit together
 - `buildPlan.md`: the plan, screens, flows and build order
 - `design.md`: the "soft slab" design system (colours, type, motion)
 
 ## Run it
 
-1. Start the backend (from `../backend`, needs Docker):
+1. Start the backend (from `../backend`, needs Docker Desktop):
    ```bash
-   npm run docker:up        # API on http://localhost:3000, seeded users
+   cp .env.example .env     # first time only
+   npm run docker:up        # MongoDB + API on http://localhost:3000; leave it running
    ```
-2. Start the app (from this folder):
+2. Add the demo users, once, from another terminal:
+   ```bash
+   docker exec chatapp_api npm run seed
+   ```
+3. Start the app (from this folder):
    ```bash
    npm install
    npx expo start
    ```
-3. Scan the QR code with Expo Go. The phone and the Mac must be on the same Wi-Fi.
+4. Open Expo Go and sign in to an Expo account (Expo Go asks for one before it opens a
+   project), then scan the QR code. The phone and the Mac must be on the same Wi-Fi.
    The first time, macOS may ask to allow incoming connections on port 3000: allow it.
-4. Log in as `aarav`, `diya`, `kabir`, `meera` or `rohan`. The password is `demo123`.
+5. Log in as `aarav`, `diya`, `kabir`, `meera` or `rohan`. The password is `demo123`.
+   The app finds the Mac's backend by itself from the address Expo Go connected to
+   (`src/api/baseUrl.js`), so there is no IP to type.
 
 ### Class server
 

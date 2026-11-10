@@ -1226,3 +1226,57 @@ Built, not committed (413 tests, lint, iOS + Android export, expo-doctor 20/20).
 - The old Inspector pieces (`LiveWire`, `FlowDot`, `FlowNode`, `FlowRipple`, `ExplainSteps`,
   `HeartbeatRow`, `flowEvents.js` + test, and their FLOW_* timing constants) were deleted on
   the user's request (2026-11-10). Phone check passed: tabs show, the user is happy with it.
+
+## 16. Sharing the app with classmates: DROPPED
+
+Dropped by the user (2026-11-10): no public release for now (the teacher has not asked for
+one); anyone who wants to see the app runs it from the repository. Kept for reference.
+
+### Original plan
+
+Decision (user, 2026-11-10): classmates, in class, Android only.
+
+Why not Expo Go: since May 2026 Expo Go only opens published projects you own (or your
+organisation owns), and since September 2026 it needs an Expo login. So classmates get a real
+app: an Android `.apk` built by EAS Build, shared as an install link.
+
+### What has to change in the app
+
+1. **"my laptop" cannot work in an installed app.** It finds the laptop through Metro (the
+   dev server's address in `Constants.expoConfig.hostUri`); an installed app has no Metro, so
+   `lanBaseUrl()` returns null. In an installed build the login screen will hide "my laptop"
+   and start on "class server", where you type the teacher's address (or your laptop's IP,
+   e.g. `http://10.41.170.153:3000`, when you run the backend for the class).
+2. **Plain `http://` is blocked in Android release builds** (Android 9+ default). The class
+   server and the laptop are `http://`, so add `expo-build-properties` with
+   `android.usesCleartextTraffic: true`. Fine for a classroom network; it would not be for a
+   public app.
+3. **App identity:** `android.package` (e.g. `com.aryan.huddle`), `versionCode`, and the
+   version shown in Profile / Inspector tools.
+4. **`eas.json`** with a `preview` profile: `distribution: "internal"`, Android `buildType:
+   "apk"` (an installable file, not a Play Store bundle).
+5. The Inspector stays in the build (it is part of the viva); it only shows server logs on the
+   local backend, as now.
+
+### What you do (needs your accounts, so not something I can do)
+
+1. Create a free account at expo.dev.
+2. In this folder: `! npx eas-cli@latest login`, then `! npx eas-cli@latest init` (links the
+   project to your account; it adds a project id to app.json).
+3. Build: `! npx eas-cli@latest build -p android --profile preview` (runs on Expo's servers,
+   about 10-20 min on the free plan's queue).
+4. Share the install link / QR code from the build page. Classmates open it on their phone,
+   allow "install unknown apps" once, and install.
+5. Each later change needs a new build (free plan: a limited number of builds a month).
+
+### Checks before sharing
+
+- Install the APK on your own phone first: log in on the class server, send a message and a
+  photo, open the Inspector, airplane mode -> "reconnecting" in the island.
+- The app works only on the class Wi-Fi (where the server is reachable); outside it shows
+  "can't reach the server", which is expected.
+
+### Not in this step (would need more work)
+
+- Hosting the backend online (for use anywhere): HTTPS, sign-up limits, MongoDB Atlas.
+- iPhones: Apple Developer Program ($99/year). Google Play: $25 once, plus review.
