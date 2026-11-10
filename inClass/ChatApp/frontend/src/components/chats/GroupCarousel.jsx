@@ -14,7 +14,7 @@ const ACTIVE_DOT = 18;
 
 /**
  * @param {object} props
- * @param {{ id: string, title: string, names: string[] }[]} props.groups
+ * @param {{ id: string, title: string, names: string[], preview?: string, unread?: number }[]} props.groups
  * @param {(id: string) => void} props.onOpen
  * @param {(id: string) => void} props.onShowMembers
  */
@@ -42,6 +42,8 @@ export function GroupCarousel({ groups, onOpen, onShowMembers }) {
           <GroupCard
             title={item.title}
             names={item.names}
+            preview={item.preview}
+            unread={item.unread}
             width={cardWidth}
             onOpen={() => onOpen(item.id)}
             onShowMembers={() => onShowMembers(item.id)}

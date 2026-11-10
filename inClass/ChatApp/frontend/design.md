@@ -79,19 +79,23 @@ The reference is light. A dark theme keeps the same logic with the materials swa
 
 | Token | Light | Dark |
 |---|---|---|
-| `surface` | `#E3E9E7` | `#141414` |
-| `surfaceRaised` | `#ECF0EF` | `#1E1E1F` |
-| `card` | `#F7FBFC` | `#262627` |
-| `slab` | `#222021` | `#0B0B0B` (headers go *darker* than the surface) |
+| `surface` | `#E3E9E7` | `#0E0E0F` |
+| `surfaceRaised` | `#ECF0EF` | `#18181A` |
+| `card` | `#F7FBFC` | `#212123` |
+| `slab` | `#222021` | `#2A292C` (lifted above the surface, like an elevated iOS dark surface) |
+| `slabRaised` | `#3A3839` | `#3B3A3E` |
+| `slabEdge` | transparent | `rgba(255,255,255,0.08)` hairline on the notch's lower edge |
 | `ink` (outgoing) | `#1F1F1F` | `#F2F4F3` (outgoing becomes light, so it still stands out) |
 | `textPrimary` | `#0A0D0C` | `#F3F5F4` |
 | `textSecondary` | `#5A605E` | `#A3A8A6` |
 | `textTertiary` | `#707775` | `#858B89` |
-| `textOnSlabMuted` | `#A3A1A2` | `#9C9A9B` |
-| `danger` / `dangerOnSlab` | `#A8443A` / `#EE9489` | `#E07A6F` / `#E07A6F` |
+| `textOnSlabMuted` | `#A3A1A2` | `#A9A7A8` |
+| `danger` / `dangerOnSlab` | `#A8443A` / `#EE9489` | `#E07A6F` / `#EE9489` |
 | Gradient | unchanged | unchanged |
 
 Contrast is checked by `theme.test.js`: body text 4.5:1 or more, tertiary text 3.5:1 or more.
+The dark notch must stand 1.3:1 off the surface and 1.4:1 off the black island (visual review,
+V2): the old `#0B0B0B` slab on `#141414` measured 1.08:1 and vanished.
 Known exception: white labels on the accent gradient measure about 2.2:1 to 2.5:1; they are
 kept for the look and always appear on short, bold labels, badges and icons.
 
@@ -213,7 +217,7 @@ the sketches (`(←)`, `(mic)`, ✓, `(heart)`) are placeholders for SVG icons, 
 | State | On slab | On surface |
 |---|---|---|
 | default | fill `slab`, 1 px `ringOnSlab`, icon white | fill `surfaceRaised`, level-2 shadow, icon `textPrimary` |
-| pressed | scale 0.92, fill +6% lighter | scale 0.92, shadow level 1 |
+| pressed | scale 0.97 (120 ms), fill +6% lighter | scale 0.97 (120 ms), shadow level 1 |
 | active / primary | gradient fill, white icon | gradient fill, white icon |
 | with badge | gradient dot 20, white count 11, top-left offset (−4, −4) | same |
 
@@ -345,23 +349,42 @@ The bottom bar for a mode (call, selection). The gradient button is the commit a
 
 ## 8. Motion
 
+Calm and quick (retuned in the visual review, buildPlan.md 13 V1). Springs use Reanimated's
+`duration` + `dampingRatio` form; no spring goes below a ratio of 0.85, so motion settles
+instead of bouncing (`motion.test.js` enforces it). Springs are for things a finger moves and
+for the island; everything else is a timing curve. UI timings stay at or under 300 ms.
+
 | Interaction | Animation | Timing |
 |---|---|---|
-| Button press | scale to 0.92, back to 1 | spring (damping 15, stiffness 300) |
-| Tab switch | gradient pill springs to the new item; icons crossfade | spring (damping 18) |
-| New message (mine) | rises 24 pt from the composer and fades in | 260 ms ease-out, slight overshoot |
-| New message (theirs) | fades and slides up 12 | 220 ms |
-| List first load | rows fade up one after another | 40 ms stagger, 240 ms each |
-| Screen push | slide plus fade, header slab stays pinned | 300 ms |
-| Sheet open | springs up, background dims to 40% with blur | spring (damping 20) |
-| Badge appear | scale from 0 to 1.15 to 1 | 300 ms spring |
-| Error | horizontal shake (±8 pt ×3) | 300 ms |
-| Selection | gradient ring draws in; check pops | 200 ms |
-| Images | blur placeholder, then fade to the sharp image | 250 ms |
+| Button press | scale to 0.97 on press-in, back on release | 120 ms, ease-out `(0.23, 1, 0.32, 1)` |
+| Tab / segmented indicator | the pill glides to the new item, no overshoot | 250 ms, ease-in-out `(0.77, 0, 0.175, 1)` |
+| New message | fades up 8 pt | 220 ms ease-out |
+| Pop-ins (ticks, menus, faces) | fade plus a grow from 0.96 (never from 0) | 160-220 ms ease-out |
+| Chat rows reorder | the row glides to its new place | 250 ms ease-in-out |
+| Lists | no entrance on virtualized rows (they recycle); content is simply there | - |
+| Sheet open | slides up on the iOS sheet curve `(0.32, 0.72, 0, 1)` | 300 ms |
+| Drag release (orb, viewer) | snaps back carrying the finger's velocity | spring 400 ms, ratio 0.9 |
+| Island morph | width, height and radius together; content follows the shape | spring 460 ms, ratio 0.86 |
+| Error | horizontal shake (5 pt) | 280 ms |
+| Images | fade to the sharp image | 200 ms |
 
-Pair every important touch with haptics: **light** for presses, **medium** for long-press
-and selection, **success / error** for outcomes. Respect the OS "reduce motion" setting by
-replacing movement with simple fades.
+Pair important touches with haptics, once per action and on the same frame as the visual:
+**light** for presses, **medium** for long-press and switching, **success / error** for
+outcomes. Reduce motion: movement and scale are dropped, opacity changes stay.
+
+### 8.1 The notch island
+
+A black pill around the front camera, above every screen (`NotchIsland`). Shapes: rest,
+compact (content either side of the camera), multi (main pill plus up to two circles, like
+the iPhone 18 Pro's three live activities), expanded (a card with quick reply), confirm (a
+near-square with a drawn check). The shape leads and content follows; circles split off
+through a liquid neck (an SVG path that thins to nothing) and merge back the same way. It is
+always `#000000`, in both themes.
+
+Liquid details: a 90 ms "inhale" (scaleX 1.04, scaleY 0.94) before any growth; a press squish
+(wider 2.5%, shorter 5%); a stretch along a drag from its velocity (up to 6%); content scales
+from the camera point (top centre). Arrival: one gradient ring, 600 ms. Rest: still, except
+one breath (6% wider and back, with a faint rim) when the app returns and nothing is new.
 
 ---
 

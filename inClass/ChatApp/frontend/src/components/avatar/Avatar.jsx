@@ -1,14 +1,16 @@
 /**
  * Avatar: a user's illustrated face on a pastel circle (buildPlan.md 4).
- * Memoised because lists render many of these and the SVG parse is the
- * expensive part; the SVG string itself comes from a cache.
+ * Memoised because lists render many of these. The face is parsed once per
+ * (style, name) and drawn from the cached tree at an exact pixel size, so it
+ * never waits on layout (buildPlan.md 13, V0).
  */
 import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { SvgXml } from 'react-native-svg';
+import { SvgAst } from 'react-native-svg';
 import { useStore } from '../../hooks/useStore';
 import { settingsStore } from '../../store/settingsStore';
-import { avatarSvg, avatarTint } from './avatarSvg';
+import { avatarAst } from './avatarAst';
+import { avatarTint } from './avatarSvg';
 
 /**
  * @param {object} props
@@ -31,7 +33,10 @@ function AvatarBase({ name, size = 40, styleId, ringColor }) {
       accessibilityRole="image"
       accessibilityLabel={name ? `${name}'s avatar` : 'avatar'}
     >
-      <SvgXml xml={avatarSvg(name, styleId ?? chosenStyle)} width="100%" height="100%" />
+      <SvgAst
+        ast={avatarAst(name, styleId ?? chosenStyle)}
+        override={{ width: size, height: size }}
+      />
     </View>
   );
 }

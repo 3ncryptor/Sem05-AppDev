@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar } from '../src/components/avatar/Avatar';
+import { AvatarLab } from '../src/components/avatar/AvatarLab';
 import { AVATAR_STYLES } from '../src/components/avatar/avatarSvg';
 import { AvatarStack } from '../src/components/avatar/AvatarStack';
 import { Chip } from '../src/components/ui/Chip';
@@ -83,6 +84,9 @@ export default function Playground() {
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 120 }]}
         keyboardShouldPersistTaps="handled"
       >
+        {label('avatar lab (temporary)')}
+        <AvatarLab />
+
         {label('wordmark')}
         <Wordmark size={40} />
 

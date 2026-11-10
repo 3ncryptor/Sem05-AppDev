@@ -14,6 +14,7 @@ import * as lorelei from '@dicebear/lorelei';
 import * as notionists from '@dicebear/notionists';
 import * as openPeeps from '@dicebear/open-peeps';
 import { pickBySeed } from '../../utils/hash';
+import { cleanAvatarSvg } from './cleanSvg';
 
 export const AVATAR_STYLES = [
   { id: 'lorelei', label: 'lorelei', style: lorelei },
@@ -50,7 +51,7 @@ function seedFor(name) {
  * SVG markup for a user's face.
  * @param {string} name username (the seed)
  * @param {string} [styleId] one of AVATAR_STYLES ids; unknown ids use the default
- * @returns {string} an <svg> document with a transparent background
+ * @returns {string} an <svg> document with a transparent background, cleaned for react-native-svg
  */
 export function avatarSvg(name, styleId = DEFAULT_AVATAR_STYLE) {
   const entry = findStyle(styleId);
@@ -60,7 +61,7 @@ export function avatarSvg(name, styleId = DEFAULT_AVATAR_STYLE) {
   const cached = cache.get(key);
   if (cached) return cached;
 
-  const svg = createAvatar(entry.style, { seed }).toString();
+  const svg = cleanAvatarSvg(createAvatar(entry.style, { seed }).toString());
   if (cache.size >= MAX_CACHE_ENTRIES) cache.clear();
   cache.set(key, svg);
   return svg;

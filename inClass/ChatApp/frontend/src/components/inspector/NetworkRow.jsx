@@ -1,81 +1,81 @@
 /**
- * NetworkRow: one HTTP request. Collapsed: method, path, poll tag, status,
- * time and size. Tap to expand: the (redacted) request and response bodies
- * and the server's own log lines for it, joined by X-Request-Id.
+ * NetworkRow: one request in the network list, devtools style (buildPlan.md
+ * 15, screen 5): method, path, status, time and a waterfall bar on a shared
+ * time axis; the plain sentence under the path. Tap opens the request detail.
  */
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { fonts, radius, space } from '../../constants/theme';
+import { fonts, gradient, space } from '../../constants/theme';
+import { describeRow } from '../../debug/describeRequest';
 import { useTheme } from '../../hooks/useTheme';
-import { formatBytes } from '../../utils/fileData';
 
-/**
- * @param {object} row networkStore row
- * @returns {'info' | 'warn' | 'error'}
- */
-function rowLevel(row) {
-  if (row.state === 'error') return 'error';
-  if (row.state === 'pending') return 'warn';
-  return 'info';
-}
-
-function Detail({ label, text, color }) {
-  const { colors } = useTheme();
-  if (!text) return null;
-  return (
-    <Text style={[styles.mono, { color }]} selectable>
-      <Text style={{ color: colors.textOnSlabMuted }}>{label} </Text>
-      {text}
-    </Text>
-  );
-}
+const BAR_WIDTH = 56;
 
 /**
  * @param {object} props
- * @param {object} props.row
- * @param {object[]} props.serverLines server log entries with this request id
+ * @param {object} props.row networkStore row
+ * @param {{ left: number, width: number } | undefined} props.bar waterfall position (0..1)
+ * @param {(id: string) => void} props.onOpen
  */
-function NetworkRowView({ row, serverLines }) {
+function NetworkRowView({ row, bar, onOpen }) {
   const { colors } = useTheme();
-  const [isOpen, setIsOpen] = useState(false);
-  const level = rowLevel(row);
-  const statusColor = level === 'error' ? colors.dangerOnSlab : colors.textOnSlab;
-  const status = row.state === 'pending' ? '...' : String(row.status ?? 'ERR');
-  const timing = row.durationMs === undefined ? '' : `${row.durationMs}ms`;
-  const size = row.bytes ? formatBytes(row.bytes) : '';
+  const isError = row.state === 'error';
+  const isPending = row.state === 'pending';
+  const statusColor = isError
+    ? colors.dangerOnSlab
+    : isPending
+      ? colors.textOnSlabMuted
+      : colors.success;
+  const status = isPending ? '...' : isError ? (row.status ?? 'ERR') : row.status;
+  const time =
+    row.durationMs === undefined
+      ? ''
+      : row.durationMs >= 1000
+        ? `${(row.durationMs / 1000).toFixed(1)}s`
+        : `${row.durationMs}ms`;
 
   return (
     <Pressable
-      onPress={() => setIsOpen(!isOpen)}
+      onPress={() => onOpen(row.id)}
+      style={({ pressed }) => [styles.row, pressed && { backgroundColor: colors.slabRaised }]}
       accessibilityRole="button"
-      accessibilityLabel={`${row.method} ${row.path}, status ${status}`}
-      style={[styles.row, { backgroundColor: isOpen ? colors.slabRaised : 'transparent' }]}
+      accessibilityLabel={`${describeRow(row)}, ${status}, ${time}. Open details`}
     >
-      <View style={styles.summary}>
-        <Text style={[styles.mono, styles.method, { color: colors.textOnSlabMuted }]}>
-          {row.method}
-        </Text>
-        <Text style={[styles.mono, styles.path, { color: colors.textOnSlab }]} numberOfLines={1}>
+      <Text
+        style={[
+          styles.method,
+          { color: row.method === 'GET' ? gradient.colors[0] : gradient.colors[2] },
+        ]}
+      >
+        {row.method}
+      </Text>
+      <View style={styles.main}>
+        <Text style={[styles.path, { color: colors.textOnSlab }]} numberOfLines={1}>
           {row.path}
+          {row.isPoll ? <Text style={{ color: colors.textOnSlabMuted }}> poll</Text> : null}
         </Text>
-        {row.isPoll ? (
-          <Text style={[styles.mono, { color: colors.textOnSlabMuted }]}>poll</Text>
-        ) : null}
-        <Text style={[styles.mono, { color: statusColor }]}>{status}</Text>
-        <Text style={[styles.mono, styles.num, { color: colors.textOnSlabMuted }]}>{timing}</Text>
-        <Text style={[styles.mono, styles.num, { color: colors.textOnSlabMuted }]}>{size}</Text>
+        <Text style={[styles.phrase, { color: colors.textOnSlabMuted }]} numberOfLines={1}>
+          {describeRow(row)}
+        </Text>
       </View>
-      {isOpen ? (
-        <View style={styles.details}>
-          <Detail label="id      " text={`#${row.id}`} color={colors.textOnSlabMuted} />
-          <Detail label="request " text={row.requestPreview} color={colors.textOnSlab} />
-          <Detail label="response" text={row.responsePreview} color={colors.textOnSlab} />
-          <Detail label="error   " text={row.error} color={colors.dangerOnSlab} />
-          {serverLines.map((line) => (
-            <Detail key={line.id} label="server  " text={line.message} color={colors.textOnSlab} />
-          ))}
-        </View>
-      ) : null}
+      <View style={styles.numbers}>
+        <Text style={[styles.status, { color: statusColor }]}>{status}</Text>
+        <Text style={[styles.time, { color: colors.textOnSlabMuted }]}>{time}</Text>
+      </View>
+      <View style={[styles.track, { backgroundColor: colors.slabRaised }]}>
+        {bar ? (
+          <View
+            style={[
+              styles.bar,
+              {
+                left: bar.left * BAR_WIDTH,
+                width: Math.max(2, bar.width * BAR_WIDTH),
+                backgroundColor: statusColor,
+              },
+            ]}
+          />
+        ) : null}
+      </View>
     </Pressable>
   );
 }
@@ -83,11 +83,21 @@ function NetworkRowView({ row, serverLines }) {
 export const NetworkRow = memo(NetworkRowView);
 
 const styles = StyleSheet.create({
-  row: { paddingVertical: space.xs, paddingHorizontal: space.xs, borderRadius: radius.image },
-  summary: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
-  mono: { fontFamily: fonts.mono, fontSize: 11, lineHeight: 15 },
-  method: { width: 34 },
-  path: { flex: 1 },
-  num: { minWidth: 40, textAlign: 'right' },
-  details: { marginTop: space.xs, gap: 2 },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.sm,
+    paddingVertical: space.sm,
+    paddingHorizontal: space.xs,
+    borderRadius: 16,
+  },
+  method: { width: 40, fontFamily: fonts.semibold, fontSize: 11 },
+  main: { flex: 1, gap: 2 },
+  path: { fontFamily: fonts.mono, fontSize: 12 },
+  phrase: { fontFamily: fonts.regular, fontSize: 12 },
+  numbers: { alignItems: 'flex-end', gap: 2, minWidth: 44 },
+  status: { fontFamily: fonts.semibold, fontSize: 12 },
+  time: { fontFamily: fonts.regular, fontSize: 11 },
+  track: { width: BAR_WIDTH, height: 6, borderRadius: 3, overflow: 'hidden' },
+  bar: { position: 'absolute', top: 0, bottom: 0, borderRadius: 3 },
 });

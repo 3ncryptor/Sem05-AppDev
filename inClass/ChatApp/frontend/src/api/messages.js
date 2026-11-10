@@ -3,13 +3,14 @@ import { request } from './client';
 
 /**
  * @param {string} conversationId
- * @param {{ cursor?: string, isPoll?: boolean }} [options]
+ * @param {{ cursor?: string, isPoll?: boolean, initiator?: string }} [options]
  * @returns {Promise<{ data: object[], nextCursor?: string, count: number }>}
  */
-export function listMessages(conversationId, { cursor, isPoll = false } = {}) {
+export function listMessages(conversationId, { cursor, isPoll = false, initiator } = {}) {
   return request('/message', {
     query: { conversation_id: conversationId, from_message_cursor: cursor },
     isPoll,
+    initiator,
   });
 }
 

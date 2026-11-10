@@ -3,7 +3,10 @@
  * memory only, so a restart always brings the app back to normal.
  * - pausePolling stops chat and room polls (the Inspector's own polls keep going)
  * - simulateOffline makes every request fail as if the network were down
- * - pollMs overrides the chat and room poll intervals
+ * - pollMs overrides the chat, room and inbox poll intervals
+ * - inboxChecks switches the background check of every chat off (e.g. on the
+ *   shared class server, where 200 phones add up)
+ * - islandWire runs a dot across the notch island for every request
  */
 import { POLL_MS } from '../constants/config';
 import { createStore } from '../store/createStore';
@@ -12,7 +15,13 @@ import { log } from '../utils/logger';
 export const DEFAULT_TOOLS = {
   pausePolling: false,
   simulateOffline: false,
-  pollMs: { conversations: POLL_MS.conversations, messages: POLL_MS.messages },
+  inboxChecks: true,
+  islandWire: false,
+  pollMs: {
+    conversations: POLL_MS.conversations,
+    messages: POLL_MS.messages,
+    inbox: POLL_MS.inbox,
+  },
 };
 
 export const toolsStore = createStore(DEFAULT_TOOLS);
@@ -24,7 +33,7 @@ export function setTools(patch) {
 }
 
 /**
- * @param {'conversations' | 'messages'} key
+ * @param {'conversations' | 'messages' | 'inbox'} key
  * @param {number} ms
  */
 export function setPollInterval(key, ms) {

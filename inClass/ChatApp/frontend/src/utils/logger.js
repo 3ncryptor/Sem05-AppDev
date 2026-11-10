@@ -4,8 +4,12 @@
  * thing (buildPlan.md 9). Never pass passwords or the Authorization header;
  * request bodies go through safeForLog first (see api/client.js).
  *
- * Usage: log.api('-> GET /user #a1f3'); log.state('session: signed in');
+ * Terminal lines are aligned columns with ANSI colour (V4):
+ *   09:05:07  API    sent a message · ok 201 · 84 ms   POST /message #ab12
+ *
+ * Usage: log.state('session: signed in'); log.nav('tab bar -> people');
  */
+import { formatConsoleLine } from '../debug/describeRequest';
 import { addLogEntry } from '../debug/logStore';
 
 const CONSOLE_BY_LEVEL = {
@@ -15,22 +19,32 @@ const CONSOLE_BY_LEVEL = {
 };
 
 /**
+ * Prints an entry to the terminal (used directly when an entry was updated in place).
+ * @param {object} entry a stored log entry
+ * @param {'info' | 'warn' | 'error'} [consoleLevel]
+ */
+export function printLog(entry, consoleLevel) {
+  CONSOLE_BY_LEVEL[consoleLevel ?? entry.level](formatConsoleLine(entry));
+}
+
+/**
  * @param {object} entry
  * @param {'info' | 'warn' | 'error'} entry.level
  * @param {'API' | 'POLL' | 'NAV' | 'STATE' | 'APP'} entry.category
- * @param {string} entry.message
+ * @param {string} entry.message the plain sentence
+ * @param {string} [entry.detail] technical detail: method, path, request id
  * @param {string} [entry.requestId]
  * @param {boolean} [entry.isPoll]
  * @param {boolean} [entry.toConsole=true] false keeps it in the Inspector only
  * @param {'info' | 'warn' | 'error'} [entry.consoleLevel] console channel when it should
  *   differ from the level. Expected failures (server down, wrong password) use 'warn':
  *   console.error opens React Native's red error screen, which is meant for code bugs.
+ * @returns {object} the stored entry
  */
 export function writeLog({ toConsole = true, consoleLevel, ...entry }) {
-  addLogEntry(entry);
-  if (!toConsole) return;
-  const tag = `[${entry.category}]`.padEnd(8);
-  CONSOLE_BY_LEVEL[consoleLevel ?? entry.level](`${tag}${entry.message}`);
+  const stored = addLogEntry(entry);
+  if (toConsole) printLog(stored, consoleLevel);
+  return stored;
 }
 
 function make(category, defaultLevel = 'info') {

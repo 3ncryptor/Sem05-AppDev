@@ -1,17 +1,19 @@
 /**
  * SegmentedPill: a pill-shaped switch between a few options (for example
- * "my laptop" / "class server" on login). The gradient thumb springs to the
+ * "my laptop" / "class server" on login). The gradient thumb glides to the
  * chosen option with the tab spring from design.md 8.
  */
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { springs } from '../../constants/motion';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { durations, EASE_IN_OUT } from '../../constants/motion';
 import { radius, type } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { haptics } from '../../utils/haptics';
 import { segmentWidth, selectedIndex } from '../../utils/segments';
 import { GradientFill } from './GradientFill';
+
+const INDICATOR_TIMING = { duration: durations.indicator, easing: EASE_IN_OUT };
 
 const HEIGHT = 44;
 const PADDING = 4;
@@ -32,10 +34,10 @@ export function SegmentedPill({ options, value, onChange, on = 'surface' }) {
   const index = selectedIndex(options, value);
 
   useEffect(() => {
-    offset.set(withSpring(index * width, springs.tab));
+    offset.set(withTiming(index * width, INDICATOR_TIMING));
   }, [index, width, offset]);
 
-  const thumbStyle = useAnimatedStyle(() => ({ transform: [{ translateX: offset.value }] }));
+  const thumbStyle = useAnimatedStyle(() => ({ transform: [{ translateX: offset.get() }] }));
   const trackColor = on === 'slab' ? colors.slabRaised : colors.surfaceRaised;
   const idleText = on === 'slab' ? colors.textOnSlabMuted : colors.textSecondary;
 

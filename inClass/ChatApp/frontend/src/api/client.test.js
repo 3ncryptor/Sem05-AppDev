@@ -112,7 +112,12 @@ describe('request', () => {
     fetch.mockResolvedValue(jsonResponse(200, []));
     await request('/conversation', { isPoll: true, connection });
     expect(console.log).not.toHaveBeenCalled();
-    expect(logStore.get().entries.length).toBeGreaterThan(0);
+    expect(logStore.get().entries).toHaveLength(0);
+    expect(logStore.get().heartbeat).toMatchObject({
+      checks: 1,
+      failures: 0,
+      byKind: { chats: 1 },
+    });
   });
 });
 
@@ -143,12 +148,58 @@ describe('request extras for the Inspector', () => {
   });
 });
 
+describe('readable request logging (V4)', () => {
+  it('keeps one line per request and fills it in when the reply arrives', async () => {
+    global.fetch.mockResolvedValue(jsonResponse(201, { id: 'm1' }));
+    await request('/message', { method: 'POST', body: { content: 'hi' }, connection });
+    const lines = logStore.get().entries.filter((entry) => entry.category === 'API');
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({ pending: false, level: 'info' });
+    expect(lines[0].message).toMatch(/^sent a message · ok 201 · \d+ ms$/);
+    expect(lines[0].detail).toMatch(/^POST \/message #/);
+    expect(console.log).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('a reply whose body fails', () => {
+  it('fails as a network error and settles the log line', async () => {
+    global.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: () => Promise.reject(new Error('connection reset')),
+    });
+    await expect(request('/user', { connection })).rejects.toMatchObject({ kind: 'network' });
+    const line = logStore.get().entries.find((entry) => entry.category === 'API');
+    expect(line).toMatchObject({ pending: false, level: 'error' });
+    expect(networkStore.get().requests[0]).toMatchObject({ state: 'error' });
+  });
+});
+
 describe('failed request logging', () => {
   it('prints failures with console.warn (no red error screen) but stores them as errors', async () => {
     global.fetch.mockRejectedValue(new Error('Network request failed'));
     await expect(request('/user', { connection })).rejects.toMatchObject({ kind: 'network' });
     expect(console.error).not.toHaveBeenCalled();
-    expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('network GET /user'));
+    expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('server unreachable'));
+    expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('GET /user #'));
     expect(logStore.get().entries.at(-1).level).toBe('error');
+  });
+});
+
+describe('request detail for the Inspector (devtools view)', () => {
+  it('records safe headers, the full url, timing and the reply', async () => {
+    global.fetch.mockResolvedValue(jsonResponse(200, { data: [{ id: 'm1' }] }));
+    await request('/message', {
+      query: { conversation_id: 'c1' },
+      connection,
+      initiator: 'inbox checker',
+    });
+    const row = networkStore.get().requests[0];
+    expect(row.url).toBe('http://10.0.0.5:3000/message?conversation_id=c1');
+    expect(row.initiator).toBe('inbox checker');
+    expect(row.requestHeaders.Authorization).toBe('Basic aarav:<hidden>');
+    expect(row.response).toEqual({ data: [{ id: 'm1' }] });
+    expect(Number.isFinite(row.ttfbMs)).toBe(true);
+    expect(JSON.stringify(row)).not.toContain('demo123');
   });
 });

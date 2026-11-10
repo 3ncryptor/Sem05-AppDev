@@ -46,6 +46,12 @@ describe('contrast (WCAG)', () => {
     { text: 'dangerOnSlab', on: SLABS, min: 4.5 },
   ];
 
+  it('lifts the dark notch off the surface (at least 1.3:1) and off the black island', () => {
+    const { slab, surface } = themes.dark;
+    expect(contrastRatio(slab, surface)).toBeGreaterThanOrEqual(1.3);
+    expect(contrastRatio(slab, '#000000')).toBeGreaterThanOrEqual(1.4);
+  });
+
   it('knows the extremes', () => {
     expect(contrastRatio('#000000', '#FFFFFF')).toBeCloseTo(21, 0);
     expect(contrastRatio('#777777', '#777777')).toBe(1);

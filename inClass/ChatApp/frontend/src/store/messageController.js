@@ -79,10 +79,7 @@ export function createMessageController({ conversationId, myId }) {
     try {
       const page = await listMessages(conversationId, { isPoll: true });
       const count = apply(mergeMessages(store.get().messages, page.data));
-      log.poll(`${tag}: ${count ? `+${count} new` : 'no change'}`, {
-        isPoll: true,
-        toConsole: count > 0,
-      });
+      if (count) log.state(`${tag}: ${count} new ${count === 1 ? 'message' : 'messages'}`);
       if (store.get().status !== 'ready') store.set({ status: 'ready', error: '' });
     } catch {
       store.set({ isLive: false });

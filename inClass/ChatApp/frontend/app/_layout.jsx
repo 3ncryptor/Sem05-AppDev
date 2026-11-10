@@ -19,10 +19,13 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { InspectorLayer } from '../src/components/inspector/InspectorLayer';
+import { NotchIsland } from '../src/components/island/NotchIsland';
 import { useStore } from '../src/hooks/useStore';
 import { useTheme } from '../src/hooks/useTheme';
 import { restoreSession, sessionStore } from '../src/store/sessionStore';
 import { restoreSettings } from '../src/store/settingsStore';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { useInboxChecker } from '../src/hooks/useInboxChecker';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,6 +37,7 @@ export default function RootLayout() {
     Inter_600SemiBold,
   });
   const status = useStore(sessionStore, (state) => state.status);
+  useInboxChecker();
   const isSignedIn = status === 'signedIn';
   const isReady = (fontsLoaded || Boolean(fontError)) && status !== 'restoring';
 
@@ -58,25 +62,31 @@ export default function RootLayout() {
         {/* every animation follows the phone's "reduce motion" setting */}
         <ReducedMotionConfig mode={ReduceMotion.System} />
         <StatusBar style={isDark ? 'light' : 'dark'} />
-        <Stack
-          screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface } }}
-        >
-          <Stack.Screen name="index" />
-          <Stack.Protected guard={!isSignedIn}>
-            <Stack.Screen name="login" options={{ animation: 'fade' }} />
-          </Stack.Protected>
-          <Stack.Protected guard={isSignedIn}>
-            <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
-            <Stack.Screen name="chat/[id]" />
-            <Stack.Screen name="new-group" options={{ presentation: 'modal' }} />
-            <Stack.Screen
-              name="image/[id]"
-              options={{ presentation: 'transparentModal', animation: 'fade' }}
-            />
-          </Stack.Protected>
-          <Stack.Screen name="playground" />
-        </Stack>
-        <InspectorLayer />
+        <KeyboardProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.surface },
+            }}
+          >
+            <Stack.Screen name="index" />
+            <Stack.Protected guard={!isSignedIn}>
+              <Stack.Screen name="login" options={{ animation: 'fade' }} />
+            </Stack.Protected>
+            <Stack.Protected guard={isSignedIn}>
+              <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+              <Stack.Screen name="chat/[id]" />
+              <Stack.Screen name="new-group" options={{ presentation: 'modal' }} />
+              <Stack.Screen
+                name="image/[id]"
+                options={{ presentation: 'transparentModal', animation: 'fade' }}
+              />
+            </Stack.Protected>
+            <Stack.Screen name="playground" />
+          </Stack>
+          <NotchIsland />
+          <InspectorLayer />
+        </KeyboardProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

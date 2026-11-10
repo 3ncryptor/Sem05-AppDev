@@ -1,11 +1,15 @@
 /**
  * PressableScale: the base of every tappable element. Shrinks slightly on
- * press with a spring (design.md 8) and can play a light haptic.
+ * press-in (120 ms ease-out, 3%: felt more than seen) and can play a light
+ * haptic. Feedback on press-in, the action on press-out.
  */
 import { Pressable } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { PRESS_SCALE, springs } from '../../constants/motion';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { durations, EASE_OUT, PRESS_SCALE } from '../../constants/motion';
 import { haptics } from '../../utils/haptics';
+
+const PRESS_TIMING = { duration: durations.press, easing: EASE_OUT };
+const PRESS_RETENTION = 16;
 
 /**
  * @param {object} props
@@ -27,7 +31,7 @@ export function PressableScale({
   children,
 }) {
   const scale = useSharedValue(1);
-  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
 
   function handlePress() {
     if (haptic) haptics.tap();
@@ -38,8 +42,9 @@ export function PressableScale({
     <Animated.View style={[style, animatedStyle]}>
       <Pressable
         onPress={handlePress}
-        onPressIn={() => scale.set(withSpring(scaleTo, springs.press))}
-        onPressOut={() => scale.set(withSpring(1, springs.press))}
+        onPressIn={() => scale.set(withTiming(scaleTo, PRESS_TIMING))}
+        onPressOut={() => scale.set(withTiming(1, PRESS_TIMING))}
+        pressRetentionOffset={PRESS_RETENTION}
         disabled={disabled}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}

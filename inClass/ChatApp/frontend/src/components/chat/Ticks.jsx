@@ -7,10 +7,13 @@ import Check from 'lucide-react-native/icons/check';
 import CheckCheck from 'lucide-react-native/icons/check-check';
 import CircleAlert from 'lucide-react-native/icons/circle-alert';
 import Clock from 'lucide-react-native/icons/clock';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { gradient } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { Icon } from '../ui/Icon';
+import { durations, softPop } from '../../constants/motion';
+
+const POP = softPop(durations.fast);
 
 const SIZE = 14;
 const LABELS = {
@@ -39,7 +42,7 @@ export function Ticks({ state }) {
         : colors.textTertiary;
 
   return (
-    <Animated.View key={state} entering={ZoomIn.springify()} accessibilityLabel={LABELS[state]}>
+    <Animated.View key={state} entering={POP} accessibilityLabel={LABELS[state]}>
       <Icon as={icon} color={color} size={SIZE} />
     </Animated.View>
   );

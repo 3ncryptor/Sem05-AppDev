@@ -7,7 +7,8 @@ import Globe from 'lucide-react-native/icons/globe';
 import RefreshCw from 'lucide-react-native/icons/refresh-cw';
 import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, { FadeInDown, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeOut } from 'react-native-reanimated';
+import { riseIn } from '../../constants/motion';
 import { resolveBaseUrl } from '../../api/baseUrl';
 import { space, type } from '../../constants/theme';
 import { useConnectionTest } from '../../hooks/useConnectionTest';
@@ -16,6 +17,8 @@ import { PillInput } from '../ui/PillInput';
 import { RingButton } from '../ui/RingButton';
 import { SegmentedPill } from '../ui/SegmentedPill';
 import { ConnectionStatus } from './ConnectionStatus';
+
+const ROW_IN = riseIn();
 
 const OPTIONS = [
   { value: 'lan', label: 'this mac' },
@@ -47,7 +50,7 @@ export function ServerPicker({ mode, onModeChange, customUrl, onCustomUrlChange,
       <Text style={[type.caption, styles.label, { color: colors.textTertiary }]}>server</Text>
       <SegmentedPill options={OPTIONS} value={mode} onChange={onModeChange} />
       {mode === 'custom' ? (
-        <Animated.View entering={FadeInDown} exiting={FadeOut} style={styles.customRow}>
+        <Animated.View entering={ROW_IN} exiting={FadeOut} style={styles.customRow}>
           <View style={styles.grow}>
             <PillInput
               value={customUrl}

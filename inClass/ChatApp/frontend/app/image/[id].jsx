@@ -23,10 +23,13 @@ import Animated, {
 import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RingButton } from '../../src/components/ui/RingButton';
-import { springs } from '../../src/constants/motion';
+import { durations, softPop, springs } from '../../src/constants/motion';
 import { space, type } from '../../src/constants/theme';
 import { useFileImage } from '../../src/hooks/useFileImage';
 import { clampScale, MIN_SCALE, nextDoubleTapScale, shouldDismiss } from '../../src/utils/zoom';
+
+/** The photo grows in as the viewer opens, so it feels lifted out of the chat. */
+const PHOTO_IN = softPop(durations.sheet);
 
 const FADE_DISTANCE = 300;
 
@@ -48,10 +51,10 @@ export default function ImageViewer() {
 
   function reset() {
     'worklet';
-    scale.set(withSpring(1, springs.sheet));
+    scale.set(withSpring(1, springs.settle));
     savedScale.set(1);
-    x.set(withSpring(0, springs.sheet));
-    y.set(withSpring(0, springs.sheet));
+    x.set(withSpring(0, springs.settle));
+    y.set(withSpring(0, springs.settle));
     savedX.set(0);
     savedY.set(0);
   }
@@ -87,7 +90,7 @@ export default function ImageViewer() {
         return;
       }
       if (shouldDismiss(event.translationY, event.velocityY)) scheduleOnRN(close);
-      else y.set(withSpring(0, springs.sheet));
+      else y.set(withSpring(0, { ...springs.snap, velocity: event.velocityY }));
     },
   });
 
@@ -98,7 +101,7 @@ export default function ImageViewer() {
       const next = nextDoubleTapScale(savedScale.get());
       if (next === MIN_SCALE) reset();
       else {
-        scale.set(withSpring(next, springs.sheet));
+        scale.set(withSpring(next, springs.settle));
         savedScale.set(next);
       }
     },
@@ -119,12 +122,14 @@ export default function ImageViewer() {
       <GestureDetector gesture={gestures}>
         <Animated.View style={[styles.stage, imageStyle]}>
           {image.uri ? (
-            <Image
-              source={{ uri: image.uri }}
-              style={styles.image}
-              contentFit="contain"
-              accessibilityLabel={caption ? `Photo: ${caption}` : 'Photo'}
-            />
+            <Animated.View entering={PHOTO_IN} style={styles.image}>
+              <Image
+                source={{ uri: image.uri }}
+                style={styles.image}
+                contentFit="contain"
+                accessibilityLabel={caption ? `Photo: ${caption}` : 'Photo'}
+              />
+            </Animated.View>
           ) : image.status === 'error' ? (
             <Text style={[type.meta, styles.text]}>This photo could not be loaded.</Text>
           ) : (

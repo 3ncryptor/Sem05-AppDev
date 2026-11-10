@@ -1,7 +1,8 @@
 /**
  * GroupCard: one group in the Chats carousel (buildPlan.md 5.2, design.md 6.7).
  * Top: a gradient wash with member faces, the group name and member chips,
- * and an action bar (members, open). Bottom: a dark footer slab.
+ * and an action bar (members, open). Bottom: a dark footer slab with the last
+ * message ("diya: see you at 5") and an unread badge once the inbox knows (V6).
  */
 import ArrowRight from 'lucide-react-native/icons/arrow-right';
 import Users from 'lucide-react-native/icons/users';
@@ -9,6 +10,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { radius, space, type } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { AvatarStack } from '../avatar/AvatarStack';
+import { Badge } from '../ui/Badge';
 import { Chip } from '../ui/Chip';
 import { GradientFill } from '../ui/GradientFill';
 import { Icon } from '../ui/Icon';
@@ -27,8 +29,18 @@ const ACTION_HEIGHT = 56;
  * @param {number} props.width card width
  * @param {() => void} props.onOpen
  * @param {() => void} props.onShowMembers
+ * @param {string} [props.preview] "name: last message"
+ * @param {number} [props.unread]
  */
-export function GroupCard({ title, names, width, onOpen, onShowMembers }) {
+export function GroupCard({
+  title,
+  names,
+  width,
+  onOpen,
+  onShowMembers,
+  preview = '',
+  unread = 0,
+}) {
   const { colors } = useTheme();
   const extra = names.length - MAX_CHIPS;
 
@@ -68,8 +80,11 @@ export function GroupCard({ title, names, width, onOpen, onShowMembers }) {
           <Text style={[type.heading, { color: colors.textOnSlab }]} numberOfLines={1}>
             {title}
           </Text>
-          <Text style={[type.meta, { color: colors.textOnSlabMuted }]}>{names.length} members</Text>
+          <Text style={[type.meta, { color: colors.textOnSlabMuted }]} numberOfLines={1}>
+            {preview || `${names.length} members`}
+          </Text>
         </View>
+        <Badge count={unread} ringColor={colors.slab} isAnimated={false} />
       </View>
     </View>
   );

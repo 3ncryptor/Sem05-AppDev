@@ -15,7 +15,8 @@ const APPEARANCES = ['auto', 'light', 'dark'];
 export const DEFAULT_SETTINGS = {
   avatarStyle: DEFAULT_AVATAR_STYLE,
   appearance: 'auto',
-  showOrb: true,
+  // The island's long press opens the Inspector now (V7), so the orb starts hidden.
+  showOrb: false,
   shakeToOpen: true,
 };
 

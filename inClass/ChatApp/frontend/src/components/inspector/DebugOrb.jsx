@@ -7,9 +7,16 @@
 import Activity from 'lucide-react-native/icons/activity';
 import { Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { springs } from '../../constants/motion';
+import { EASE_IN_OUT, springs } from '../../constants/motion';
 import { space } from '../../constants/theme';
 import { unseenErrorCount } from '../../debug/filterLogs';
 import { inspectorStore, openInspector } from '../../debug/inspectorStore';
@@ -26,6 +33,21 @@ const SIZE = 48;
 const MARGIN = space.sm;
 /** Start a little above the middle so it clears the tab bar and the composer. */
 const START_Y_RATIO = 0.42;
+/** The orb glides up into the header notch, then the notch grows into the Inspector. */
+const FLY = { duration: 300, easing: EASE_IN_OUT };
+const FLY_SCALE = 0.35;
+
+function openFromOrb() {
+  openInspector('orb');
+}
+
+/** Where the user left the orb; it unmounts while the Inspector is open and comes back here. */
+const lastSpot = { x: null, y: null };
+
+function rememberSpot(x, y) {
+  lastSpot.x = x;
+  lastSpot.y = y;
+}
 
 export function DebugOrb() {
   const { colors } = useTheme();
@@ -36,10 +58,14 @@ export function DebugOrb() {
 
   const minY = insets.top + space.xs;
   const maxY = height - insets.bottom - SIZE - space.xs;
-  const x = useSharedValue(width - SIZE - MARGIN);
-  const y = useSharedValue(height * START_Y_RATIO);
-  const savedX = useSharedValue(width - SIZE - MARGIN);
-  const savedY = useSharedValue(height * START_Y_RATIO);
+  const startX = lastSpot.x ?? width - SIZE - MARGIN;
+  const startY = lastSpot.y ?? height * START_Y_RATIO;
+  const x = useSharedValue(startX);
+  const y = useSharedValue(startY);
+  const savedX = useSharedValue(startX);
+  const savedY = useSharedValue(startY);
+  const flight = useSharedValue(0);
+  const reduceMotion = useReducedMotion();
 
   const drag = usePanGesture({
     maxPointers: 1,
@@ -51,19 +77,36 @@ export function DebugOrb() {
     onDeactivate: () => {
       'worklet';
       const snapped = snapOrbX(x.get(), width, SIZE, MARGIN);
-      x.set(withSpring(snapped, springs.sheet));
+      x.set(withSpring(snapped, springs.snap));
       savedX.set(snapped);
       savedY.set(y.get());
+      scheduleOnRN(rememberSpot, snapped, y.get());
     },
   });
 
   const position = useAnimatedStyle(() => ({
-    transform: [{ translateX: x.get() }, { translateY: y.get() }],
+    opacity: 1 - flight.get(),
+    transform: [
+      { translateX: x.get() },
+      { translateY: y.get() },
+      { scale: 1 - (1 - FLY_SCALE) * flight.get() },
+    ],
   }));
 
   function open() {
     haptics.tap();
-    openInspector('orb');
+    if (reduceMotion) {
+      openFromOrb();
+      return;
+    }
+    // fly to the top centre (the header notch), shrink and fade, then the notch grows
+    x.set(withTiming(width / 2 - SIZE / 2, FLY));
+    y.set(withTiming(insets.top, FLY));
+    flight.set(
+      withTiming(1, FLY, (done) => {
+        if (done) scheduleOnRN(openFromOrb);
+      }),
+    );
   }
 
   return (

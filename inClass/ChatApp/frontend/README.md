@@ -52,29 +52,75 @@ unavailable here" on that server. That's expected: only the local backend shares
 - **Logging:** everything goes through `src/utils/logger.js` to the Metro terminal and
   to the in-app Inspector. Passwords and the `Authorization` header are never logged.
 
+## The notch island
+
+A black pill around the front camera, on every screen. It shows what is live: new messages
+(with a quick reply), reconnecting and back online, a photo uploading, messages that failed
+(tap to retry), "copied", and short confirmations (signed in, photo sent, group created).
+
+| On | Tap | Hold | Sideways | Up | Down |
+|---|---|---|---|---|---|
+| resting pill | status glance | Inspector | - | - | status glance |
+| message | open chat | card with quick reply | mark read | dismiss | card |
+| failed send | retry | card | dismiss | dismiss | card |
+| photo upload | open chat | - | - | - | - |
+| reconnecting | Inspector > network | - | - | dismiss | - |
+| confirmation | skip | - | - | - | - |
+| a small circle | bring it forward | - | switch to the next | - | - |
+
+Up to three things show at once (the pill plus two circles). Motion is calm and liquid: the
+pill inhales before it grows, circles pull away through a liquid neck, a ring leaves the pill
+once when a message arrives, and at rest it stays still apart from one quiet breath when you
+come back to the app and nothing is new.
+
+New messages come from the **inbox checker**: it asks for each chat's newest page in turn,
+one chat at a time, so one full round takes 10 s (Inspector > tools sets the cycle or turns it
+off for the class server). Unread counts are kept on the phone, because the backend has no
+read state.
+
 ## The Inspector
 
-Open it from the floating orb, by shaking the phone, or from Profile > inspector.
+Open it from Profile > inspector, by shaking the phone, by holding the island when it is at
+rest, or with the debug orb (Profile > show debug orb; it flies into the header first). The
+header notch grows down into a full-screen panel; swipe up on its top strip, press back or
+tap (x) to fold it away. Every line is written twice: a plain sentence, then the exact
+technical detail.
 
 | Tab | Shows |
 |---|---|
-| logs | App and server lines merged by time. Tap a `#id` to see one request from both sides |
-| network | Every request: status, time, size, the redacted request and response bodies, and the server's lines |
-| flow | Live Wire: a dot per request from phone to server to db and back. **explain** steps through one real request; **slow-mo** runs at quarter speed |
-| tools | Pause polling, poll intervals, simulate offline, versions, copy a debug report |
+| overview | A live app -> server -> database picture, requests this minute, failures, typical time, one sentence about how things are, and the last problem |
+| flow | The architecture (frontend -> network -> NestJS backend -> MongoDB). **live**: every request travels the real path as an animated packet and the boxes light up; tap a box to learn what it does. **replay**: one request step by step with captions, play / pause / step / speed |
+| network | Every request like browser devtools: filters, search, a waterfall. Tap one for summary, headers (password hidden), payload, response (JSON tree), timing, server lines; replay in flow, copy as cURL, copy reply, resend (GET only) |
+| logs | A diary grouped by time, a pulse line for background checks, search, filters behind one button; tap a line to follow its request or open it in network |
+| tools | Cards: polling (pause, intervals, inbox checks), try a problem (simulate offline), island, about and the debug report |
+
+On the class server the backend and database parts say "from the code": that server does not
+share its logs, so those steps come from this repository's backend code.
 
 ## Phone checklist (Docker, then the class server, light and dark)
 
 - [ ] Login: wrong password shakes and shows the server's message; the right one opens Chats
 - [ ] Restarting the app keeps you logged in
 - [ ] Chats: groups carousel and DMs load; pull to refresh works
-- [ ] Stop Docker: "reconnecting" banner. Start it: "back online"
+- [ ] Stop Docker: the island shows "reconnecting". Start it: "back online" with a check
 - [ ] Chat: send text; the message appears at once, then ticks; scroll up loads older messages
 - [ ] Long press: copy and details
 - [ ] Photo: pick, upload, appears for the other user; viewer pinch, double tap, swipe down
 - [ ] People: search, open a DM; New group: pick 2+, create, lands in the group
 - [ ] Profile: change avatar style (every face changes), appearance, log out
-- [ ] Inspector: orb, shake, all four tabs; class server shows "server logs unavailable here"
-- [ ] Inspector tools: simulate offline shows the banner; pause polling stops the dots
+- [ ] Inspector: the header grows into the panel and covers the whole screen (no message box
+      showing at the bottom); swipe up / back closes it; all five tabs; class server shows
+      "server logs unavailable here" and "from the code"
+- [ ] Network: tap a request, check every detail view, replay it in flow, copy as cURL
+- [ ] Flow: live packets travel to the right collection; replay steps through one request
+- [ ] Inspector tools: simulate offline shows "reconnecting" in the island; pause polling stops the dots
+- [ ] Avatars: Playground > avatar lab, "after" rows are complete and sharp (Android)
+- [ ] Motion: presses barely shrink, nothing bounces; dark mode notch stands off the surface
+- [ ] Keyboard (Android): the message box and last message stay above the keyboard; login fields too
+- [ ] Inbox: a message from another phone shows in the island within about 10 s, the Chats row
+      shows the preview, time and unread badge, and the badge clears after opening the chat
+- [ ] Island: quick reply sends; sideways on a message marks it read; three live things at once;
+      swipe across the circles to switch; tap the resting pill for the glance
+- [ ] Sheets (members, log out, Inspector): drag the handle down to close, or flick it
 - [ ] iOS Settings > Accessibility > Reduce Motion on: no travelling or looping animations
 - [ ] VoiceOver or TalkBack reads buttons and message bubbles

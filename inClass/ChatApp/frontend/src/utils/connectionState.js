@@ -1,5 +1,5 @@
 /**
- * The connection banner's states (buildPlan.md 5.2):
+ * The connection states shown in the island (buildPlan.md 5.2, V7):
  *   online --failure--> reconnecting --success--> restored --(timer)--> online
  * "restored" shows "back online" briefly; the hook clears it with a timer.
  */

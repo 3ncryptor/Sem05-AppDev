@@ -5,7 +5,7 @@
 import Copy from 'lucide-react-native/icons/copy';
 import * as Clipboard from 'expo-clipboard';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { space, type } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { haptics } from '../../utils/haptics';
@@ -14,6 +14,9 @@ import { Avatar } from '../avatar/Avatar';
 import { Icon } from '../ui/Icon';
 import { PressableScale } from '../ui/PressableScale';
 import { Slab } from '../ui/Slab';
+import { softPop } from '../../constants/motion';
+
+const POP = softPop();
 
 const SHORT_ID = 6;
 
@@ -31,7 +34,7 @@ export function ProfileHeader({ name, userId }) {
 
   return (
     <Slab variant="notch" style={styles.slab}>
-      <Animated.View entering={ZoomIn.springify()}>
+      <Animated.View entering={POP}>
         <Avatar name={name} size={96} ringColor={colors.ringOnSlab} />
       </Animated.View>
       <Text style={[type.title, { color: colors.textOnSlab }]}>{name}</Text>

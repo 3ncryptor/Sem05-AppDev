@@ -37,3 +37,13 @@ describe('networkStore', () => {
     });
   });
 });
+
+describe('networkStore keeps full bodies only for the newest rows', () => {
+  const { pruneBodies } = jest.requireActual('./networkStore');
+  it('drops older responses and keeps the newest', () => {
+    const rows = [1, 2, 3, 4].map((n) => ({ id: String(n), response: { n } }));
+    const pruned = pruneBodies(rows, 2);
+    expect(pruned.map((row) => row.response)).toEqual([undefined, undefined, { n: 3 }, { n: 4 }]);
+    expect(rows[0].response).toEqual({ n: 1 });
+  });
+});

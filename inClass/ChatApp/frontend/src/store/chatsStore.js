@@ -52,10 +52,8 @@ export async function loadConversations({ isPoll = false } = {}) {
     if (changed) chatsStore.set({ conversations, signature });
     chatsStore.set({ status: 'ready', error: '' });
     moveConnection('success');
-    log.poll(`conversations: ${conversations.length}${changed ? '' : ' (no change)'}`, {
-      isPoll,
-      toConsole: !isPoll || changed,
-    });
+    // Unchanged background checks are counted by the heartbeat, not logged (V4).
+    if (changed) log.state(`chats changed: ${conversations.length} in total`, { isPoll });
 
     const ids = conversations.flatMap((item) => item.participants_ids);
     if (hasUnknownUsers(ids)) loadUsers({ isPoll });

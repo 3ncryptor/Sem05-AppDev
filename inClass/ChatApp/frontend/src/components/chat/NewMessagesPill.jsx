@@ -4,18 +4,22 @@
  */
 import ArrowDown from 'lucide-react-native/icons/arrow-down';
 import { StyleSheet, Text } from 'react-native';
-import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
+import { riseIn, softOut } from '../../constants/motion';
 import { radius, shadow, space, type } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { Icon } from '../ui/Icon';
 import { PressableScale } from '../ui/PressableScale';
+
+const PILL_IN = riseIn();
+const PILL_OUT = softOut();
 
 /** @param {{ count: number, onPress: () => void }} props */
 export function NewMessagesPill({ count, onPress }) {
   const { colors } = useTheme();
   if (count <= 0) return null;
   return (
-    <Animated.View entering={FadeInDown.springify()} exiting={FadeOutDown} style={styles.anchor}>
+    <Animated.View entering={PILL_IN} exiting={PILL_OUT} style={styles.anchor}>
       <PressableScale
         onPress={onPress}
         accessibilityLabel={`${count} new messages, jump to newest`}

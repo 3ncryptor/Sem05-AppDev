@@ -9,7 +9,7 @@ import { BlurView } from 'expo-blur';
 import * as Clipboard from 'expo-clipboard';
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { radius, shadow, space, type } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { formatDateTime } from '../../utils/format';
@@ -18,6 +18,10 @@ import { log } from '../../utils/logger';
 import { receiptRows } from '../../utils/ticks';
 import { Icon } from '../ui/Icon';
 import { PressableScale } from '../ui/PressableScale';
+import { softPop } from '../../constants/motion';
+import { islandCopied } from '../../island/islandEvents';
+
+const POP = softPop();
 
 const DETAILS_MAX_HEIGHT = 260;
 
@@ -40,6 +44,7 @@ export function MessageMenu({ message, isMine, usersById, onClose }) {
   async function copy() {
     await Clipboard.setStringAsync(message?.content ?? '');
     haptics.success();
+    islandCopied();
     log.app('message copied');
     close();
   }
@@ -54,7 +59,14 @@ export function MessageMenu({ message, isMine, usersById, onClose }) {
   );
 
   return (
-    <Modal visible={Boolean(message)} transparent animationType="fade" onRequestClose={close}>
+    <Modal
+      visible={Boolean(message)}
+      transparent
+      animationType="fade"
+      onRequestClose={close}
+      statusBarTranslucent
+      navigationBarTranslucent
+    >
       <BlurView intensity={40} tint={isDark ? 'dark' : 'light'} style={StyleSheet.absoluteFill}>
         <Pressable
           style={StyleSheet.absoluteFill}
@@ -67,7 +79,7 @@ export function MessageMenu({ message, isMine, usersById, onClose }) {
             pointerEvents="box-none"
           >
             <Animated.View
-              entering={ZoomIn.springify()}
+              entering={POP}
               style={[
                 styles.bubble,
                 isMine

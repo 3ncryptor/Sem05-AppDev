@@ -7,12 +7,15 @@
  */
 import Check from 'lucide-react-native/icons/check';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { fonts, radius, space } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { GradientFill } from './GradientFill';
 import { Icon } from './Icon';
 import { PressableScale } from './PressableScale';
+import { softPop } from '../../constants/motion';
+
+const POP = softPop();
 
 const HEIGHT = 56;
 
@@ -35,7 +38,7 @@ export function PrimaryButton({ label, onPress, status = 'idle', variant = 'ink'
     status === 'loading' ? (
       <ActivityIndicator color={textColor} accessibilityLabel="Loading" />
     ) : status === 'success' ? (
-      <Animated.View entering={ZoomIn.springify()}>
+      <Animated.View entering={POP}>
         <Icon as={Check} color={textColor} size={24} />
       </Animated.View>
     ) : (

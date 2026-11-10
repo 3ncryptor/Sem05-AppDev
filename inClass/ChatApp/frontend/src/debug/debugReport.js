@@ -7,10 +7,10 @@ import { formatLogTime } from '../utils/format';
 
 /**
  * @param {{ time: number, source: string, category: string, message: string,
- *   requestId?: string }} entry
+ *   detail?: string, requestId?: string }} entry
  */
 export function formatLogLine(entry) {
-  const id = entry.requestId ? ` #${entry.requestId}` : '';
+  const id = entry.detail ? `   ${entry.detail}` : entry.requestId ? ` #${entry.requestId}` : '';
   const source = entry.source === 'server' ? 'SRV' : 'APP';
   return `${formatLogTime(entry.time)} ${source} ${entry.category.toLowerCase()} ${entry.message}${id}`;
 }

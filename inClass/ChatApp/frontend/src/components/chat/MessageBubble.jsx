@@ -7,7 +7,6 @@
 import ImageIcon from 'lucide-react-native/icons/image';
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { FadeInUp } from 'react-native-reanimated';
 import { radius, shadow, space, type } from '../../constants/theme';
 import { useShake } from '../../hooks/useShake';
 import { useTheme } from '../../hooks/useTheme';
@@ -17,6 +16,15 @@ import { bubbleLabel, tickState } from '../../utils/ticks';
 import { Avatar } from '../avatar/Avatar';
 import { Icon } from '../ui/Icon';
 import { Ticks } from './Ticks';
+import Animated, { Keyframe } from 'react-native-reanimated';
+import { durations, EASE_OUT, riseIn } from '../../constants/motion';
+
+const BUBBLE_IN = riseIn(0, durations.messageIn);
+/** My message grows out of the composer corner (origin-aware), not out of nowhere. */
+const MINE_IN = new Keyframe({
+  0: { opacity: 0, transform: [{ translateY: 10 }, { scale: 0.94 }] },
+  100: { opacity: 1, transform: [{ translateY: 0 }, { scale: 1 }], easing: EASE_OUT },
+}).duration(durations.messageIn);
 
 const AVATAR = 28;
 const SENDING_OPACITY = 0.7;
@@ -79,7 +87,7 @@ export function MessageBubble({
 
   return (
     <Animated.View
-      entering={message.isFresh ? FadeInUp.duration(isMine ? 260 : 220) : undefined}
+      entering={message.isFresh ? (isMine ? MINE_IN : BUBBLE_IN) : undefined}
       style={[styles.row, isMine ? styles.mine : styles.theirs, isLastInRun && styles.runEnd]}
     >
       {!isMine ? (
@@ -146,7 +154,7 @@ export function MessageBubble({
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: space.md, marginTop: 4 },
   runEnd: { marginBottom: space.xs },
-  mine: { justifyContent: 'flex-end' },
+  mine: { justifyContent: 'flex-end', transformOrigin: 'right bottom' },
   theirs: { justifyContent: 'flex-start' },
   avatarSlot: { width: AVATAR, marginRight: space.xs, marginBottom: 20 },
   column: { maxWidth: '78%', gap: 4 },

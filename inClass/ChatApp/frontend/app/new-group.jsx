@@ -8,7 +8,8 @@ import Pencil from 'lucide-react-native/icons/pencil';
 import X from 'lucide-react-native/icons/x';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { friendlyMessage } from '../src/api/ApiError';
 import { AvatarStack } from '../src/components/avatar/AvatarStack';
 import { FaceGrid } from '../src/components/people/FaceGrid';
@@ -22,6 +23,7 @@ import { space, type } from '../src/constants/theme';
 import { useStore } from '../src/hooks/useStore';
 import { useTheme } from '../src/hooks/useTheme';
 import { createGroup } from '../src/store/chatsStore';
+import { islandGroupCreated } from '../src/island/islandEvents';
 import { directoryStore, loadUsers } from '../src/store/directoryStore';
 import { sessionStore } from '../src/store/sessionStore';
 import { haptics } from '../src/utils/haptics';
@@ -57,6 +59,7 @@ export default function NewGroup() {
       setStatus('success');
       haptics.success();
       await new Promise((resolve) => setTimeout(resolve, LOGIN_SUCCESS_HOLD_MS));
+      islandGroupCreated(name.trim());
       log.nav(`new-group -> chat/${id}`);
       router.replace(`/chat/${id}`);
     } catch (failure) {
@@ -68,7 +71,7 @@ export default function NewGroup() {
   return (
     <KeyboardAvoidingView
       style={[styles.screen, { backgroundColor: colors.surface }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
     >
       <Slab variant="notch">
         <View style={styles.row}>

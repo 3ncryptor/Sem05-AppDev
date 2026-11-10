@@ -8,7 +8,7 @@ import MessageCircle from 'lucide-react-native/icons/message-circle';
 import WifiOff from 'lucide-react-native/icons/wifi-off';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AttachButton } from '../../src/components/chat/AttachButton';
 import { ChatHeader } from '../../src/components/chat/ChatHeader';
@@ -29,6 +29,11 @@ import { sessionStore } from '../../src/store/sessionStore';
 import { conversationTitle, memberNames } from '../../src/utils/conversationTitle';
 import { formatClock } from '../../src/utils/format';
 import { log } from '../../src/utils/logger';
+import { KeyboardSpacer } from '../../src/components/ui/KeyboardSpacer';
+import { setOpenChat, syncOpenChat } from '../../src/inbox/inboxStore';
+import { islandFailed, islandPhotoDone, islandPhotoStarted } from '../../src/island/islandEvents';
+import { dismissActivity } from '../../src/island/islandStore';
+import { isLocal } from '../../src/hooks/messageList';
 
 function showPhotoError(message) {
   Alert.alert('Photo not sent', message);
@@ -50,6 +55,34 @@ export default function ChatRoom() {
   const [isMembersOpen, setIsMembersOpen] = useState(false);
   const [sentCount, setSentCount] = useState(0);
 
+  // The inbox skips this chat while it is open, and counts it as read (V5).
+  useEffect(() => {
+    setOpenChat(conversationId);
+    // the island's "new message" for this chat has been answered by opening it
+    dismissActivity(`msg:${conversationId}`);
+    dismissActivity(`new:${conversationId}`);
+    return () => setOpenChat(null);
+  }, [conversationId]);
+
+  // Keep the Chats row (last message) in step with what this screen sees.
+  useEffect(() => {
+    const fromServer = chat.messages.filter((message) => !isLocal(message));
+    if (fromServer.length) syncOpenChat(conversationId, fromServer, myId);
+  }, [chat.messages, conversationId, myId]);
+
+  // Messages that failed to send show in the island, tap to retry them all (V7).
+  const failedIds = chat.messages
+    .filter((message) => message.localState === 'failed')
+    .map((message) => message.id)
+    .join(',');
+  useEffect(() => {
+    const ids = failedIds ? failedIds.split(',') : [];
+    islandFailed(conversationId, ids.length, () => ids.forEach((id) => chat.retry(id)));
+    // chat.retry is stable (the controller is created once)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [failedIds, conversationId]);
+  useEffect(() => () => islandFailed(conversationId, 0), [conversationId]);
+
   // Opened from a link before the chat list loaded: fetch what the header needs.
   useEffect(() => {
     if (!conversation) loadConversations();
@@ -68,7 +101,9 @@ export default function ChatRoom() {
 
   async function sendPhoto(photo) {
     setSentCount((count) => count + 1);
+    islandPhotoStarted(conversationId);
     const result = await chat.sendImage(photo);
+    islandPhotoDone(result.ok);
     if (result.error) showPhotoError(result.error);
   }
 
@@ -126,10 +161,7 @@ export default function ChatRoom() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.screen, { backgroundColor: colors.surface }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={[styles.screen, { backgroundColor: colors.surface }]}>
       <ChatHeader
         title={title}
         isGroup={isGroup}
@@ -138,12 +170,13 @@ export default function ChatRoom() {
         onShowMembers={() => setIsMembersOpen(true)}
       />
       <View style={styles.body}>{renderBody()}</View>
-      <View style={{ paddingBottom: insets.bottom + space.sm, paddingTop: space.xs }}>
+      <View style={styles.composer}>
         <Composer
           onSend={send}
           leading={<AttachButton onPick={sendPhoto} onError={showPhotoError} />}
         />
       </View>
+      <KeyboardSpacer restingHeight={insets.bottom} />
       <MessageMenu
         message={menuMessage}
         isMine={menuMessage?.senderId === myId}
@@ -157,11 +190,12 @@ export default function ChatRoom() {
         names={names}
         myName={myName}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   body: { flex: 1 },
+  composer: { paddingTop: space.xs, paddingBottom: space.sm },
 });

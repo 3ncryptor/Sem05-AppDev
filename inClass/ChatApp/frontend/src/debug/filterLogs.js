@@ -43,7 +43,7 @@ function matches(entry, filters) {
     return false;
   const search = filters.search.trim().toLowerCase();
   if (!search) return true;
-  return [entry.message, entry.category, entry.requestId ?? '']
+  return [entry.message, entry.category, entry.requestId ?? '', entry.detail ?? '']
     .join(' ')
     .toLowerCase()
     .includes(search);

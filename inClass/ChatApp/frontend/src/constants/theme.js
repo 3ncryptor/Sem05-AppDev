@@ -26,29 +26,36 @@ const light = {
   success: '#58B566',
   danger: '#A8443A',
   dangerOnSlab: '#EE9489',
+  slabEdge: 'rgba(0,0,0,0)',
   shadow: '#1F1F1F',
   scrim: 'rgba(10,13,12,0.40)',
 };
 
-/** Dark theme: headers go darker than the surface; outgoing bubbles turn light. */
+/**
+ * Dark theme: the surface sits near black and the slab is lifted above it
+ * (an elevated dark surface, like iOS), with a hairline edge, so the notch
+ * reads as its own layer and the black island stands out on it (V2).
+ * Outgoing bubbles turn light.
+ */
 const dark = {
-  surface: '#141414',
-  surfaceRaised: '#1E1E1F',
-  card: '#262627',
-  slab: '#0B0B0B',
-  slabRaised: '#2C2B2C',
+  surface: '#0E0E0F',
+  surfaceRaised: '#18181A',
+  card: '#212123',
+  slab: '#2A292C',
+  slabRaised: '#3B3A3E',
   ink: '#F2F4F3',
   onInk: '#0A0D0C',
   textPrimary: '#F3F5F4',
   textSecondary: '#A3A8A6',
   textTertiary: '#858B89',
   textOnSlab: '#FFFFFF',
-  textOnSlabMuted: '#9C9A9B',
+  textOnSlabMuted: '#A9A7A8',
   ringOnSlab: 'rgba(255,255,255,0.08)',
   ringOnSurface: 'rgba(255,255,255,0.06)',
   success: '#5FC46F',
   danger: '#E07A6F',
-  dangerOnSlab: '#E07A6F',
+  dangerOnSlab: '#EE9489',
+  slabEdge: 'rgba(255,255,255,0.08)',
   shadow: '#000000',
   scrim: 'rgba(0,0,0,0.55)',
 };

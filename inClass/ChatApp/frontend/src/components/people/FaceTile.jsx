@@ -9,7 +9,7 @@ import Check from 'lucide-react-native/icons/check';
 import MessageCircle from 'lucide-react-native/icons/message-circle';
 import { BlurView } from 'expo-blur';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { radius, space, type } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { haptics } from '../../utils/haptics';
@@ -18,6 +18,9 @@ import { avatarTint } from '../avatar/avatarSvg';
 import { GradientFill } from '../ui/GradientFill';
 import { Icon } from '../ui/Icon';
 import { PressableScale } from '../ui/PressableScale';
+import { softPop } from '../../constants/motion';
+
+const POP = softPop();
 
 const RING = 36;
 const SELECTED_RING = 3;
@@ -54,7 +57,7 @@ export function FaceTile({
     <ActivityIndicator color={colors.textPrimary} />
   ) : isSelect ? (
     isSelected ? (
-      <Animated.View entering={ZoomIn.springify()}>
+      <Animated.View entering={POP}>
         <GradientFill style={styles.ring}>
           <Icon as={Check} color="#FFFFFF" size={18} />
         </GradientFill>

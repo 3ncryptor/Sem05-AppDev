@@ -3,8 +3,6 @@
  * after another on first render.
  */
 import { FlatList, StyleSheet, View, useWindowDimensions } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import { STAGGER_MS } from '../../constants/motion';
 import { space } from '../../constants/theme';
 import { FaceTile } from './FaceTile';
 
@@ -50,8 +48,8 @@ export function FaceGrid({
       keyboardShouldPersistTaps="handled"
       refreshControl={refreshControl}
       contentContainerStyle={[styles.content, { paddingBottom: bottomPadding }]}
-      renderItem={({ item, index }) => (
-        <Animated.View entering={FadeInDown.delay(Math.min(index, 10) * STAGGER_MS)}>
+      renderItem={({ item }) => (
+        <View>
           <FaceTile
             name={item.name}
             size={size}
@@ -61,7 +59,7 @@ export function FaceGrid({
             isBusy={busyId === item.id}
             onPress={() => onPress(item)}
           />
-        </Animated.View>
+        </View>
       )}
       ItemSeparatorComponent={() => <View style={{ height: GAP }} />}
     />

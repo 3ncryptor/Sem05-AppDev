@@ -1,12 +1,12 @@
 /**
  * LogFilters: source, level and category chips, the hide-polls / hide-bot
- * toggles, and the search box for the Logs tab. Stateless: the panel owns
+ * toggles for the Logs tab (search lives in the panel's toolbar). Folded behind
+ * the toolbar's filter button. Stateless: the panel owns
  * the filters and passes changes back as new objects.
  */
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { fonts, radius, space } from '../../constants/theme';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { space } from '../../constants/theme';
 import { LOG_LEVELS, toggleValue } from '../../debug/filterLogs';
-import { useTheme } from '../../hooks/useTheme';
 import { InspectorChip } from './InspectorChip';
 
 /**
@@ -16,7 +16,6 @@ import { InspectorChip } from './InspectorChip';
  * @param {string[]} props.categories categories present in the logs
  */
 export function LogFilters({ filters, onChange, categories }) {
-  const { colors } = useTheme();
   const toggle = (key, value) => onChange({ ...filters, [key]: toggleValue(filters[key], value) });
 
   return (
@@ -69,17 +68,6 @@ export function LogFilters({ filters, onChange, categories }) {
           />
         ))}
       </ScrollView>
-      <TextInput
-        value={filters.search}
-        onChangeText={(search) => onChange({ ...filters, search })}
-        placeholder="search, or tap a #request id"
-        placeholderTextColor={colors.textOnSlabMuted}
-        autoCapitalize="none"
-        autoCorrect={false}
-        clearButtonMode="while-editing"
-        accessibilityLabel="Search logs"
-        style={[styles.search, { backgroundColor: colors.slabRaised, color: colors.textOnSlab }]}
-      />
     </View>
   );
 }
@@ -88,11 +76,4 @@ const styles = StyleSheet.create({
   wrap: { gap: space.xs },
   row: { gap: space.xs, alignItems: 'center' },
   gap: { width: space.xs },
-  search: {
-    height: 40,
-    borderRadius: radius.pill,
-    paddingHorizontal: space.md,
-    fontFamily: fonts.mono,
-    fontSize: 13,
-  },
 });

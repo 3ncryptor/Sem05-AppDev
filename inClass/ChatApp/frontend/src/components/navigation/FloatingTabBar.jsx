@@ -1,7 +1,7 @@
 /**
  * FloatingTabBar: the dark pill tab bar (design.md 6.6). Slots: chats,
  * people, new (an action: opens New group), profile. The gradient disc
- * springs to the active tab.
+ * glides to the active tab (250 ms ease-in-out, no overshoot).
  */
 import MessageCircle from 'lucide-react-native/icons/message-circle';
 import Plus from 'lucide-react-native/icons/plus';
@@ -10,8 +10,8 @@ import Users from 'lucide-react-native/icons/users';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { springs } from '../../constants/motion';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { durations, EASE_IN_OUT } from '../../constants/motion';
 import { space } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { log } from '../../utils/logger';
@@ -19,6 +19,8 @@ import { FloatingBar } from '../ui/FloatingBar';
 import { GradientFill } from '../ui/GradientFill';
 import { Icon } from '../ui/Icon';
 import { PressableScale } from '../ui/PressableScale';
+
+const INDICATOR_TIMING = { duration: durations.indicator, easing: EASE_IN_OUT };
 
 const ITEM = 56;
 const GAP = space.xs;
@@ -45,10 +47,10 @@ export function FloatingTabBar({ state, navigateToTab }) {
   const offset = useSharedValue(activeSlot * (ITEM + GAP));
 
   useEffect(() => {
-    offset.set(withSpring(activeSlot * (ITEM + GAP), springs.tab));
+    offset.set(withTiming(activeSlot * (ITEM + GAP), INDICATOR_TIMING));
   }, [activeSlot, offset]);
 
-  const discStyle = useAnimatedStyle(() => ({ transform: [{ translateX: offset.value }] }));
+  const discStyle = useAnimatedStyle(() => ({ transform: [{ translateX: offset.get() }] }));
 
   function press(slot) {
     if (slot.action) {

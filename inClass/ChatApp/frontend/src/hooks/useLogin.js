@@ -7,18 +7,14 @@
 import { useState } from 'react';
 import { lanBaseUrl } from '../api/baseUrl';
 import { getProfile } from '../api/users';
-import { LOGIN_SUCCESS_HOLD_MS } from '../constants/config';
 import { completeSignIn, sessionStore } from '../store/sessionStore';
 import { haptics } from '../utils/haptics';
 import { log } from '../utils/logger';
 import { classifyLoginError, hasErrors, validateLogin } from '../utils/loginForm';
 import { normalizeServerUrl } from '../utils/serverUrl';
+import { islandSignedIn } from '../island/islandEvents';
 
 const NO_ERRORS = { name: '', password: '', server: '', form: '' };
-
-function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 export function useLogin() {
   const saved = sessionStore.get();
@@ -57,10 +53,10 @@ export function useLogin() {
     log.app(`login: trying ${name} @ ${baseUrl}`);
     try {
       const user = await getProfile({ connection: { baseUrl, name, password } });
-      setStatus('success');
-      haptics.success();
-      await wait(LOGIN_SUCCESS_HOLD_MS);
+      // One confirmation, not two: the island says "hi <name>" across the switch to Chats (W6).
       await completeSignIn({ serverMode, customUrl, baseUrl, name, password, user });
+      haptics.success();
+      islandSignedIn(name);
     } catch (error) {
       const { field, message } = classifyLoginError(error, baseUrl);
       setStatus('idle');
